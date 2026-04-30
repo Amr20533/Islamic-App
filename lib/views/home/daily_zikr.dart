@@ -55,14 +55,20 @@ class DailyZikr extends StatelessWidget {
                           boxShadow: context.softShadow, // Added your shadow here too!
                         ),
                         child: Center(
-                          child: Text(
-                            FormatHelper.replaceWithArabicNumbers(
-                                "${dailyDhikrController.count.value} / ${dailyDhikrController.maxCount}"
-                            ),
+                          child: Text("${dailyDhikrController.count.value} / ${dailyDhikrController.maxCount}",
                             style: AppTextStyles.textTheme.displaySmall?.copyWith(height: 1),
                             textAlign: TextAlign.center,
                           ),
                         ),
+                        // child: Center(
+                        //   child: Text(
+                        //     FormatHelper.replaceWithArabicNumbers(
+                        //         "${dailyDhikrController.count.value} / ${dailyDhikrController.maxCount}"
+                        //     ),
+                        //     style: AppTextStyles.textTheme.displaySmall?.copyWith(height: 1),
+                        //     textAlign: TextAlign.center,
+                        //   ),
+                        // ),
                       ),
                     ),
                     ),

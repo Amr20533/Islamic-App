@@ -14,7 +14,8 @@ class MainController extends GetxController {
   // 2. Define the pages here so the View can access them
   final List<Widget> pages = [
     HomeView(),
-    AdanView(),
+    const QuranView(),
+    // AdanView(),
     ZikrView(),
     const QuranView(),
     const Center(child: SizedBox.shrink(),),

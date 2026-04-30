@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:islamic_app/core/controllers/audio_controller.dart';
 import 'package:islamic_app/core/controllers/azkar_controller.dart';
 import 'package:islamic_app/core/controllers/daily_dhikr_controller.dart';
+import 'package:islamic_app/core/controllers/quran/surah_selection_controller.dart';
 import 'package:islamic_app/core/controllers/quran_controller.dart';
 import 'package:islamic_app/core/controllers/ramadan_controller.dart';
 import 'package:islamic_app/services/notification_service.dart';
@@ -38,6 +39,9 @@ void setupLocator() {
 
   locator.registerLazySingleton<DailyDhikrController>(
         () => DailyDhikrController(),
+  );
+  locator.registerLazySingleton<SurahSelectorController>(
+        () => SurahSelectorController(),
   );
 
   // locator.registerLazySingleton<PrayerController>(

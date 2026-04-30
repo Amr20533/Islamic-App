@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:islamic_app/services/extensions/theme_extension.dart';
 import 'package:islamic_app/static_files/app_colors.dart';
 import 'package:islamic_app/static_files/app_text_styles.dart';
+import 'package:islamic_app/widgets/default/app_primary_button.dart';
 
 class DailyQuranPaper extends StatelessWidget {
   const DailyQuranPaper({super.key});
@@ -32,6 +33,14 @@ class DailyQuranPaper extends StatelessWidget {
                 "سورة البقرة - صفحة  12",
                 style: AppTextStyles.textTheme.labelSmall!.copyWith(fontSize: 14),
               ),
+              const Spacer(flex: 1,),
+              AppPrimaryButton(
+                width: 116,
+                onPressed: () {
+
+                },label: 'تم', ),
+              const SizedBox(height: 37,),
+
             ],
           ),
         ),

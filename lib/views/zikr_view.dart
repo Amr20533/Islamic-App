@@ -13,19 +13,22 @@ class ZikrView extends StatelessWidget {
   Widget build(BuildContext context) {
     final AzkarController controller = locator<AzkarController>();
 
-    return ListView.builder(
-      itemCount: AzkarCategory.azkar.length,
-      itemBuilder: (context, index) {
-        final cat = AzkarCategory.azkar[index];
-        return ListTile(
-          title: Text(cat.title, textAlign: TextAlign.right),
-          trailing: Icon(Icons.arrow_forward_ios, size: 14),
-          onTap: () {
-            controller.loadZikrDetails(cat.id);
-            Get.to(() => AzkarDetailScreen(title: cat.title));
-          },
-        );
-      },
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: ListView.builder(
+        itemCount: AzkarCategory.azkar.length,
+        itemBuilder: (context, index) {
+          final cat = AzkarCategory.azkar[index];
+          return ListTile(
+            title: Text(cat.title, textAlign: TextAlign.right),
+            trailing: Icon(Icons.arrow_forward_ios, size: 14),
+            onTap: () {
+              controller.loadZikrDetails(cat.id);
+              Get.to(() => AzkarDetailScreen(title: cat.title));
+            },
+          );
+        },
+      ),
     );
   }
 }

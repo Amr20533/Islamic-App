@@ -4,6 +4,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:islamic_app/static_files/app_colors.dart';
+import 'package:islamic_app/static_files/app_text_styles.dart';
+import 'package:islamic_app/widgets/default/app_primary_button.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -77,6 +80,7 @@ class AdhanController extends GetxController {
       debugPrint("Error playing adhan audio: $e");
     }
   }
+
   // إيقاف الأذان وإغلاق الواجهة
   void stopAdhan() {
     _audioPlayer.stop();
@@ -136,45 +140,41 @@ class AdhanController extends GetxController {
   void _showAdhanOverlay(String prayerName) {
     Get.dialog(
       Scaffold(
-        backgroundColor: Colors.black.withOpacity(0.8),
+        // backgroundColor: Colors.black.withOpacity(0.8),
         body: Container(
           width: double.infinity,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF1B4332), Color(0xFF081C15)],
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+              colors: [
+                Color(0xFF8B6B4F),
+                Color(0xFF3E2F25),
+              ],
+              // colors: [Color(0xFF1B4332), Color(0xFF081C15)],
             ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.mosque, size: 100, color: Color(0xFFD4AF37)),
+              const Icon(Icons.mosque, size: 100, color: AppColors.whiteColor),
               const SizedBox(height: 30),
               Text(
                 "حان الآن موعد أذان $prayerName",
-                style: const TextStyle(
-                  fontSize: 28,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.textTheme.bodyLarge!.copyWith(fontSize: 28,
+                  color: AppColors.creamOverlay,),
               ),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 "حي على الصلاة.. حي على الفلاح",
-                style: TextStyle(fontSize: 18, color: Colors.white70),
+                style: AppTextStyles.textTheme.titleSmall!.copyWith(fontSize: 18,
+                  color: AppColors.whiteColor,),
               ),
+
               const SizedBox(height: 60),
-              ElevatedButton.icon(
-                onPressed: stopAdhan,
-                icon: const Icon(Icons.stop),
-                label: const Text("إيقاف الأذان"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                ),
-              ),
+              AppPrimaryButton(
+                width: 240,
+                label: "إيقاف الأذان", onPressed: stopAdhan, ),
             ],
           ),
         ),

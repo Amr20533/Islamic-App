@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _loadApp() async {
     await Future.delayed(const Duration(seconds: 3));
 
-    Get.offNamed(AppRoutes.main);
+    Get.offNamed(AppRoutes.login);
   }
 
   @override

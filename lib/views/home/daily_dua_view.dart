@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:islamic_app/services/extensions/theme_extension.dart';
 import 'package:islamic_app/static_files/app_colors.dart';
 import 'package:islamic_app/static_files/app_text_styles.dart';
+import 'package:islamic_app/widgets/default/app_primary_button.dart';
 
 class DailyDuaView extends StatelessWidget {
   const DailyDuaView({super.key});
@@ -24,14 +25,25 @@ class DailyDuaView extends StatelessWidget {
           title: Text("دعاء اليوم", style: AppTextStyles.textTheme.titleLarge,),
         ),
         body: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-            child: Text(
-              "\"اللهم أنت ربي لا إله إلا أنت خلقتني وأنا عبدك وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك علي وأبوء بذنبي فاغفر لي فإنه لا يغفر الذنوب إلا أنت.\"",
-              style: AppTextStyles.textTheme.labelSmall!.copyWith(fontSize: 28),
-              textAlign: TextAlign.center,
-              softWrap: true,
-            ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                child: Text(
+                  "\"اللهم أنت ربي لا إله إلا أنت خلقتني وأنا عبدك وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك علي وأبوء بذنبي فاغفر لي فإنه لا يغفر الذنوب إلا أنت.\"",
+                  style: AppTextStyles.textTheme.labelSmall!.copyWith(fontSize: 28),
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ),
+              const Spacer(flex: 1,),
+              AppPrimaryButton(
+                width: 116,
+                onPressed: () {
+
+              },label: 'تم', ),
+              const SizedBox(height: 37,),
+            ],
           ),
         ),
       ),

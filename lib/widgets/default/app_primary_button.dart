@@ -8,6 +8,8 @@ class AppPrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double? width;
   final double height;
+  final double fontSize;
+  final double radius;
   final Color bgColor;
   final Color foregroundColor;
 
@@ -17,6 +19,8 @@ class AppPrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.width = double.infinity,
     this.height = 40,
+    this.radius = 12.47,
+    this.fontSize = 16,
     this.bgColor = AppColors.primaryColor,
     this.foregroundColor = AppColors.secondaryColor,
   });
@@ -30,10 +34,11 @@ class AppPrimaryButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: bgColor,
-          foregroundColor: context.surfaceColor,
+          foregroundColor: foregroundColor,
+          // foregroundColor: context.surfaceColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.47),
+            borderRadius: BorderRadius.circular(radius),
           ),
           padding: EdgeInsets.zero,
         ),
@@ -41,7 +46,7 @@ class AppPrimaryButton extends StatelessWidget {
           label,
           style: AppTextStyles.textTheme.titleLarge?.copyWith(
             color: context.surfaceColor,
-            fontSize: 16,
+            fontSize: fontSize,
             height: 1.0,
           ),
           textAlign: TextAlign.center,
