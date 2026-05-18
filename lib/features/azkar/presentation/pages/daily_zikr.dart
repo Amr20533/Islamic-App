@@ -38,7 +38,10 @@ class DailyZikr extends StatelessWidget {
                   children: [
                     Text(
                       "\"استغفر الله\"",
-                      style: AppTextStyles.textTheme.displayLarge,
+                      style: AppTextStyles.textTheme.displayLarge?.copyWith(
+                        fontFamily: 'QuranFont',
+                        fontSize: 48,
+                      ),
                     ),
                     BlocBuilder<DailyDhikrCubit, DailyDhikrState>(
                       builder: (context, state) {

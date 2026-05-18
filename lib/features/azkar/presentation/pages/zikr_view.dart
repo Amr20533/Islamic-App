@@ -20,23 +20,26 @@ class ZikrView extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final list = categories.isNotEmpty ? categories : AzkarCategory.azkar;
+
           return ListView.builder(
-            itemCount: categories.isNotEmpty
-                ? categories.length
-                : AzkarCategory.azkar.length,
+            itemCount: list.length,
             itemBuilder: (context, index) {
-              final cat = categories.isNotEmpty
-                  ? categories[index]
-                  : AzkarCategory.azkar[index];
+              final cat = list[index];
               return ListTile(
                 title: Text(cat.title, textAlign: TextAlign.right),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                 onTap: () {
-                  context.read<AzkarCubit>().loadZikrDetails(cat.id);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => AzkarDetailScreen(title: cat.title),
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<AzkarCubit>(),
+                        child: AzkarDetailScreen(
+                          title: cat.title,
+                          categoryId: cat.id,
+                        ),
+                      ),
                     ),
                   );
                 },

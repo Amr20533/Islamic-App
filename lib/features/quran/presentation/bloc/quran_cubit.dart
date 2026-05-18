@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:islamic_app/features/quran/data/models/verse.dart';
+import 'package:islamic_app/features/quran/data/models/audio_reciter.dart';
 
 abstract class QuranState extends Equatable {
   const QuranState();
@@ -16,12 +17,14 @@ class QuranLoading extends QuranState {}
 
 class QuranLoaded extends QuranState {
   final Map<int, List<Verse>> pagesInCurrentSurah;
-  const QuranLoaded(this.pagesInCurrentSurah);
+  final List<AudioReciter> reciters;
+
+  const QuranLoaded(this.pagesInCurrentSurah, this.reciters);
 
   List<int> get sortedPageNumbers => pagesInCurrentSurah.keys.toList()..sort();
 
   @override
-  List<Object?> get props => [pagesInCurrentSurah];
+  List<Object?> get props => [pagesInCurrentSurah, reciters];
 }
 
 class QuranError extends QuranState {
@@ -53,7 +56,10 @@ class QuranCubit extends Cubit<QuranState> {
         tempPages[verse.page]!.add(verse);
       }
 
-      emit(QuranLoaded(tempPages));
+      List audioData = data['audio'] ?? [];
+      List<AudioReciter> reciters = audioData.map((e) => AudioReciter.fromJson(e)).toList();
+
+      emit(QuranLoaded(tempPages, reciters));
     } catch (e) {
       emit(QuranError(e.toString()));
     }

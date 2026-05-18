@@ -6,6 +6,7 @@ import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.d
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_event.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_search_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/surah_selector_cubit.dart';
 import 'package:islamic_app/features/ramadan/presentation/bloc/ramadan_cubit.dart';
 
@@ -17,6 +18,7 @@ void setupLocator() {
     () => NotificationService(),
   );
   locator.registerLazySingleton<QuranCubit>(() => QuranCubit());
+  locator.registerLazySingleton<QuranSearchCubit>(() => QuranSearchCubit());
   locator.registerLazySingleton<RamadanCubit>(() => RamadanCubit());
   locator.registerLazySingleton<AzkarCubit>(() => AzkarCubit());
   locator.registerLazySingleton<DailyDhikrCubit>(() => DailyDhikrCubit());

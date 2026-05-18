@@ -5,7 +5,6 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 class NotificationService {
-  // 1. قائمة الرسائل المحفزة
   final List<String> motivationalMessages = [
     "هل صليت على النبي اليوم؟",
     "استعن بالله ولا تعجز، وردك القرآني بانتظارك.",
@@ -13,7 +12,6 @@ class NotificationService {
     "نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل.",
   ];
 
-  // Singleton pattern
   NotificationService._internal();
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -21,36 +19,45 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  /// وظيفة لجدولة تنبيهات يومية (للتجربة الساعة 11 مساءً)
   Future<void> scheduleDailyReminders() async {
+    // جدولة التنبيه بعد دقيقتين من الآن بالضبط
+    final scheduledDate = tz.TZDateTime.now(
+      tz.local,
+    ).add(const Duration(minutes: 2));
+
+    print("--- Final Test Debug ---");
+    print("Now: ${tz.TZDateTime.now(tz.local)}");
+    print("Target: $scheduledDate");
+    print("------------------------");
+
     await _notificationsPlugin.zonedSchedule(
-      id: 999,
-      title: 'تذكير يومي',
-      body: motivationalMessages[0],
-      scheduledDate: _nextInstanceOfElevenPM(),
+      id: 123,
+      title: 'رسالة تحفيزية',
+      body: motivationalMessages[1],
+      scheduledDate: scheduledDate,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
-          'daily_reminder_channel',
-          'Daily Reminders',
+          'default_channel',
+          'Default Notifications',
           importance: Importance.max,
           priority: Priority.high,
+          showWhen: true,
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
     );
+    print("Scheduled for 2 minutes from now!");
   }
 
-  /// حساب التوقيت القادم للساعة 11 مساءً
-  tz.TZDateTime _nextInstanceOfElevenPM() {
+  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate = tz.TZDateTime(
       tz.local,
       now.year,
       now.month,
       now.day,
-      23,
-      0,
+      hour,
+      minute,
     );
 
     if (scheduledDate.isBefore(now)) {
@@ -59,7 +66,6 @@ class NotificationService {
     return scheduledDate;
   }
 
-  /// Initialize notifications
   Future<void> init() async {
     tz.initializeTimeZones();
 
@@ -68,6 +74,7 @@ class NotificationService {
         (info) => info.identifier,
       );
       tz.setLocalLocation(tz.getLocation(timeZoneName));
+      print("Timezone set to: $timeZoneName");
     } catch (e) {
       tz.setLocalLocation(tz.getLocation('UTC'));
     }
@@ -97,9 +104,15 @@ class NotificationService {
       settings: initSettings,
       onDidReceiveNotificationResponse: (details) {},
     );
+
+    // تنبيه فوري للتأكد
+    await showNotification(
+      id: 0,
+      title: "نظام التنبيهات",
+      body: "تم تفعيل نظام التنبيهات بنجاح!",
+    );
   }
 
-  /// Simple test notification
   Future<void> showNotification({
     required int id,
     String? title,
@@ -141,22 +154,6 @@ class NotificationService {
         (info) => info.identifier,
       );
       tz.setLocalLocation(tz.getLocation(timeZoneName));
-    }
-
-    final androidImplementation = _notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
-    bool? hasPermission = await androidImplementation
-        ?.canScheduleExactNotifications();
-
-    if (hasPermission == false) {
-      await androidImplementation?.requestExactAlarmsPermission();
-      return;
-    }
-
-    if (scheduledTime.isBefore(DateTime.now())) {
-      return;
     }
 
     await _notificationsPlugin.zonedSchedule(

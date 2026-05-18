@@ -6,6 +6,9 @@ import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/custom_surah_selector.dart';
+import 'package:islamic_app/features/quran/presentation/pages/quran_search_view.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_search_cubit.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
 
 class QuranView extends StatelessWidget {
   const QuranView({super.key});
@@ -85,25 +88,44 @@ class QuranView extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  height: 40,
-                  alignment: AlignmentDirectional.centerStart,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    border: Border.all(color: AppColors.borderColor, width: 1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "ابحث عن سورة أو آية ...",
-                        style: AppTextStyles.textTheme.titleSmall,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider.value(
+                          value: context.read<QuranSearchCubit>(),
+                          child: BlocProvider.value(
+                            value: context.read<QuranCubit>(),
+                            child: const QuranSearchView(),
+                          ),
+                        ),
                       ),
-                      Image.asset('assets/icons/iconoir_search.png'),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 40,
+                    alignment: AlignmentDirectional.centerStart,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      border: Border.all(
+                        color: AppColors.borderColor,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "ابحث عن سورة أو آية ...",
+                          style: AppTextStyles.textTheme.titleSmall,
+                        ),
+                        Image.asset('assets/icons/iconoir_search.png'),
+                      ],
+                    ),
                   ),
                 ),
                 const CustomSurahSelector(),

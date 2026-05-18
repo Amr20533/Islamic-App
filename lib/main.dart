@@ -10,6 +10,7 @@ import 'package:islamic_app/features/audio/presentation/bloc/audio_cubit.dart';
 import 'package:islamic_app/features/ramadan/presentation/bloc/ramadan_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_search_cubit.dart';
 import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/core/services/helpers/location_helper.dart';
 import 'package:islamic_app/core/services/notification_service.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(create: (_) => locator<DailyDhikrCubit>()),
         BlocProvider(create: (_) => locator<QuranCubit>()),
+        BlocProvider(create: (_) => locator<QuranSearchCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

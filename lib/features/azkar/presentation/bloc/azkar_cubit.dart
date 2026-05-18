@@ -42,9 +42,7 @@ class AzkarCubit extends Cubit<AzkarState> {
   Future<void> loadCategories() async {
     emit(AzkarLoading());
     try {
-      final String response = await rootBundle.loadString('assets/azkar.json');
-      final List<dynamic> data = json.decode(response);
-      final categories = data.map((e) => AzkarCategory.fromJson(e)).toList();
+      final categories = AzkarCategory.azkar;
       emit(AzkarCategoriesLoaded(categories));
     } catch (e) {
       emit(AzkarError(e.toString()));
@@ -58,23 +56,34 @@ class AzkarCubit extends Cubit<AzkarState> {
         'assets/azkar/azkar.json',
       );
       final List<dynamic> data = json.decode(response);
-      final selected = data.firstWhere((element) => element['ID'] == id);
-      final List<dynamic> zikrData = selected['ZIKR'][0].values.first;
+      print("Loaded Azkar JSON entries: ${data.length}");
+      print("Available IDs: ${data.map((e) => e['ID']).toList()}");
+      print("Searching for ID: $id");
 
+      final selected = data.firstWhere(
+        (element) => element['ID'] == id,
+        orElse: () => null,
+      );
+      if (selected == null) {
+        print("Selected was null for ID: $id");
+        emit(const AzkarError('لم يتم العثور على هذا الذكر'));
+        return;
+      }
+      final List<dynamic> zikrData = selected['ZIKR'][0].values.first;
       final zikrList = zikrData
           .map(
             (z) => ZikrItem(
-              arabicText: z['ARABIC_TEXT'],
-              repeat: z['REPEAT'],
-              audio: z['AUDIO'],
-              id: z['ID'],
-              translatedText: z['TRANSLATED_TEXT'],
+              arabicText: z['ARABIC_TEXT'] ?? '',
+              repeat: z['REPEAT'] ?? 1,
+              audio: z['AUDIO'] ?? '',
+              id: z['ID'] ?? 0,
+              translatedText: z['TRANSLATED_TEXT'] ?? '',
             ),
           )
           .toList();
-
       emit(AzkarDetailsLoaded(zikrList));
     } catch (e) {
+      print("Error loading zikr: $e");
       emit(AzkarError(e.toString()));
     }
   }

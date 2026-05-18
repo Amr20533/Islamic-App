@@ -61,6 +61,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - assets/quran_search.json
 
   fonts:
     - family: Tajawal
@@ -75,3 +76,7 @@ flutter:
           weight: 700
         - asset: assets/fonts/Tajawal/Tajawal-Black.ttf
           weight: 900
+
+    - family: QuranFont
+      fonts:
+        - asset: assets/fonts/me_quran.ttf
