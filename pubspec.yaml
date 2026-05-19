@@ -17,7 +17,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_local_notifications:
   timezone:
-  get:
+  flutter_bloc: ^9.1.0
+  bloc: ^9.0.0
+  equatable: ^2.0.7
   get_it:
   audioplayers:
   flutter_timezone:
@@ -59,6 +61,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - assets/quran_search.json
 
   fonts:
     - family: Tajawal
@@ -73,3 +76,7 @@ flutter:
           weight: 700
         - asset: assets/fonts/Tajawal/Tajawal-Black.ttf
           weight: 900
+
+    - family: QuranFont
+      fonts:
+        - asset: assets/fonts/me_quran.ttf

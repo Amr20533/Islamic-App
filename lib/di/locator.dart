@@ -1,51 +1,29 @@
 import 'package:get_it/get_it.dart';
-import 'package:islamic_app/core/controllers/audio_controller.dart';
-import 'package:islamic_app/core/controllers/azkar_controller.dart';
-import 'package:islamic_app/core/controllers/daily_dhikr_controller.dart';
-import 'package:islamic_app/core/controllers/quran/surah_selection_controller.dart';
-import 'package:islamic_app/core/controllers/quran_controller.dart';
-import 'package:islamic_app/core/controllers/ramadan_controller.dart';
-import 'package:islamic_app/services/notification_service.dart';
-import '../core/controllers/adhan_controller.dart';
-import '../core/controllers/main_controller.dart';
+import 'package:islamic_app/core/services/notification_service.dart';
+import 'package:islamic_app/features/audio/presentation/bloc/audio_cubit.dart';
+import 'package:islamic_app/features/azkar/presentation/bloc/azkar_cubit.dart';
+import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/adhan_event.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_search_cubit.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/surah_selector_cubit.dart';
+import 'package:islamic_app/features/ramadan/presentation/bloc/ramadan_cubit.dart';
 
 final GetIt locator = GetIt.instance;
 
 void setupLocator() {
-  locator.registerLazySingleton<MainController>(
-        () => MainController(),
-  );
-  locator.registerLazySingleton<AudioController>(
-        () => AudioController(),
-  );
-  // Add this line
+  locator.registerLazySingleton<AudioCubit>(() => AudioCubit());
   locator.registerLazySingleton<NotificationService>(
-        () => NotificationService(),
+    () => NotificationService(),
   );
-  locator.registerLazySingleton<QuranController>(
-        () => QuranController(),
+  locator.registerLazySingleton<QuranCubit>(() => QuranCubit());
+  locator.registerLazySingleton<QuranSearchCubit>(() => QuranSearchCubit());
+  locator.registerLazySingleton<RamadanCubit>(() => RamadanCubit());
+  locator.registerLazySingleton<AzkarCubit>(() => AzkarCubit());
+  locator.registerLazySingleton<DailyDhikrCubit>(() => DailyDhikrCubit());
+  locator.registerLazySingleton<SurahSelectorCubit>(() => SurahSelectorCubit());
+  locator.registerLazySingleton<AdhanBloc>(
+    () => AdhanBloc()..add(AdhanInitializeEvent()),
   );
-  locator.registerLazySingleton<RamadanController>(
-        () => RamadanController()..fetchPrayerTimes(),
-  );
-
-  locator.registerLazySingleton<AzkarController>(
-        () => AzkarController(),
-  );
-
-  locator.registerLazySingleton<AdhanController>(
-        () => AdhanController(),
-  );
-
-  locator.registerLazySingleton<DailyDhikrController>(
-        () => DailyDhikrController(),
-  );
-  locator.registerLazySingleton<SurahSelectorController>(
-        () => SurahSelectorController(),
-  );
-
-  // locator.registerLazySingleton<PrayerController>(
-  //       () => PrayerController(latitude: 30.0444, longitude: 31.2357),
-  // );
-
 }
