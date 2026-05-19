@@ -19,10 +19,13 @@ import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'core/static_files/app_colors.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ar', null);
-  setupLocator();
+  final sharedPreferences = await SharedPreferences.getInstance();
+  setupLocator(sharedPreferences);
   await _getLocation();
   runApp(const MyApp());
   await NotificationService().init();

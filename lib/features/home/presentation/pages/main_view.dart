@@ -11,6 +11,8 @@ import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_state.dart';
 import 'package:islamic_app/features/prayer/presentation/widgets/adhan_overlay.dart';
 
+import 'package:islamic_app/features/calendar/presentation/pages/calendar_view.dart';
+
 class MainView extends StatefulWidget {
   const MainView({super.key});
 
@@ -25,7 +27,7 @@ class _MainViewState extends State<MainView> {
     HomeView(),
     const QuranView(),
     ZikrView(),
-    const QuranView(), // Placeholder for Calendar
+    const CalendarView(),
     const Center(child: SizedBox.shrink()), // Placeholder for More
   ];
 

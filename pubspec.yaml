@@ -31,6 +31,7 @@ dependencies:
   geolocator:
   adhan:
   flutter_svg:
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
