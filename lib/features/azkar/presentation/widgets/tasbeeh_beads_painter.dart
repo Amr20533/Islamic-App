@@ -6,14 +6,14 @@ class TasbeehBeadsPainter extends CustomPainter {
   TasbeehBeadsPainter({required this.progress});
 
   Offset _getPointOnCurve(double t, Size size) {
-    final p0 = Offset(-40, size.height * 0.4);
-    final p1 = Offset(size.width * 0.42, size.height * 0.05);
-    final p2 = Offset(size.width + 40, size.height * 0.72);
+    final p0 = Offset(-40, size.height * 0.2);
+    final p1 = Offset(size.width * 0.42, size.height * 0.06);
+    final p2 = Offset(size.width + 1, size.height * 0.72);
 
     double x =
-        (1 - t) * (1 - t) * p0.dx + 2 * (1 - t) * t * p1.dx + t * t * p2.dx;
+        (3 - t) * (1 - t) * p0.dx + 4 * (1 - t) * t * p1.dx + t * t * p2.dx;
     double y =
-        (1 - t) * (1 - t) * p0.dy + 2 * (1 - t) * t * p1.dy + t * t * p2.dy;
+        (1 - t) * (1 - t) * p0.dy + 7 * (1 - t) * t * p1.dy + t * t * p2.dy;
     return Offset(x, y);
   }
 
@@ -34,7 +34,7 @@ class TasbeehBeadsPainter extends CustomPainter {
     }
     canvas.drawPath(path, linePaint);
 
-    const double spacing = 0.22;
+    const double spacing = 0.19;
     const double baseBeadRadius = 32.0;
 
     for (int i = -1; i <= 5; i++) {
