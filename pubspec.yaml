@@ -62,6 +62,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - assets/svg/
     - assets/quran_search.json
 
   fonts:

@@ -39,10 +39,26 @@ class AzkarError extends AzkarState {
 class AzkarCubit extends Cubit<AzkarState> {
   AzkarCubit() : super(AzkarInitial());
 
+  // Cache the raw JSON data so we don't reload it every time
+  List<dynamic>? _cachedData;
+
+  Future<List<dynamic>> _loadJsonData() async {
+    if (_cachedData != null) return _cachedData!;
+    final String response = await rootBundle.loadString(
+      'assets/azkar/azkar.json',
+    );
+    _cachedData = json.decode(response);
+    return _cachedData!;
+  }
+
   Future<void> loadCategories() async {
     emit(AzkarLoading());
     try {
-      final categories = AzkarCategory.azkar;
+      final data = await _loadJsonData();
+      // Build categories directly from the JSON so IDs always match
+      final categories = data
+          .map((e) => AzkarCategory(id: e['ID'], title: e['TITLE']))
+          .toList();
       emit(AzkarCategoriesLoaded(categories));
     } catch (e) {
       emit(AzkarError(e.toString()));
@@ -52,20 +68,13 @@ class AzkarCubit extends Cubit<AzkarState> {
   Future<void> loadZikrDetails(int id) async {
     emit(AzkarLoading());
     try {
-      final String response = await rootBundle.loadString(
-        'assets/azkar/azkar.json',
-      );
-      final List<dynamic> data = json.decode(response);
-      print("Loaded Azkar JSON entries: ${data.length}");
-      print("Available IDs: ${data.map((e) => e['ID']).toList()}");
-      print("Searching for ID: $id");
+      final data = await _loadJsonData();
 
       final selected = data.firstWhere(
         (element) => element['ID'] == id,
         orElse: () => null,
       );
       if (selected == null) {
-        print("Selected was null for ID: $id");
         emit(const AzkarError('لم يتم العثور على هذا الذكر'));
         return;
       }
@@ -83,7 +92,6 @@ class AzkarCubit extends Cubit<AzkarState> {
           .toList();
       emit(AzkarDetailsLoaded(zikrList));
     } catch (e) {
-      print("Error loading zikr: $e");
       emit(AzkarError(e.toString()));
     }
   }
