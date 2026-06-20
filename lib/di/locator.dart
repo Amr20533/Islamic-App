@@ -17,6 +17,18 @@ import 'package:islamic_app/features/calendar/data/repositories/calendar_reposit
 import 'package:islamic_app/features/calendar/domain/repositories/calendar_repository.dart';
 import 'package:islamic_app/features/calendar/presentation/bloc/calendar_cubit.dart';
 
+// Prayer alarm clean architecture registrations
+import 'package:islamic_app/features/prayer/data/datasources/prayer_alarm_local_datasource.dart';
+import 'package:islamic_app/features/prayer/data/repositories/prayer_alarm_repository_impl.dart';
+import 'package:islamic_app/features/prayer/domain/repositories/prayer_alarm_repository.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_cubit.dart';
+
+// Profile Feature
+import 'package:islamic_app/features/profile/data/datasources/profile_local_datasource.dart';
+import 'package:islamic_app/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:islamic_app/features/profile/domain/repositories/profile_repository.dart';
+import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
+
 final GetIt locator = GetIt.instance;
 
 void setupLocator(SharedPreferences sharedPreferences) {
@@ -47,5 +59,33 @@ void setupLocator(SharedPreferences sharedPreferences) {
   );
   locator.registerFactory<CalendarCubit>(
     () => CalendarCubit(repository: locator<CalendarRepository>()),
+  );
+
+  // Prayer Alarm Feature
+  locator.registerLazySingleton<PrayerAlarmLocalDataSource>(
+    () => PrayerAlarmLocalDataSourceImpl(sharedPreferences: locator<SharedPreferences>()),
+  );
+  locator.registerLazySingleton<PrayerAlarmRepository>(
+    () => PrayerAlarmRepositoryImpl(localDataSource: locator<PrayerAlarmLocalDataSource>()),
+  );
+  locator.registerFactory<PrayerAlarmCubit>(
+    () => PrayerAlarmCubit(
+      repository: locator<PrayerAlarmRepository>(),
+      notificationService: locator<NotificationService>(),
+    ),
+  );
+
+  // Profile Feature
+  locator.registerLazySingleton<ProfileLocalDataSource>(
+    () => ProfileLocalDataSourceImpl(sharedPreferences: locator<SharedPreferences>()),
+  );
+  locator.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(localDataSource: locator<ProfileLocalDataSource>()),
+  );
+  locator.registerLazySingleton<ProfileCubit>(
+    () => ProfileCubit(
+      repository: locator<ProfileRepository>(),
+      notificationService: locator<NotificationService>(),
+    ),
   );
 }

@@ -4,7 +4,7 @@ import 'package:islamic_app/core/static_files/app_text_styles.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
-import 'package:islamic_app/features/quran/presentation/pages/surah_details_view.dart';
+import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/features/quran/data/models/quran_metadata.dart';
 
 class PageSlider extends StatelessWidget {
@@ -28,14 +28,13 @@ class PageSlider extends StatelessWidget {
                 var data = QuranMetadata.pageToSurah[pageNumber];
                 if (data != null) {
                   context.read<QuranCubit>().loadSurahData(data['surahNumber']);
-                  Navigator.push(
+                  Navigator.pushNamed(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => SurahDetailsView(
-                        surahName: data['surahName'],
-                        initialPageNumber: data['pageNumber'],
-                      ),
-                    ),
+                    AppRoutes.surahDetails,
+                    arguments: {
+                      'surahName': data['surahName'],
+                      'initialPageNumber': data['pageNumber'],
+                    },
                   );
                 }
               },

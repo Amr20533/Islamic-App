@@ -7,8 +7,7 @@ import 'package:islamic_app/features/azkar/presentation/widgets/electronic_tasbe
 import 'package:islamic_app/features/azkar/presentation/widgets/featured_azkar_grid.dart';
 import 'package:islamic_app/features/azkar/presentation/widgets/other_azkar_list.dart';
 import 'package:islamic_app/features/azkar/presentation/widgets/zikr_header.dart';
-import 'package:islamic_app/features/azkar/presentation/pages/azkar_details_screen.dart';
-import 'package:islamic_app/features/azkar/presentation/pages/electronic_tasbeeh_screen.dart';
+import 'package:islamic_app/core/static_files/app_routes.dart';
 
 class ZikrView extends StatefulWidget {
   const ZikrView({super.key});
@@ -30,17 +29,13 @@ class _ZikrViewState extends State<ZikrView> {
   }
 
   void _navigateToDetail(String title, int categoryId) {
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (_) => AzkarCubit(),
-          child: AzkarDetailScreen(
-            categoryTitle: title,
-            categoryId: categoryId,
-          ),
-        ),
-      ),
+      AppRoutes.azkarDetail,
+      arguments: {
+        'categoryTitle': title,
+        'categoryId': categoryId,
+      },
     ).then((_) {
       if (mounted) {
         context.read<AzkarCubit>().loadCategories();
@@ -136,11 +131,9 @@ class _ZikrViewState extends State<ZikrView> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: ElectronicTasbeehCard(
         onTap: () {
-          Navigator.push(
+          Navigator.pushNamed(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ElectronicTasbeehScreen(),
-            ),
+            AppRoutes.electronicTasbeeh,
           );
         },
       ),

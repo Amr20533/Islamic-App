@@ -2,20 +2,19 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 
 class FormatHelper{
-  static String getHijriFormattedDate({String locale = 'ar'}) {
+  static String getHijriFormattedDate({DateTime? dateTime, String locale = 'ar'}) {
     HijriCalendar.setLocal(locale);
-    final hijri = HijriCalendar.now();
+    final hijri = dateTime != null ? HijriCalendar.fromDate(dateTime) : HijriCalendar.now();
 
-    // Pattern from image: [Year] [Month Name] [Day]
-    // Note: RTL handles the visual order, but we provide the logic
-    String date = "${hijri.hYear} ${hijri.longMonthName} ${hijri.hDay}";
+    // Pattern from image: [Day] [Month Name] [Year]
+    String date = "${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear}";
     return replaceWithArabicNumbers(date);
   }
 
-  static String getMiladFormattedDate({String locale = 'ar'}) {
-    final milad = DateTime.now();
-    // Pattern from image: [Year] [Month Name] [Day]
-    final formatter = DateFormat('yyyy MMMM d', locale);
+  static String getMiladFormattedDate({DateTime? dateTime, String locale = 'ar'}) {
+    final milad = dateTime ?? DateTime.now();
+    // Pattern from image: [Day] [Month Name] [Year]
+    final formatter = DateFormat('d MMMM yyyy', locale);
     String formatted = formatter.format(milad);
 
     return replaceWithArabicNumbers(formatted);
@@ -24,9 +23,12 @@ class FormatHelper{
   static String formatTime12Hour(DateTime? dateTime, {String locale = 'ar'}) {
     if (dateTime == null) return "--:--";
 
+    // Convert to local time zone to show accurate local prayer times
+    final localDateTime = dateTime.toLocal();
+
     // 1. Format the time
     final formatter = DateFormat('hh:mm a', locale);
-    String formatted = formatter.format(dateTime);
+    String formatted = formatter.format(localDateTime);
 
     // 2. If locale is Arabic, convert digits to Eastern Arabic numerals
     if (locale == 'ar') {
