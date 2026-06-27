@@ -20,114 +20,23 @@ import 'core/static_files/app_colors.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-/*void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ar', null);
-  final sharedPreferences = await SharedPreferences.getInstance();
-  setupLocator(sharedPreferences);
-  await _getLocation();
-  runApp(const MyApp());
-  await NotificationService().init();
-  await NotificationService().scheduleDailyReminders();
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => locator<PrayerCubit>()),
-        BlocProvider(create: (_) => locator<AdhanBloc>()),
-        BlocProvider(create: (_) => locator<SurahSelectorCubit>()),
-        BlocProvider(create: (_) => locator<AzkarCubit>()..loadCategories()),
-        BlocProvider(create: (_) => locator<AudioCubit>()),
-        BlocProvider(
-          create: (_) => locator<RamadanCubit>()..fetchPrayerTimes(),
-        ),
-        BlocProvider(create: (_) => locator<DailyDhikrCubit>()),
-        BlocProvider(create: (_) => locator<QuranCubit>()),
-        BlocProvider(create: (_) => locator<QuranSearchCubit>()),
-        BlocProvider(create: (_) => locator<ProfileCubit>()..loadProfile()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Islamic App',
-        theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: AppColors.whiteColor,
-          colorScheme: ColorScheme(
-            brightness: Brightness.light,
-            primary: AppColors.primaryColor,
-            onPrimary: AppColors.whiteColor,
-            secondary: AppColors.secondaryColor,
-            onSecondary: AppColors.whiteColor,
-            tertiary: AppColors.thirdColor,
-            onTertiary: AppColors.primaryTextColor,
-            surface: AppColors.whiteColor,
-            onSurface: AppColors.primaryTextColor,
-            error: Colors.redAccent,
-            onError: AppColors.whiteColor,
-            outline: AppColors.greyColor,
-          ),
-          fontFamily: 'Tajawal',
-          textTheme: AppTextStyles.textTheme,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            centerTitle: true,
-            elevation: 0,
-          ),
-        ),
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
-      ),
-    );
-  }
-}
-
-Future<void> _getLocation() async {
-  Position? position;
-  try {
-    position = await LocationHelper.getCurrentLocation();
-  } catch (e) {
-    print("Location not available: $e");
-  }
-
-  if (!locator.isRegistered<PrayerCubit>()) {
-    locator.registerLazySingleton<PrayerCubit>(
-      () => PrayerCubit(
-        latitude: position?.latitude ?? 30.0444,
-        longitude: position?.longitude ?? 31.2357,
-      ),
-    );
-  }
-}
-*/
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ تهيئة التاريخ بالعربية
   await initializeDateFormatting('ar', null);
 
-  // ✅ الحصول على SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
   service_locator.setupLocator(sharedPreferences);
 
-  // ✅ الحصول على الموقع الجغرافي
   await _getLocation();
 
-  // ✅ تهيئة الإشعارات قبل runApp
   debugPrint('🔔 Initializing notifications...');
   await NotificationService().init();
   debugPrint('✅ Notifications initialized');
 
-  debugPrint('📅 Scheduling daily reminders...');
-  await NotificationService().scheduleDailyReminders();
-  debugPrint('✅ Daily reminders scheduled');
+  await NotificationService().scheduleDailyReminderAt(hour: 8, minute: 0);
+  debugPrint('✅ Default daily reminder scheduled at 08:00');
 
-  // ✅ شغّل التطبيق آخراً
   runApp(const MyApp());
 }
 
@@ -157,8 +66,35 @@ Future<void> _getLocation() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+/// Adds [WidgetsBindingObserver] so we can call [NotificationService.onAppResumed]
+/// when the user returns from the "Alarms & Reminders" Settings screen after
+/// [requestExactAlarmsPermission] sent them there.
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      NotificationService().onAppResumed();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

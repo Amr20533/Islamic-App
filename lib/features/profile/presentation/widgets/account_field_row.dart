@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 
 class AccountFieldRow extends StatelessWidget {
@@ -31,11 +32,7 @@ class AccountFieldRow extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: onEdit,
-                child: const Icon(
-                  Icons.edit_outlined,
-                  color: AppColors.primaryColor,
-                  size: 20,
-                ),
+                child: SvgPicture.asset('assets/svg/iconamoon_edit-thin.svg'),
               ),
             ],
           ),

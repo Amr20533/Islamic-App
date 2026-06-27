@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:islamic_app/core/services/notification_service.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_state.dart';
@@ -71,52 +70,6 @@ class DailyReminderCard extends StatelessWidget {
                   ),
                 ),
 
-                // Test notification button
-                if (!isEnabled)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () async {
-                          final notifService = NotificationService();
-                          await notifService.showNotification(
-                            id: 999,
-                            title: '🔔 اختبار النوتفكيشن',
-                            body: 'إذا ظهرت هذه الرسالة فالنوتفكيشن يعمل بشكل صحيح ✅',
-                          );
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'تم إرسال نوتفكيشن تجريبي - تحقق من شريط الإشعارات',
-                                  style: TextStyle(fontFamily: 'Tajawal'),
-                                ),
-                                backgroundColor: AppColors.primaryColor,
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.notifications_active, size: 18),
-                        label: const Text(
-                          'اختبار النوتفكيشن الآن',
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryColor,
-                          side: const BorderSide(color: AppColors.primaryColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
                 // Time picker row
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -126,7 +79,9 @@ class DailyReminderCard extends StatelessWidget {
                     final currentState = cubit.state;
                     TimeOfDay initialTime = const TimeOfDay(hour: 8, minute: 0);
                     if (currentState is ProfileLoaded) {
-                      initialTime = cubit.parseTimeForDisplay(currentState.dailyReminderTime);
+                      initialTime = cubit.parseTimeForDisplay(
+                        currentState.dailyReminderTime,
+                      );
                     }
                     final picked = await showTimePicker(
                       context: context,
@@ -139,7 +94,9 @@ class DailyReminderCard extends StatelessWidget {
                     if (picked != null) {
                       // Update time and auto-enable the reminder
                       await cubit.updateReminderTime(picked);
-                      if (!(cubit.state is ProfileLoaded && (cubit.state as ProfileLoaded).isDailyReminderEnabled)) {
+                      if (!(cubit.state is ProfileLoaded &&
+                          (cubit.state as ProfileLoaded)
+                              .isDailyReminderEnabled)) {
                         await cubit.toggleDailyReminder(true);
                       }
                     }

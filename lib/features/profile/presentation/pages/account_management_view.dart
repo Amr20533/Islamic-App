@@ -196,22 +196,23 @@ class _AccountManagementContent extends StatelessWidget {
 
                   // ── Name Row ─────────────────────────────────────────────
                   AccountFieldRow(
-                    value: state.profileName,
-                    icon: SvgPicture.asset(
-                      'assets/icons/user.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
                     onEdit: () => _showEditDialog(
                       context: context,
                       title: 'تعديل الاسم',
                       initialValue: state.profileName,
                       onSave: (val) =>
                           context.read<ProfileCubit>().updateProfileName(val),
+                    ),
+
+                    value: state.profileName,
+                    icon: SvgPicture.asset(
+                      "assets/icons/user.svg",
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
 

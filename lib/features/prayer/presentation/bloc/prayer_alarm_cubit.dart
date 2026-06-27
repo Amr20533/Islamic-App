@@ -47,14 +47,14 @@ class PrayerAlarmCubit extends Cubit<PrayerAlarmState> {
         await notificationService.cancelNotification(config.notificationId);
       }
 
-      final updatedStates = Map<String, bool>.from(currentStates)..[config.key] = isEnabled;
+      final updatedStates = Map<String, bool>.from(currentStates)
+        ..[config.key] = isEnabled;
       emit(PrayerAlarmLoaded(alarmStates: updatedStates));
     } catch (e) {
       emit(PrayerAlarmError(message: e.toString()));
     }
   }
 
-  /// Reschedules notifications for all active alarms using the latest prayer times.
   Future<void> rescheduleEnabledAlarms({
     required List<PrayerAlarmConfig> configs,
     required Map<String, DateTime> todayPrayers,
@@ -63,6 +63,8 @@ class PrayerAlarmCubit extends Cubit<PrayerAlarmState> {
     final alarmStates = (state as PrayerAlarmLoaded).alarmStates;
 
     for (final config in configs) {
+      await notificationService.cancelNotification(config.notificationId);
+
       if (alarmStates[config.key] == true) {
         final prayerTime = todayPrayers[config.name];
         if (prayerTime != null) {

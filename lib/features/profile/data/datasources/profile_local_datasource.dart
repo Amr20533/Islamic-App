@@ -73,7 +73,7 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
 
   @override
   Future<String> getProfileEmail() async {
-    return sharedPreferences.getString(_keyProfileEmail) ?? 'omer.user@gmail.com';
+    return sharedPreferences.getString(_keyProfileEmail) ?? 'user@gmail.com';
   }
 
   @override
