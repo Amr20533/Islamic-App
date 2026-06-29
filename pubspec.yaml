@@ -17,9 +17,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_local_notifications:
   timezone:
-  flutter_bloc: ^9.1.0
-  bloc: ^9.0.0
-  equatable: ^2.0.7
+  flutter_bloc:
+  bloc:
+  equatable:
   get_it:
   audioplayers:
   flutter_timezone:
@@ -31,7 +31,8 @@ dependencies:
   geolocator:
   adhan:
   flutter_svg:
-  shared_preferences: ^2.5.5
+  shared_preferences:
+  sqflite: 
 
 dev_dependencies:
   flutter_test:
