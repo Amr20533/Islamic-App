@@ -65,4 +65,14 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<void> saveProfilePassword(String password) {
     return localDataSource.saveProfilePassword(password);
   }
+
+  @override
+  Future<String?> getGender() {
+    return localDataSource.getGender();
+  }
+
+  @override
+  Future<void> saveGender(String gender) {
+    return localDataSource.saveGender(gender);
+  }
 }

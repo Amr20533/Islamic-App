@@ -13,6 +13,8 @@ abstract class ProfileLocalDataSource {
   Future<void> saveProfileEmail(String email);
   Future<String> getProfilePassword();
   Future<void> saveProfilePassword(String password);
+  Future<String?> getGender();
+  Future<void> saveGender(String gender);
 }
 
 class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
@@ -24,6 +26,7 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
   static const _keyProfileName = 'profile_name';
   static const _keyProfileEmail = 'profile_email';
   static const _keyProfilePassword = 'profile_password';
+  static const _keyGender = 'profile_gender';
 
   ProfileLocalDataSourceImpl({required this.sharedPreferences});
 
@@ -89,5 +92,15 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
   @override
   Future<void> saveProfilePassword(String password) async {
     await sharedPreferences.setString(_keyProfilePassword, password);
+  }
+
+  @override
+  Future<String?> getGender() async {
+    return sharedPreferences.getString(_keyGender);
+  }
+
+  @override
+  Future<void> saveGender(String gender) async {
+    await sharedPreferences.setString(_keyGender, gender);
   }
 }

@@ -40,7 +40,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-/// الحصول على الموقع الجغرافي للمستخدم
 Future<void> _getLocation() async {
   try {
     final position = await LocationHelper.getCurrentLocation();

@@ -20,6 +20,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       final name = await repository.getProfileName();
       final email = await repository.getProfileEmail();
       final password = await repository.getProfilePassword();
+      final gender = await repository.getGender();
       emit(
         ProfileLoaded(
           isDailyReminderEnabled: isEnabled,
@@ -28,6 +29,7 @@ class ProfileCubit extends Cubit<ProfileState> {
           profileName: name,
           profileEmail: email,
           profilePassword: password,
+          gender: gender,
         ),
       );
     } catch (e) {
@@ -36,32 +38,45 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> updateProfileImage(String path) async {
-    if (state is! ProfileLoaded) return;
-    final current = state as ProfileLoaded;
     await repository.saveProfileImagePath(path);
-    emit(current.copyWith(profileImagePath: path));
+    if (state is ProfileLoaded) {
+      final current = state as ProfileLoaded;
+      emit(current.copyWith(profileImagePath: path));
+    }
   }
 
   Future<void> updateProfileName(String name) async {
-    if (state is! ProfileLoaded) return;
-    final current = state as ProfileLoaded;
     await repository.saveProfileName(name);
-    emit(current.copyWith(profileName: name));
+    if (state is ProfileLoaded) {
+      final current = state as ProfileLoaded;
+      emit(current.copyWith(profileName: name));
+    }
   }
 
   Future<void> updateProfileEmail(String email) async {
-    if (state is! ProfileLoaded) return;
-    final current = state as ProfileLoaded;
     await repository.saveProfileEmail(email);
-    emit(current.copyWith(profileEmail: email));
+    if (state is ProfileLoaded) {
+      final current = state as ProfileLoaded;
+      emit(current.copyWith(profileEmail: email));
+    }
   }
 
   Future<void> updateProfilePassword(String password) async {
-    if (state is! ProfileLoaded) return;
-    final current = state as ProfileLoaded;
     await repository.saveProfilePassword(password);
-    emit(current.copyWith(profilePassword: password));
+    if (state is ProfileLoaded) {
+      final current = state as ProfileLoaded;
+      emit(current.copyWith(profilePassword: password));
+    }
   }
+
+  Future<void> updateGender(String gender) async {
+    await repository.saveGender(gender);
+    if (state is ProfileLoaded) {
+      final current = state as ProfileLoaded;
+      emit(current.copyWith(gender: gender));
+    }
+  }
+
 
   Future<void> toggleDailyReminder(bool enabled) async {
     if (state is! ProfileLoaded) return;

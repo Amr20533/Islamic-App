@@ -36,7 +36,7 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
     _pageController = PageController();
     if (widget.zikrList == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<AzkarCubit>().loadZikrDetails(widget.categoryId);
+        context.read<AzkarCubit>().loadZikrDetails(widget.categoryId, widget.categoryTitle);
       });
     }
   }

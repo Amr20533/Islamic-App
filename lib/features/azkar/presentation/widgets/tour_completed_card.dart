@@ -6,6 +6,9 @@ import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_shadows.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
+import 'package:islamic_app/di/locator.dart';
+import 'package:islamic_app/core/services/streak_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TourCompletedCard extends StatelessWidget {
   const TourCompletedCard({super.key});
@@ -46,8 +49,18 @@ class TourCompletedCard extends StatelessWidget {
           Text("تمت الجولة", style: AppTextStyles.textTheme.titleLarge),
           const SizedBox(height: 64),
           AppPrimaryButton(
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
+              final now = DateTime.now();
+              final dateStr = "${now.year}-${now.month}-${now.day}";
+              await locator<SharedPreferences>().setBool(
+                "daily_dhikr_done_$dateStr",
+                true,
+              );
+              // Auto-refresh the streak card on home screen
+              locator<StreakNotifier>().refresh();
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
             },
             label: 'تم',
           ),

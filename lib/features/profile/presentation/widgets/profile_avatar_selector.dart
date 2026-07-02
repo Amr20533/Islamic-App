@@ -4,12 +4,14 @@ import 'package:islamic_app/core/static_files/app_colors.dart';
 
 class ProfileAvatarSelector extends StatelessWidget {
   final String? imagePath;
+  final String? gender;
   final VoidCallback onEditTap;
   final double size;
 
   const ProfileAvatarSelector({
     super.key,
     required this.imagePath,
+    this.gender,
     required this.onEditTap,
     this.size = 156.0,
   });
@@ -24,19 +26,17 @@ class ProfileAvatarSelector extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.borderColor2,
-                width: 2,
-              ),
+              border: Border.all(color: AppColors.borderColor2, width: 2),
             ),
             child: ClipOval(
               child: imagePath != null && File(imagePath!).existsSync()
-                  ? Image.file(
-                      File(imagePath!),
-                      fit: BoxFit.cover,
-                    )
+                  ? Image.file(File(imagePath!), fit: BoxFit.cover)
                   : Image.asset(
-                      'assets/images/avatar_1.jpg',
+                      gender == 'female'
+                          ? 'assets/images/Ellipse 12 (1).png'
+                          : gender == 'male'
+                          ? 'assets/images/Ellipse 12.png'
+                          : 'assets/images/avatar_1.jpg',
                       fit: BoxFit.cover,
                     ),
             ),
@@ -52,10 +52,7 @@ class ProfileAvatarSelector extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.borderColor2,
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: AppColors.borderColor2, width: 1.5),
                 ),
                 child: const Icon(
                   Icons.edit_outlined,

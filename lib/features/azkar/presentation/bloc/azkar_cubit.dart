@@ -65,7 +65,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     }
   }
 
-  Future<void> loadZikrDetails(int id) async {
+  Future<void> loadZikrDetails(int id, [String? categoryTitle]) async {
     emit(AzkarLoading());
     try {
       final data = await _loadJsonData();
@@ -79,7 +79,7 @@ class AzkarCubit extends Cubit<AzkarState> {
         return;
       }
       final List<dynamic> zikrData = selected['ZIKR'][0].values.first;
-      final zikrList = zikrData
+      List<ZikrItem> zikrList = zikrData
           .map(
             (z) => ZikrItem(
               arabicText: z['ARABIC_TEXT'] ?? '',
@@ -90,6 +90,81 @@ class AzkarCubit extends Cubit<AzkarState> {
             ),
           )
           .toList();
+
+      if (id == 27 && categoryTitle != null) {
+        if (categoryTitle == 'أذكار الصباح') {
+          // Exclude evening-only dhikr (ID 97: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ...)
+          zikrList = zikrList.where((item) => item.id != 97).toList();
+        } else if (categoryTitle == 'أذكار المساء') {
+          // Exclude morning-only dhikrs (ID 93, 94, 95)
+          zikrList = zikrList
+              .where((item) => item.id != 93 && item.id != 94 && item.id != 95)
+              .toList();
+
+          // Map morning phrases to evening phrases
+          zikrList = zikrList.map((item) {
+            String updatedText = item.arabicText;
+
+            // Item 77: أصبحنا وأصبح الملك لله -> أمسينا وأمسى الملك لله
+            if (item.id == 77) {
+              updatedText = updatedText
+                  .replaceAll('أَصْبَحْنَا', 'أَمْسَيْنَا')
+                  .replaceAll('أَصْبَحَ', 'أَمْسَى')
+                  .replaceAll('هَذَا الْيَوْمِ', 'هَذِهِ اللَّيْلَةِ')
+                  .replaceAll('مَا بَعْدَهُ', 'مَا بَعْدَهَا');
+            }
+            // Item 78: اللهم بك أصبحنا... -> اللهم بك أمسينا...
+            else if (item.id == 78) {
+              updatedText = updatedText.replaceAll(
+                'اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا ، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ',
+                'اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ',
+              );
+            }
+            // Item 79: أصبحت -> أمسيت
+            else if (item.id == 79) {
+              updatedText = updatedText.replaceAll('أَصْبَحْتُ', 'أَمْسَيْتُ');
+            }
+            // Item 80: أصبحت -> أمسيت
+            else if (item.id == 80) {
+              updatedText = updatedText.replaceAll('أَصْبَحْتُ', 'أَمْسَيْتُ');
+            }
+            // Item 81: ما أصبح -> ما أمسى
+            else if (item.id == 81) {
+              updatedText = updatedText.replaceAll(
+                'مَا أَصْبَحَ',
+                'مَا أَمْسَى',
+              );
+            }
+            // Item 89: أصبحنا وأصبح... اليوم -> أمسينا وأمسى... الليلة
+            else if (item.id == 89) {
+              updatedText = updatedText
+                  .replaceAll('أَصْبَحْنَا', 'أَمْسَيْنَا')
+                  .replaceAll('أَصْبَحَ', 'أَمْسَى')
+                  .replaceAll('هَذَا الْيَوْمِ', 'هَذِهِ اللَّيْلَةِ')
+                  .replaceAll('فَتْحَهُ', 'فَتْحَهَا')
+                  .replaceAll('نَصْرَهُ', 'نَصْرَهَا')
+                  .replaceAll('نورَهُ', 'نُورَهَا')
+                  .replaceAll('بَرَكَتَهُ', 'بَرَكَتَهَا')
+                  .replaceAll('هُدَاهُ', 'هُدَاهَا')
+                  .replaceAll('مَا فِيهِ', 'مَا فِيهَا')
+                  .replaceAll('مَا بَعْدَهُ', 'مَا بَعْدَهَا');
+            }
+            // Item 90: أصبحنا -> أمسينا
+            else if (item.id == 90) {
+              updatedText = updatedText.replaceAll('أَصْبَحْنا', 'أَمْسَيْنَا');
+            }
+
+            return ZikrItem(
+              id: item.id,
+              arabicText: updatedText,
+              repeat: item.repeat,
+              audio: item.audio,
+              translatedText: item.translatedText,
+            );
+          }).toList();
+        }
+      }
+
       emit(AzkarDetailsLoaded(zikrList));
     } catch (e) {
       emit(AzkarError(e.toString()));

@@ -189,6 +189,7 @@ class _AccountManagementContent extends StatelessWidget {
                   // ── Circular Avatar with Edit Overlay ────────────────────
                   ProfileAvatarSelector(
                     imagePath: state.profileImagePath,
+                    gender: state.gender,
                     onEditTap: () => _pickImage(context),
                   ),
 
@@ -196,14 +197,6 @@ class _AccountManagementContent extends StatelessWidget {
 
                   // ── Name Row ─────────────────────────────────────────────
                   AccountFieldRow(
-                    onEdit: () => _showEditDialog(
-                      context: context,
-                      title: 'تعديل الاسم',
-                      initialValue: state.profileName,
-                      onSave: (val) =>
-                          context.read<ProfileCubit>().updateProfileName(val),
-                    ),
-
                     value: state.profileName,
                     icon: SvgPicture.asset(
                       "assets/icons/user.svg",
@@ -213,6 +206,13 @@ class _AccountManagementContent extends StatelessWidget {
                         AppColors.primaryColor,
                         BlendMode.srcIn,
                       ),
+                    ),
+                    onEdit: () => _showEditDialog(
+                      context: context,
+                      title: 'تعديل الاسم',
+                      initialValue: state.profileName,
+                      onSave: (val) =>
+                          context.read<ProfileCubit>().updateProfileName(val),
                     ),
                   ),
 

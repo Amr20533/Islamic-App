@@ -25,30 +25,50 @@ class HomeView extends StatelessWidget {
             children: [
               BlocBuilder<ProfileCubit, ProfileState>(
                 builder: (context, state) {
-                  final String name = state is ProfileLoaded ? state.profileName : '';
-                  final String? imagePath = state is ProfileLoaded ? state.profileImagePath : null;
-                  
-                  final greetingText = name.isNotEmpty ? "السلام عليكم، $name" : "السلام عليكم";
+                  final String name = state is ProfileLoaded
+                      ? state.profileName
+                      : '';
+                  final String? imagePath = state is ProfileLoaded
+                      ? state.profileImagePath
+                      : null;
+                  final String? gender = state is ProfileLoaded
+                      ? state.gender
+                      : null;
+
+                  final greetingText = name.isNotEmpty
+                      ? "السلام عليكم، $name"
+                      : "السلام عليكم";
+
+                  ImageProvider avatarImage;
+                  if (imagePath != null && File(imagePath).existsSync()) {
+                    avatarImage = FileImage(File(imagePath));
+                  } else if (gender == 'female') {
+                    avatarImage = const AssetImage(
+                      'assets/images/Ellipse 12 (1).png',
+                    );
+                  } else if (gender == 'male') {
+                    avatarImage = const AssetImage(
+                      'assets/images/Ellipse 12.png',
+                    );
+                  } else {
+                    avatarImage = const AssetImage(
+                      'assets/images/avatar_1.jpg',
+                    );
+                  }
 
                   return Directionality(
                     textDirection: TextDirection.rtl,
                     child: Row(
                       spacing: 12,
                       children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundImage: (imagePath != null && File(imagePath).existsSync())
-                              ? FileImage(File(imagePath)) as ImageProvider
-                              : const AssetImage("assets/images/avatar_1.jpg"),
-                        ),
+                        CircleAvatar(radius: 25, backgroundImage: avatarImage),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               greetingText,
-                              style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                                height: 1.2,
-                              ),
+                              style: AppTextStyles.textTheme.titleLarge!
+                                  .copyWith(height: 1.2),
                             ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -186,7 +206,6 @@ class HomeView extends StatelessWidget {
                       const ProgressCard(
                         icon: 'assets/icons/progress.png',
                         leading: 'استمرارك ',
-                        trailing: '12 يوم',
                       ),
                       const SizedBox(height: 20),
                     ],
@@ -200,56 +219,3 @@ class HomeView extends StatelessWidget {
     );
   }
 }
-
-
-
-// 3. Simple Placeholder for when data is null
-
-
-
-// class HomeView extends StatelessWidget {
-//   HomeView({super.key});
-//
-//   final AudioController controller = locator<AudioController>();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.center,
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           // ElevatedButton(
-//           //   onPressed: () async {
-//           //     await NotificationService().showNotification(
-//           //       id: 1,
-//           //       title: 'موعد الأذان',
-//           //       body: 'حان الان موعد اذان العصر',
-//           //     );
-//           //     Future.delayed(Duration(seconds: 1), (){
-//           //       controller.playAsset('audio/adhan.mp3');
-//           //     });
-//           //
-//           //   },
-//           //   child: const Text('Show Notification'),
-//           // ),
-//           ElevatedButton(
-//             onPressed: () async {
-//               // Access the ALREADY INITIALIZED service
-//               final notificationService = locator<NotificationService>();
-//
-//               await notificationService.scheduleNotification(
-//                 id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Unique ID
-//                 title: 'موعد الأذان',
-//                 body: 'حان الان موعد اذان الظهر',
-//                 scheduledTime: DateTime.now().add(const Duration(seconds: 10)),
-//               );
-//             },
-//             child: const Text('Scheduled Notification'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-// }
