@@ -8,7 +8,10 @@ abstract class AdhanEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AdhanInitializeEvent extends AdhanEvent {}
+// AdhanInitializeEvent removed:
+//   Plugin initialization is the sole responsibility of NotificationService.init().
+//   Having a second initialization path in AdhanBloc caused a duplicate
+//   FlutterLocalNotificationsPlugin instance and reset the tap-response callback.
 
 class AdhanScheduleEvent extends AdhanEvent {
   final PrayerTimes prayerTimes;
@@ -26,4 +29,6 @@ class AdhanPlayEvent extends AdhanEvent {
   List<Object?> get props => [prayerName];
 }
 
-class AdhanStopEvent extends AdhanEvent {}
+class AdhanStopEvent extends AdhanEvent {
+  const AdhanStopEvent();
+}

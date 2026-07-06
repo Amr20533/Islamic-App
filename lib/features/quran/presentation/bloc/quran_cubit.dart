@@ -16,15 +16,24 @@ class QuranInitial extends QuranState {}
 class QuranLoading extends QuranState {}
 
 class QuranLoaded extends QuranState {
-  final Map<int, List<Verse>> pagesInCurrentSurah;
+  final Map<int, List<Verse>> pages;
   final List<AudioReciter> reciters;
+  final Set<int> loadedSurahs;
+  final int activeSurahNumber;
 
-  const QuranLoaded(this.pagesInCurrentSurah, this.reciters);
+  const QuranLoaded({
+    required this.pages,
+    required this.reciters,
+    required this.loadedSurahs,
+    required this.activeSurahNumber,
+  });
 
-  List<int> get sortedPageNumbers => pagesInCurrentSurah.keys.toList()..sort();
+  // For backward compatibility
+  Map<int, List<Verse>> get pagesInCurrentSurah => pages;
+  List<int> get sortedPageNumbers => pages.keys.toList()..sort();
 
   @override
-  List<Object?> get props => [pagesInCurrentSurah, reciters];
+  List<Object?> get props => [pages, reciters, loadedSurahs, activeSurahNumber];
 }
 
 class QuranError extends QuranState {
@@ -37,31 +46,90 @@ class QuranError extends QuranState {
 class QuranCubit extends Cubit<QuranState> {
   QuranCubit() : super(QuranInitial());
 
-  Future<void> loadSurahData(int surahNumber) async {
-    emit(QuranLoading());
+  // Cache variables
+  final Map<int, List<Verse>> _cachedPages = {};
+  final Set<int> _loadedSurahs = {};
+
+  Future<void> loadSurahData(int surahNumber, {bool showGlobalLoading = true}) async {
+    if (showGlobalLoading) {
+      emit(QuranLoading());
+    }
     try {
       final String response = await rootBundle.loadString(
         'assets/surah/surah_$surahNumber.json',
       );
       final data = json.decode(response);
-      List versesData = data['verses'];
+      final List versesData = data['verses'] ?? [];
+      final String surahNameAr = data['name']?['ar'] ?? '';
+      final int surahNum = data['number'] ?? surahNumber;
 
-      Map<int, List<Verse>> tempPages = {};
+      // To avoid duplicate verses from the same Surah, clear existing cache entries for it
+      for (var page in _cachedPages.keys) {
+        _cachedPages[page]!.removeWhere((v) => v.surahNumber == surahNum);
+      }
 
       for (var v in versesData) {
         Verse verse = Verse.fromJson(v);
-        if (!tempPages.containsKey(verse.page)) {
-          tempPages[verse.page] = [];
-        }
-        tempPages[verse.page]!.add(verse);
+        verse.surahNameAr = surahNameAr;
+        verse.surahNumber = surahNum;
+        _cachedPages[verse.page] ??= [];
+        _cachedPages[verse.page]!.add(verse);
+      }
+
+      // Sort verses on each page to maintain correct Quranic sequence
+      for (var page in _cachedPages.keys) {
+        _cachedPages[page]!.sort((a, b) {
+          if (a.surahNumber != b.surahNumber) {
+            return a.surahNumber!.compareTo(b.surahNumber!);
+          }
+          return a.number!.compareTo(b.number!);
+        });
       }
 
       List audioData = data['audio'] ?? [];
       List<AudioReciter> reciters = audioData.map((e) => AudioReciter.fromJson(e)).toList();
 
-      emit(QuranLoaded(tempPages, reciters));
+      _loadedSurahs.add(surahNum);
+
+      emit(QuranLoaded(
+        pages: Map.from(_cachedPages),
+        reciters: reciters,
+        loadedSurahs: Set.from(_loadedSurahs),
+        activeSurahNumber: surahNum,
+      ));
     } catch (e) {
       emit(QuranError(e.toString()));
     }
+  }
+
+  Future<void> loadSurahIfNeeded(int surahNumber) async {
+    if (_loadedSurahs.contains(surahNumber)) {
+      // Already loaded, just update the active Surah number and reciters list
+      if (state is QuranLoaded) {
+        final loadedState = state as QuranLoaded;
+        if (loadedState.activeSurahNumber != surahNumber) {
+          try {
+            final String response = await rootBundle.loadString(
+              'assets/surah/surah_$surahNumber.json',
+            );
+            final data = json.decode(response);
+            List audioData = data['audio'] ?? [];
+            List<AudioReciter> reciters = audioData.map((e) => AudioReciter.fromJson(e)).toList();
+            
+            emit(QuranLoaded(
+              pages: Map.from(_cachedPages),
+              reciters: reciters,
+              loadedSurahs: Set.from(_loadedSurahs),
+              activeSurahNumber: surahNumber,
+            ));
+          } catch (e) {
+            // Keep existing state on error
+          }
+        }
+      }
+      return;
+    }
+    // Load without global spinner for smooth swiping
+    await loadSurahData(surahNumber, showGlobalLoading: false);
   }
 }

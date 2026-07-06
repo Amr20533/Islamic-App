@@ -6,7 +6,7 @@ class AppTables {
     name: 'users',
     createSql: '''
       CREATE TABLE IF NOT EXISTS users (
-        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${SignUpModel.colId}            INTEGER PRIMARY KEY AUTOINCREMENT,
         ${SignUpModel.colFullName}      TEXT    NOT NULL,
         ${SignUpModel.colEmailAddress}  TEXT    UNIQUE NOT NULL,
         ${SignUpModel.colPassword}      TEXT    NOT NULL,

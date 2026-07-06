@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/di/locator.dart';
-import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/calendar/presentation/bloc/calendar_cubit.dart';
-import 'package:islamic_app/features/calendar/presentation/bloc/calendar_state.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/calendar_header.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/calendar_days_slider.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/fard_prayers_card.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/sunnah_prayers_card.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/daily_points_card.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
+import 'package:islamic_app/core/services/helpers/islamic_occasion_helper.dart';
+import 'package:islamic_app/features/calendar/presentation/widgets/calendar_view_header.dart';
+import 'package:islamic_app/features/calendar/presentation/widgets/next_prayer_countdown_card.dart';
+import 'package:islamic_app/features/calendar/presentation/widgets/prayer_times_card.dart';
+import 'package:islamic_app/features/calendar/presentation/widgets/islamic_occasion_card.dart';
 
 class CalendarView extends StatelessWidget {
   const CalendarView({super.key});
@@ -30,88 +31,72 @@ class _CalendarPageContent extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0.5,
-          title: const Text(
-            'تقويم العبادات اليومية',
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryTextColor,
+        backgroundColor: const Color(0xFFF7F5F0),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CalendarViewHeader(
+                  hijriDate: FormatHelper.getHijriFormattedDate(),
+                  gregorianDate: FormatHelper.getMiladFormattedDate(),
+                ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: BlocBuilder<PrayerCubit, PrayerState>(
+                    builder: (context, state) {
+                      if (state is PrayerLoaded) {
+                        return NextPrayerCountdownCard(
+                          nextPrayerName: state.nextPrayerName,
+                          countdown: state.countdown,
+                        );
+                      }
+                      if (state is PrayerLoading) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(40.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: BlocBuilder<PrayerCubit, PrayerState>(
+                    builder: (context, state) {
+                      final todayPrayers = state is PrayerLoaded
+                          ? state.todayPrayers
+                          : <String, DateTime>{};
+
+                      return PrayerTimesCard(todayPrayers: todayPrayers);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 24,
+                  ),
+                  child: Builder(
+                    builder: (context) {
+                      final occasionData =
+                          IslamicOccasionHelper.getNextOccasion();
+                      return IslamicOccasionCard(
+                        occasion: occasionData.occasion,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-          centerTitle: true,
-        ),
-        body: BlocBuilder<CalendarCubit, CalendarState>(
-          builder: (context, state) {
-            if (state is CalendarInitial) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (state is CalendarLoaded) {
-              final cubit = context.read<CalendarCubit>();
-
-              return SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 120), // Avoid overlap with bottom nav
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // 1. Calendar Header (Month navigation & Hijri Date)
-                    CalendarHeader(
-                      focusedMonth: state.focusedMonth,
-                      selectedDate: state.selectedDate,
-                      onPrevMonth: () {
-                        final prev = DateTime(state.focusedMonth.year, state.focusedMonth.month - 1);
-                        cubit.changeFocusedMonth(prev);
-                      },
-                      onNextMonth: () {
-                        final next = DateTime(state.focusedMonth.year, state.focusedMonth.month + 1);
-                        cubit.changeFocusedMonth(next);
-                      },
-                    ),
-
-                    // 2. Horizontal Calendar days list
-                    CalendarDaysSlider(
-                      focusedMonth: state.focusedMonth,
-                      selectedDate: state.selectedDate,
-                      onDateSelected: (date) {
-                        cubit.loadDate(date);
-                      },
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // 3. Fard Prayers Container (الفروض الخمسة)
-                    FardPrayersCard(
-                      fardStates: state.fardStates,
-                      fardCount: state.fardCount,
-                      onToggle: (index) {
-                        cubit.toggleFard(index);
-                      },
-                    ),
-
-                    // 4. Sunan Rawatib Container (السنن الرواتب)
-                    SunnahPrayersCard(
-                      sunnahStates: state.sunnahStates,
-                      onToggle: (index) {
-                        cubit.toggleSunnah(index);
-                      },
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // 5. Total Daily Points Container (مجموع نقاط اليوم)
-                    DailyPointsCard(totalPoints: state.totalPoints),
-                  ],
-                ),
-              );
-            }
-
-            return const Center(child: CircularProgressIndicator());
-          },
         ),
       ),
     );

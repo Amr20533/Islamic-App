@@ -24,14 +24,14 @@ class ZikrDetailBottomNav extends StatelessWidget {
         children: [
           _buildNavButton(
             icon: Icons.chevron_left,
-            label: "التالي",
-            onTap: onNext,
+            label: "السابق",
+            onTap: onPrev,
           ),
           _buildPageIndicator(),
           _buildNavButton(
             icon: Icons.chevron_right,
-            label: "السابق",
-            onTap: onPrev,
+            label: "التالي",
+            onTap: onNext,
           ),
         ],
       ),
@@ -55,11 +55,7 @@ class ZikrDetailBottomNav extends StatelessWidget {
               color: AppColors.lightGreyColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFF6B5040),
-              size: 24,
-            ),
+            child: Icon(icon, color: const Color(0xFF6B5040), size: 24),
           ),
           const SizedBox(height: 6),
           Text(
@@ -78,10 +74,7 @@ class ZikrDetailBottomNav extends StatelessWidget {
 
   Widget _buildPageIndicator() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 40,
-        vertical: 15,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
       decoration: BoxDecoration(
         color: AppColors.lightGreyColor,
         borderRadius: BorderRadius.circular(25),

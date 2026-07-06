@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/core/widgets/app_text_button.dart';
 import 'package:islamic_app/core/widgets/app_text_field.dart';
-import 'package:islamic_app/features/auth/presentation/widgets/auth_button.dart';
+import 'package:islamic_app/di/locator.dart';
+import 'package:islamic_app/features/auth/cubit/login_cubit.dart';
+import 'package:islamic_app/features/auth/cubit/login_state.dart';
 import 'package:islamic_app/features/auth/presentation/widgets/forgot_and_remember_user.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,108 +47,146 @@ class LoginScreen extends StatelessWidget {
                 text: 'تخطي',
               ),
             ),
-            Center(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 11,
-                  vertical: 24,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.creamOverlay,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    width: 1,
-                    color: AppColors.authCardBorderColor,
+            BlocProvider(
+              create: (_) => locator<LoginCubit>(),
+              child: BlocConsumer<LoginCubit, LoginState>(
+            listener: (context, state) {
+              if (state.isSuccess) {
+                email.clear();
+                password.clear();
+                Navigator.pushReplacementNamed(context, AppRoutes.main);
+
+              }
+
+              if (state.message != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message!),
                   ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "تسجيل الدخول",
-                      style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                        fontSize: 32,
-                        color: AppColors.secondaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول",
-                      style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                        fontSize: 12,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    AppTextField(
-                      controller: TextEditingController(),
-                      hintText: 'البريد الإلكتروني',
-                      prefixIcon: 'email.svg',
-                    ),
-                    const SizedBox(height: 12.47),
-                    AppTextField(
-                      controller: TextEditingController(),
-                      hintText: 'كلمة المرور',
-                      prefixIcon: "lock.svg",
-                      isPassword: true,
-                    ),
-                    const SizedBox(height: 6.23),
-                    ForgotAndRememberUser(),
-                    const SizedBox(height: 43.5),
-                    AppPrimaryButton(onPressed: () {}, label: 'دخول'),
-                    const SizedBox(height: 24),
-                    Text(
-                      "أو سجّل الدخول باستخدام",
-                      style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                        fontSize: 12,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      spacing: 15,
-                      children: [
-                        Expanded(
-                          child: AuthButton(
-                            onPressed: () {},
-                            icon: 'apple.svg',
+                );
+              }
+
+            },
+            builder: (context, state) {
+              final cubit = context.read<LoginCubit>();
+
+                  return Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 24),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 11,
+                          vertical: 24,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.creamOverlay,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            width: 1,
+                            color: AppColors.authCardBorderColor,
                           ),
                         ),
-                        Expanded(
-                          child: AuthButton(
-                            onPressed: () {},
-                            icon: 'google.svg',
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "تسجيل الدخول",
+                              style: AppTextStyles.textTheme.titleLarge!.copyWith(
+                                fontSize: 32,
+                                color: AppColors.secondaryTextColor,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول",
+                              style: AppTextStyles.textTheme.labelMedium!.copyWith(
+                                fontSize: 12,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            AppTextField(
+                              controller: email,
+                              hintText: 'البريد الإلكتروني',
+                              prefixIcon: 'email.svg',
+                              onChanged: cubit.updateEmail,
+                            ),
+                            const SizedBox(height: 12.47),
+                            AppTextField(
+                              controller: password,
+                              hintText: 'كلمة المرور',
+                              prefixIcon: "lock.svg",
+                              isPassword: true,
+                              onChanged: cubit.updatePassword,
+                            ),
+                            const SizedBox(height: 6.23),
+                            ForgotAndRememberUser(),
+                            const SizedBox(height: 43.5),
+                            AppPrimaryButton(
+                                onPressed: () {
+                                  if(state.isLoading){
+                                    return;
+                                  }else{
+                                    cubit.login();
+                                  }
+                            },
+                              isLoading: state.isLoading,
+                              label: 'دخول'
+                            ),
+                            // const SizedBox(height: 24),
+                            // Text(
+                            //   "أو سجّل الدخول باستخدام",
+                            //   style: AppTextStyles.textTheme.labelMedium!.copyWith(
+                            //     fontSize: 12,
+                            //     color: AppColors.primaryColor,
+                            //   ),
+                            // ),
+                            // const SizedBox(height: 24),
+                            // Row(
+                            //   spacing: 15,
+                            //   children: [
+                            //     Expanded(
+                            //       child: AuthButton(
+                            //         onPressed: () {},
+                            //         icon: 'apple.svg',
+                            //       ),
+                            //     ),
+                            //     Expanded(
+                            //       child: AuthButton(
+                            //         onPressed: () {},
+                            //         icon: 'google.svg',
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 6,
+                              children: [
+                                Text(
+                                  "ليس لديك حساب؟",
+                                  style: AppTextStyles.textTheme.labelSmall!.copyWith(
+                                    fontSize: 12,
+                                    color: AppColors.thinGreyColor,
+                                  ),
+                                ),
+                                AppTextButton(
+                                  onPressed: () {
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      AppRoutes.signup,
+                                    );
+                                  },
+                                  text: 'أنشئ حسابًا',
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 6,
-                      children: [
-                        Text(
-                          "ليس لديك حساب؟",
-                          style: AppTextStyles.textTheme.labelSmall!.copyWith(
-                            fontSize: 12,
-                            color: AppColors.thinGreyColor,
-                          ),
-                        ),
-                        AppTextButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              AppRoutes.signup,
-                            );
-                          },
-                          text: 'أنشئ حسابًا',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                      ),
+                    );
+                }
+                )
             ),
           ],
         ),

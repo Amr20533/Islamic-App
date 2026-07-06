@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/features/home/presentation/pages/main_view.dart';
+import 'package:islamic_app/core/static_files/app_routes.dart';
 
 class ZikrHeader extends StatelessWidget {
   const ZikrHeader({super.key});
@@ -18,7 +18,7 @@ class ZikrHeader extends StatelessWidget {
               fontFamily: 'Tajawal',
               fontSize: 24,
               fontWeight: FontWeight.w900,
-              color: AppColors.primaryTextColor,
+              color: AppColors.counterColor,
             ),
           ),
           Align(
@@ -29,10 +29,7 @@ class ZikrHeader extends StatelessWidget {
                 color: Color(0xFF3D3020),
                 size: 32,
               ),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainView()),
-              ),
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.main),
             ),
           ),
         ],

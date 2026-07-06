@@ -30,7 +30,7 @@ class TasbeehHeader extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: IconButton(
                 icon: const Icon(
-                  Icons.chevron_right,
+                  Icons.chevron_left,
                   color: Color(0xFF3D3020),
                   size: 32,
                 ),

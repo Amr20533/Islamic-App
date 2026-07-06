@@ -156,7 +156,7 @@ class _ElectronicTasbeehScreenContentState
                 children: [
                   TasbeehHeader(onReset: _resetCounterDialog),
                   const SizedBox(height: 30),
-                  _buildInstructionText(),
+                  const InstructionText(),
                   const Spacer(flex: 2),
                   TasbeehCounterDisplay(counter: counter),
                   const Spacer(flex: 1),
@@ -165,7 +165,7 @@ class _ElectronicTasbeehScreenContentState
                     animationProgress: _animationProgress,
                   ),
                   const Spacer(flex: 2),
-                  _buildFooterText(),
+                  const TasbeehFooterText(),
                 ],
               );
             },
@@ -174,8 +174,13 @@ class _ElectronicTasbeehScreenContentState
       ),
     );
   }
+}
 
-  Widget _buildInstructionText() {
+class InstructionText extends StatelessWidget {
+  const InstructionText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.0),
       child: Text(
@@ -189,8 +194,13 @@ class _ElectronicTasbeehScreenContentState
       ),
     );
   }
+}
 
-  Widget _buildFooterText() {
+class TasbeehFooterText extends StatelessWidget {
+  const TasbeehFooterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.only(bottom: 40.0),
       child: Text(
@@ -205,3 +215,5 @@ class _ElectronicTasbeehScreenContentState
     );
   }
 }
+
+

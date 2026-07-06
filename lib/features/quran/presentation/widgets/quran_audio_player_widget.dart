@@ -26,12 +26,14 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
   AudioReciter? _selectedReciter;
   double _playbackRate = 1.0;
   bool _isRepeat = false;
+  List<AudioReciter> _filteredReciters = [];
 
   @override
   void initState() {
     super.initState();
-    if (widget.reciters.isNotEmpty) {
-      _selectedReciter = widget.reciters.first;
+    _filterReciters();
+    if (_filteredReciters.isNotEmpty) {
+      _selectedReciter = _filteredReciters.first;
     }
 
     _audioPlayer.onPlayerStateChanged.listen((state) {
@@ -68,6 +70,71 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
           _playAudio(_selectedReciter!.link);
         }
       }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant QuranAudioPlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.reciters != widget.reciters) {
+      _filterReciters();
+      if (_selectedReciter != null) {
+        final exists = _filteredReciters.any((r) => r.reciterNameAr == _selectedReciter!.reciterNameAr);
+        if (!exists && _filteredReciters.isNotEmpty) {
+          _selectedReciter = _filteredReciters.first;
+        } else if (exists) {
+          _selectedReciter = _filteredReciters.firstWhere((r) => r.reciterNameAr == _selectedReciter!.reciterNameAr);
+        }
+      } else if (_filteredReciters.isNotEmpty) {
+        _selectedReciter = _filteredReciters.first;
+      }
+    }
+  }
+
+  void _filterReciters() {
+    final allowedKeywords = [
+      'العفاسي',
+      'الدوسري',
+      'فارس عباد',
+      'المعيقلي',
+      'سعد الغامدي',
+      'العجمي',
+      'القطامي',
+      'المنشاوي',
+      'الحصري',
+      'عبدالباسط',
+      'عبد الباسط',
+    ];
+
+    _filteredReciters = widget.reciters.where((reciter) {
+      final name = reciter.reciterNameAr;
+      return allowedKeywords.any((keyword) => name.contains(keyword));
+    }).toList();
+
+    final orderMap = {
+      'العفاسي': 1,
+      'الدوسري': 2,
+      'فارس عباد': 3,
+      'المعيقلي': 4,
+      'سعد الغامدي': 5,
+      'العجمي': 6,
+      'القطامي': 7,
+      'المنشاوي': 8,
+      'الحصري': 9,
+      'عبدالباسط': 10,
+      'عبد الباسط': 10,
+    };
+
+    _filteredReciters.sort((a, b) {
+      int getWeight(String name) {
+        for (final entry in orderMap.entries) {
+          if (name.contains(entry.key)) {
+            return entry.value;
+          }
+        }
+        return 99;
+      }
+      return getWeight(a.reciterNameAr).compareTo(getWeight(b.reciterNameAr));
     });
   }
 
@@ -132,9 +199,9 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: widget.reciters.length,
+                  itemCount: _filteredReciters.length,
                   itemBuilder: (context, index) {
-                    final reciter = widget.reciters[index];
+                    final reciter = _filteredReciters[index];
                     final isSelected = _selectedReciter?.id == reciter.id;
                     return ListTile(
                       title: Text(

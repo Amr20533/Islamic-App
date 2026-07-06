@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class ZikrDetailHeader extends StatelessWidget {
   final String title;
 
-  const ZikrDetailHeader({
-    super.key,
-    required this.title,
-  });
+  const ZikrDetailHeader({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

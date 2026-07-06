@@ -4,7 +4,7 @@ import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/quran/data/models/surah_category.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
-import 'package:islamic_app/features/quran/presentation/pages/surah_details_view.dart';
+import 'package:islamic_app/core/static_files/app_routes.dart';
 
 class SurahTile extends StatelessWidget {
   const SurahTile({super.key, required this.surahModel, this.isLast = false});
@@ -16,11 +16,10 @@ class SurahTile extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         context.read<QuranCubit>().loadSurahData(surahModel.number);
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (_) => SurahDetailsView(surahName: surahModel.name),
-          ),
+          AppRoutes.surahDetails,
+          arguments: {'surahName': surahModel.name},
         );
       },
       child: Container(
@@ -85,13 +84,6 @@ class SurahTile extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-            const Spacer(),
-            Text(
-              "${surahModel.wordsCount} حرف ",
-              style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                fontSize: 16,
-              ),
             ),
           ],
         ),

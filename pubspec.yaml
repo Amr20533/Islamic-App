@@ -33,6 +33,11 @@ dependencies:
   flutter_svg:
   shared_preferences:
   sqflite: 
+  image_picker:
+  path_provider:
+  http:
+  share_plus:
+  android_intent_plus:
 
 dev_dependencies:
   flutter_test:

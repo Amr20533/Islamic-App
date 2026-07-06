@@ -15,25 +15,29 @@ class PrayerLoaded extends PrayerState {
   final String nextPrayerName;
   final DateTime nextPrayerTime;
   final String countdown;
+  final Map<String, DateTime> todayPrayers;
 
   const PrayerLoaded({
     required this.nextPrayerName,
     required this.nextPrayerTime,
     required this.countdown,
+    required this.todayPrayers,
   });
 
   @override
-  List<Object?> get props => [nextPrayerName, nextPrayerTime, countdown];
+  List<Object?> get props => [nextPrayerName, nextPrayerTime, countdown, todayPrayers];
 
   PrayerLoaded copyWith({
     String? nextPrayerName,
     DateTime? nextPrayerTime,
     String? countdown,
+    Map<String, DateTime>? todayPrayers,
   }) {
     return PrayerLoaded(
       nextPrayerName: nextPrayerName ?? this.nextPrayerName,
       nextPrayerTime: nextPrayerTime ?? this.nextPrayerTime,
       countdown: countdown ?? this.countdown,
+      todayPrayers: todayPrayers ?? this.todayPrayers,
     );
   }
 }
