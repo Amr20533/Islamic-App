@@ -8,6 +8,9 @@ import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/features/quran/data/models/quran_metadata.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/mushaf_page_widget.dart';
+import 'package:islamic_app/di/locator.dart';
+import 'package:islamic_app/core/services/streak_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DailyQuranPaper extends StatefulWidget {
   const DailyQuranPaper({super.key});
@@ -89,8 +92,10 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor.withAlpha(20),
                       borderRadius: BorderRadius.circular(12),
@@ -169,9 +174,22 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
               padding: const EdgeInsets.only(bottom: 37, top: 12),
               child: AppPrimaryButton(
                 width: 116,
-                onPressed: () {
+                onPressed: () async {
 
                   Navigator.pushReplacementNamed(context, AppRoutes.login);
+
+
+                  final now = DateTime.now();
+                  final dateStr = "${now.year}-${now.month}-${now.day}";
+                  await locator<SharedPreferences>().setBool(
+                    "daily_quran_done_$dateStr",
+                    true,
+                  );
+                  // Auto-refresh the streak card on home screen
+                  locator<StreakNotifier>().refresh();
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 },
                 label: 'تم',
               ),

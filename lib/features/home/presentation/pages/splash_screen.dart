@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_app/core/widgets/custom_asset_image.dart';
+import 'package:islamic_app/di/locator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
@@ -21,7 +24,14 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.main);
+      final prefs = locator<SharedPreferences>();
+      final isCompleted = prefs.getBool('onboarding_completed') ?? false;
+
+      if (isCompleted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.main);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
     }
   }
 
@@ -41,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/icons/logo.png', width: 200),
+            CustomAssetImage(image: 'assets/icons/logo.png'),
             const SizedBox(height: 32),
             // Your Text
             Text(

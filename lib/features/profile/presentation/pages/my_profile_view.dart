@@ -1,9 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
-import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
-import 'package:islamic_app/features/auth/cubit/user_profile_states.dart';
+import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
+import 'package:islamic_app/features/profile/presentation/bloc/profile_state.dart';
 import 'package:islamic_app/features/profile/presentation/widgets/daily_reminder_card.dart';
 import 'package:islamic_app/features/profile/presentation/widgets/profile_settings_card.dart';
 
@@ -34,7 +34,6 @@ class _ProfileContent extends StatelessWidget {
             children: [
               const SizedBox(height: 24),
 
-              // ── Header ──────────────────────────────────────────────
               const Center(
                 child: Text(
                   'حسابي',
@@ -51,18 +50,27 @@ class _ProfileContent extends StatelessWidget {
 
               // ── Avatar + Name ────────────────────────────────────────
 
-              BlocBuilder<UserProfileCubit, UserProfileState>(
-                builder: (context, state) {
-                  if (state.isLoading) {
-                    return Text(
-                      'يتم تحميل البيانات...',
-                      style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                        height: 1.2,
-                      ),
-                    );
-                  }
+              // BlocBuilder<UserProfileCubit, UserProfileState>(
+              //   builder: (context, state) {
+              //     if (state.isLoading) {
+              //       return Text(
+              //         'يتم تحميل البيانات...',
+              //         style: AppTextStyles.textTheme.titleLarge!.copyWith(
+              //           height: 1.2,
+              //         ),
+              //       );
+              //     }
 
-                  final name = state.user?.fullName ?? '';
+              BlocBuilder<ProfileCubit, ProfileState>(
+                builder: (context, state) {
+                  final name =
+                      state is ProfileLoaded && state.profileName.isNotEmpty
+                      ? state.profileName
+                      : 'مستخدم';
+                  final imagePath = state is ProfileLoaded
+                      ? state.profileImagePath
+                      : null;
+                  final gender = state is ProfileLoaded ? state.gender : null;
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -77,13 +85,19 @@ class _ProfileContent extends StatelessWidget {
                             width: 2,
                           ),
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/avatar_1.jpg',
-                            fit: BoxFit.cover,
-                          ),
+                        child:
+                              imagePath != null && File(imagePath).existsSync()
+                              ? Image.file(File(imagePath), fit: BoxFit.cover)
+                              : Image.asset(
+                                  gender == 'female'
+                                      ? 'assets/images/Ellipse 12 (1).png'
+                                      : gender == 'male'
+                                      ? 'assets/images/Ellipse 12.png'
+                                      : 'assets/images/avatar_1.jpg',
+                                  fit: BoxFit.cover,
+                                ),
                         ),
-                      ),
+
                       const SizedBox(width: 8),
                       Text(
                         name,
@@ -101,12 +115,10 @@ class _ProfileContent extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // ── Daily Reminder Card ──────────────────────────────────
               const DailyReminderCard(),
 
               const SizedBox(height: 24),
 
-              // ── Settings Section Title ───────────────────────────────
               const Text(
                 'الاعدادات ',
                 style: TextStyle(
@@ -119,7 +131,6 @@ class _ProfileContent extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // ── Settings Card ────────────────────────────────────────
               const ProfileSettingsCard(),
 
               const SizedBox(height: 32),

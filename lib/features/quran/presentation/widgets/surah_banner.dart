@@ -12,12 +12,15 @@ class SurahBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         image: const DecorationImage(
-          image: AssetImage('assets/images/surah_banner_frame.png'), // إذا كان لديك إطار زخرفي
+          image: ResizeImage(
+          width: 800,
+          AssetImage('assets/images/surah_banner_frame.png'),
+          ),
           fit: BoxFit.fill,
         ),
         color: Colors.green.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         "سورة $surahName",

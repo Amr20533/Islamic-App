@@ -29,6 +29,10 @@ class DailyDhikrCubit extends Cubit<DailyDhikrState> {
     }
   }
 
+  void initDhikr(int maxCount) {
+    emit(state.copyWith(maxCount: maxCount));
+  }
+
   void resetCount() {
     emit(state.copyWith(count: 0));
   }

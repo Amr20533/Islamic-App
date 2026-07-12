@@ -14,8 +14,11 @@ class NextPrayerVirtueCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         image: const DecorationImage(
-          image: AssetImage(
+          image: ResizeImage(
+            width: 800,
+            AssetImage(
             'assets/images/Gemini_Generated_Image_1vp5pk1vp5pk1vp5 (1) 1.png',
+            ),
           ),
           fit: BoxFit.cover,
         ),

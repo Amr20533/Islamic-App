@@ -20,51 +20,29 @@ import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'core/static_files/app_colors.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initializeDateFormatting('ar', null);
-
+  // Run independent, fast inits in parallel instead of sequentially
   final sharedPreferences = await SharedPreferences.getInstance();
+  await Future.wait([
+    initializeDateFormatting('ar', null),
+  ]);
+
   service_locator.setupLocator(sharedPreferences);
 
-  await _getLocation();
+  final cachedLat = sharedPreferences.getDouble('last_lat') ?? 30.0444;
+  final cachedLng = sharedPreferences.getDouble('last_lng') ?? 31.2357;
 
-  debugPrint('🔔 Initializing notifications...');
-  await NotificationService().init();
-  debugPrint('✅ Notifications initialized');
-
-  await NotificationService().scheduleDailyReminderAt(hour: 8, minute: 0);
-  debugPrint('✅ Default daily reminder scheduled at 08:00');
+  service_locator.locator.registerLazySingleton<PrayerCubit>(
+        () => PrayerCubit(latitude: cachedLat, longitude: cachedLng),
+  );
 
   runApp(const MyApp());
-}
 
-/// الحصول على الموقع الجغرافي للمستخدم
-Future<void> _getLocation() async {
-  try {
-    final position = await LocationHelper.getCurrentLocation();
-    debugPrint('📍 Location: ${position?.latitude}, ${position?.longitude}');
-
-    if (!service_locator.locator.isRegistered<PrayerCubit>()) {
-      service_locator.locator.registerLazySingleton<PrayerCubit>(
-        () => PrayerCubit(
-          latitude: position?.latitude ?? 30.0444,
-          longitude: position?.longitude ?? 31.2357,
-        ),
-      );
-    }
-  } catch (e) {
-    debugPrint('⚠️ Location not available: $e');
-    debugPrint('📍 Using default location (Cairo)');
-
-    if (!service_locator.locator.isRegistered<PrayerCubit>()) {
-      service_locator.locator.registerLazySingleton<PrayerCubit>(
-        () => PrayerCubit(latitude: 30.0444, longitude: 31.2357),
-      );
-    }
-  }
+  // Everything below runs AFTER first frame — doesn't block startup.
+  _updateLocationInBackground(sharedPreferences);
+  _initNotificationsInBackground();
 }
 
 class MyApp extends StatefulWidget {
@@ -160,4 +138,30 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ),
     );
   }
+}
+
+Future<void> _updateLocationInBackground(SharedPreferences prefs) async {
+  try {
+    final position = await LocationHelper.getCurrentLocation();
+    if (position == null) return;
+
+    // persist for instant startup next time
+    await prefs.setDouble('last_lat', position.latitude);
+    await prefs.setDouble('last_lng', position.longitude);
+
+    if (service_locator.locator.isRegistered<PrayerCubit>()) {
+      service_locator.locator<PrayerCubit>()
+          .updateLocation(position.latitude, position.longitude);
+    }
+    debugPrint('📍 Location updated: ${position.latitude}, ${position.longitude}');
+  } catch (e) {
+    debugPrint('⚠️ Location not available: $e');
+  }
+}
+
+Future<void> _initNotificationsInBackground() async {
+  debugPrint('🔔 Initializing notifications...');
+  await NotificationService().init();
+  await NotificationService().scheduleDailyReminderAt(hour: 8, minute: 0);
+  debugPrint('✅ Notifications ready');
 }

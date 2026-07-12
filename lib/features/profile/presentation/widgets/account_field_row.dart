@@ -29,24 +29,25 @@ class AccountFieldRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              GestureDetector(
-                onTap: onEdit,
-                child: SvgPicture.asset('assets/svg/iconamoon_edit-thin.svg'),
+              icon,
+              const SizedBox(width: 12),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryTextColor,
+                ),
               ),
             ],
           ),
-
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryTextColor,
-            ),
+          GestureDetector(
+            onTap: onEdit,
+            child: SvgPicture.asset('assets/svg/iconamoon_edit-thin.svg'),
           ),
-          icon,
         ],
       ),
     );

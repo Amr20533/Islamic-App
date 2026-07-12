@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
+import 'package:islamic_app/core/widgets/custom_asset_image.dart';
 
 class PrayerTimesCard extends StatelessWidget {
   final Map<String, DateTime?> todayPrayers;
@@ -16,8 +17,11 @@ class PrayerTimesCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         image: const DecorationImage(
-          image: AssetImage(
+          image: ResizeImage(
+            width: 800,
+            AssetImage(
             'assets/images/Gemini_Generated_Image_1vp5pk1vp5pk1vp5 (1) 1.png',
+            ),
           ),
           fit: BoxFit.cover,
         ),
@@ -143,9 +147,14 @@ class _PrayerRow extends StatelessWidget {
           Row(
             children: [
               if (isPng)
-                Image.asset(iconPath, width: 32, height: 32)
+              CustomAssetImage(image: iconPath,width: 32, height: 32)
               else
-                SvgPicture.asset(iconPath, width: 24, height: 24),
+                SvgPicture.asset(
+                  iconPath,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                ),
               const SizedBox(width: 8),
               Text(
                 name,

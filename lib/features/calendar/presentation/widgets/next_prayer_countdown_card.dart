@@ -24,7 +24,10 @@ class NextPrayerCountdownCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         image: const DecorationImage(
-          image: AssetImage('assets/images/image.png'),
+          image: ResizeImage(
+              width: 800,
+              AssetImage('assets/images/image.png'),
+          ),
           fit: BoxFit.cover,
         ),
         boxShadow: [

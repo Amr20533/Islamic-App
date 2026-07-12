@@ -20,7 +20,7 @@ class AppPrimaryButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
-    this.width = double.infinity,
+    this.width = 124,
     this.height = 40,
     this.radius = 12.47,
     this.fontSize = 16,

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
-import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
-import 'package:islamic_app/features/auth/cubit/user_profile_states.dart';
 import 'package:islamic_app/features/home/presentation/widgets/daily_plan_card.dart';
 import 'package:islamic_app/features/home/presentation/widgets/progress_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,68 +21,72 @@ class HomeView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              BlocBuilder<UserProfileCubit, UserProfileState>(
+              BlocBuilder<ProfileCubit, ProfileState>(
                 builder: (context, state) {
-                  if (state.isLoading) {
-                    return Text(
-                      'يتم تحميل البيانات...',
-                      style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                        height: 1.2,
-                      ),
+                  final String name = state is ProfileLoaded
+                      ? state.profileName
+                      : '';
+                  final String? imagePath = state is ProfileLoaded
+                      ? state.profileImagePath
+                      : null;
+                  final String? gender = state is ProfileLoaded
+                      ? state.gender
+                      : null;
+
+                  final greetingText = name.isNotEmpty
+                      ? "السلام عليكم، $name"
+                      : "السلام عليكم";
+
+                  ImageProvider avatarImage;
+                  if (imagePath != null && File(imagePath).existsSync()) {
+                    avatarImage = FileImage(File(imagePath));
+                  } else if (gender == 'female') {
+                    avatarImage = const AssetImage(
+                      'assets/images/Ellipse 12 (1).png',
+                    );
+                  } else if (gender == 'male') {
+                    avatarImage = const AssetImage(
+                      'assets/images/Ellipse 12.png',
+                    );
+                  } else {
+                    avatarImage = const AssetImage(
+                      'assets/images/avatar_1.jpg',
                     );
                   }
-
-                  final name = state.user?.fullName ?? '';
-
-                  final greetingText = name.isNotEmpty ? "السلام عليكم، $name" : "السلام عليكم";
 
                   return Directionality(
                     textDirection: TextDirection.rtl,
                     child: Row(
+                      spacing: 12,
                       children: [
-                        const CircleAvatar(
-                          radius: 25,
-                          backgroundImage: AssetImage("assets/images/avatar_1.jpg"),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                greetingText,
-                                style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                                  height: 1.2,
+                        CircleAvatar(radius: 25, backgroundImage: avatarImage),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              greetingText,
+                              style: AppTextStyles.textTheme.titleLarge!
+                                  .copyWith(height: 1.2),
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              spacing: 3,
+                              children: [
+                                Text(
+                                  "جميل أنك عدت اليوم",
+                                  style: AppTextStyles.textTheme.labelMedium,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-
-                              const SizedBox(height: 4),
-
-                              Row(
-                                children: [
-                                  Text(
-                                    "جميل أنك عدت اليوم",
-                                    style: AppTextStyles.textTheme.labelMedium,
-                                  ),
-
-                                  const SizedBox(width: 3),
-
-                                  Image.asset(
-                                    "assets/icons/like.png",
-                                    width: 16,
-                                    height: 16,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                Image.asset(
+                                  "assets/icons/like.png",
+                                  width: 16,
+                                  height: 16,
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
-                    )
+                    ),
                   );
                 },
               ),
@@ -131,7 +133,6 @@ class HomeView extends StatelessWidget {
                   const ProgressCard(
                     icon: 'assets/icons/progress.png',
                     leading: 'استمرارك ',
-                    trailing: '12 يوم',
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -143,56 +144,3 @@ class HomeView extends StatelessWidget {
     );
   }
 }
-
-
-
-// 3. Simple Placeholder for when data is null
-
-
-
-// class HomeView extends StatelessWidget {
-//   HomeView({super.key});
-//
-//   final AudioController controller = locator<AudioController>();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.center,
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           // ElevatedButton(
-//           //   onPressed: () async {
-//           //     await NotificationService().showNotification(
-//           //       id: 1,
-//           //       title: 'موعد الأذان',
-//           //       body: 'حان الان موعد اذان العصر',
-//           //     );
-//           //     Future.delayed(Duration(seconds: 1), (){
-//           //       controller.playAsset('audio/adhan.mp3');
-//           //     });
-//           //
-//           //   },
-//           //   child: const Text('Show Notification'),
-//           // ),
-//           ElevatedButton(
-//             onPressed: () async {
-//               // Access the ALREADY INITIALIZED service
-//               final notificationService = locator<NotificationService>();
-//
-//               await notificationService.scheduleNotification(
-//                 id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Unique ID
-//                 title: 'موعد الأذان',
-//                 body: 'حان الان موعد اذان الظهر',
-//                 scheduledTime: DateTime.now().add(const Duration(seconds: 10)),
-//               );
-//             },
-//             child: const Text('Scheduled Notification'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-// }

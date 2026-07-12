@@ -5,9 +5,33 @@ import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/azkar/presentation/widgets/tour_completed_card.dart';
+import 'package:islamic_app/core/constants/daily_content.dart';
 
-class DailyZikr extends StatelessWidget {
+class DailyZikr extends StatefulWidget {
   const DailyZikr({super.key});
+
+  @override
+  State<DailyZikr> createState() => _DailyZikrState();
+}
+
+class _DailyZikrState extends State<DailyZikr> {
+  late final Map<String, dynamic> _currentDhikr;
+
+  @override
+  void initState() {
+    super.initState();
+    final index = DailyContent.getDayOfYearIndex(DailyContent.adhkhar.length);
+    _currentDhikr = DailyContent.adhkhar[index];
+
+    // Initialize the Cubit with the daily maxCount
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<DailyDhikrCubit>().initDhikr(
+          _currentDhikr['maxCount'] as int,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +60,17 @@ class DailyZikr extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "\"استغفر الله\"",
-                      style: AppTextStyles.textTheme.displayLarge?.copyWith(
-                        fontFamily: 'QuranFont',
-                        fontSize: 48,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        _currentDhikr['text'] as String,
+                        style: AppTextStyles.textTheme.displayLarge?.copyWith(
+                          fontFamily: 'Tajawal',
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryTextColor,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     BlocBuilder<DailyDhikrCubit, DailyDhikrState>(

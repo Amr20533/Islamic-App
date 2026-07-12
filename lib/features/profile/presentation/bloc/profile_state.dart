@@ -12,6 +12,7 @@ class ProfileLoaded extends ProfileState {
   final String profileName;
   final String profileEmail;
   final String profilePassword;
+  final String? gender;
 
   ProfileLoaded({
     required this.isDailyReminderEnabled,
@@ -20,23 +21,30 @@ class ProfileLoaded extends ProfileState {
     required this.profileName,
     required this.profileEmail,
     required this.profilePassword,
+    this.gender,
   });
 
   ProfileLoaded copyWith({
     bool? isDailyReminderEnabled,
     String? dailyReminderTime,
     String? profileImagePath,
+    bool clearImage = false,
     String? profileName,
     String? profileEmail,
     String? profilePassword,
+    String? gender,
   }) {
     return ProfileLoaded(
-      isDailyReminderEnabled: isDailyReminderEnabled ?? this.isDailyReminderEnabled,
+      isDailyReminderEnabled:
+          isDailyReminderEnabled ?? this.isDailyReminderEnabled,
       dailyReminderTime: dailyReminderTime ?? this.dailyReminderTime,
-      profileImagePath: profileImagePath ?? this.profileImagePath,
+      profileImagePath: clearImage
+          ? null
+          : (profileImagePath ?? this.profileImagePath),
       profileName: profileName ?? this.profileName,
       profileEmail: profileEmail ?? this.profileEmail,
       profilePassword: profilePassword ?? this.profilePassword,
+      gender: gender ?? this.gender,
     );
   }
 }

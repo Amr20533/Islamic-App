@@ -92,7 +92,10 @@ class _QuranViewState extends State<QuranView> {
                         color: AppColors.authCardBorderColor,
                         borderRadius: BorderRadius.circular(8),
                         image: const DecorationImage(
-                          image: AssetImage('assets/images/quran_banner_1.png'),
+                          image: ResizeImage(
+                            width: 800,
+                            AssetImage('assets/images/quran_banner_1.png'),
+                          ),
                           fit: BoxFit.fill,
                         ),
                       ),

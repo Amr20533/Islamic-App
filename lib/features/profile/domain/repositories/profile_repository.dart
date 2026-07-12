@@ -11,4 +11,6 @@ abstract class ProfileRepository {
   Future<void> saveProfileEmail(String email);
   Future<String> getProfilePassword();
   Future<void> saveProfilePassword(String password);
+  Future<String?> getGender();
+  Future<void> saveGender(String gender);
 }

@@ -4,14 +4,15 @@ import 'package:adhan_dart/adhan_dart.dart';
 import 'prayer_state.dart';
 
 class PrayerCubit extends Cubit<PrayerState> {
-  final double latitude;
-  final double longitude;
+  double latitude;
+  double longitude;
   Timer? _timer;
 
   PrayerCubit({required this.latitude, required this.longitude})
-    : super(PrayerInitial()) {
+      : super(PrayerInitial()) {
     init();
   }
+
 
   final CalculationParameters _params = CalculationMethodParameters.egyptian()
     ..madhab = Madhab.shafi;
@@ -24,6 +25,7 @@ class PrayerCubit extends Cubit<PrayerState> {
       _updatePrayerTimes();
     });
   }
+
 
   void _updatePrayerTimes() {
     try {
@@ -100,6 +102,16 @@ class PrayerCubit extends Cubit<PrayerState> {
     final seconds = diff.inSeconds % 60;
 
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+
+  void updateLocation(double lat, double lng) {
+    if ((latitude - lat).abs() < 0.01 && (longitude - lng).abs() < 0.01) {
+      return;
+    }
+    latitude = lat;
+    longitude = lng;
+    init(); // re-run prayer time calculation with new coords
   }
 
   @override

@@ -35,6 +35,7 @@ import 'package:islamic_app/features/profile/data/datasources/profile_local_data
 import 'package:islamic_app/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:islamic_app/features/profile/domain/repositories/profile_repository.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
+import 'package:islamic_app/core/services/streak_notifier.dart';
 
 final GetIt locator = GetIt.instance;
 
@@ -101,6 +102,7 @@ void setupLocator(SharedPreferences sharedPreferences) {
       notificationService: locator<NotificationService>(),
     ),
   );
+
   locator.registerFactory<LoginCubit>(
         () => LoginCubit(
       locator<UserRepository>(),
@@ -129,4 +131,8 @@ void setupLocator(SharedPreferences sharedPreferences) {
     ),
   );
 
+
+  locator.registerLazySingleton<StreakNotifier>(
+    () => StreakNotifier(locator<SharedPreferences>()),
+  );
 }

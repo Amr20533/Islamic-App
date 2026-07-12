@@ -17,8 +17,11 @@ class IslamicOccasionCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         image: const DecorationImage(
-          image: AssetImage(
+          image: ResizeImage(
+            width: 800,
+            AssetImage(
             'assets/images/Gemini_Generated_Image_p06u05p06u05p06u (1) 1.png',
+          ),
           ),
           fit: BoxFit.cover,
         ),
