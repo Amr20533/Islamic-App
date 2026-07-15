@@ -32,10 +32,7 @@ class _ZikrViewState extends State<ZikrView> {
     Navigator.pushNamed(
       context,
       AppRoutes.azkarDetail,
-      arguments: {
-        'categoryTitle': title,
-        'categoryId': categoryId,
-      },
+      arguments: {'categoryTitle': title, 'categoryId': categoryId},
     ).then((_) {
       if (mounted) {
         context.read<AzkarCubit>().loadCategories();
@@ -43,17 +40,33 @@ class _ZikrViewState extends State<ZikrView> {
     });
   }
 
+  String _normalizeArabic(String text) {
+    var result = text;
+    // Remove diacritics (tashkeel)
+    result = result.replaceAll(RegExp(r'[\u064B-\u065F\u0670]'), '');
+    // Normalize alef variants
+    result = result.replaceAll('أ', 'ا');
+    result = result.replaceAll('إ', 'ا');
+    result = result.replaceAll('آ', 'ا');
+    result = result.replaceAll('ى', 'ي');
+    // Normalize taa marbuta
+    result = result.replaceAll('ة', 'ه');
+    // Normalize hamza variants
+    result = result.replaceAll('ؤ', 'و');
+    result = result.replaceAll('ئ', 'ي');
+    return result.trim();
+  }
+
   List<AzkarCategory> _filterCategories(List<AzkarCategory> categories) {
     if (_searchQuery.isEmpty) return categories;
+    final normalizedQuery = _normalizeArabic(_searchQuery);
     return categories
-        .where((cat) => cat.title.contains(_searchQuery))
+        .where((cat) => _normalizeArabic(cat.title).contains(normalizedQuery))
         .toList();
   }
 
   List<AzkarCategory> _getRemainingCategories(List<AzkarCategory> categories) {
-    return categories
-        .where((cat) => !_featuredIds.contains(cat.id))
-        .toList();
+    return categories.where((cat) => !_featuredIds.contains(cat.id)).toList();
   }
 
   @override
@@ -131,10 +144,7 @@ class _ZikrViewState extends State<ZikrView> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: ElectronicTasbeehCard(
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            AppRoutes.electronicTasbeeh,
-          );
+          Navigator.pushNamed(context, AppRoutes.electronicTasbeeh);
         },
       ),
     );

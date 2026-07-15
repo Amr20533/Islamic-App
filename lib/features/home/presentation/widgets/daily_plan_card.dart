@@ -44,24 +44,26 @@ class _DailyPlanCardState extends State<DailyPlanCard> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: CustomPaint(
-          size: const Size(342, 328),
+          size: const Size(342, 310),
           painter: DailyPlanPainter(),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 29),
             width: 342,
-            height: 328,
+            height: 310,
             alignment: AlignmentDirectional.topStart,
             child: Directionality(
               textDirection: TextDirection.rtl,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12),
                   Text('خطتك اليوم', style: AppTextStyles.textTheme.bodyLarge),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   PlanItem(
                     onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.dailyQuranPaper).then((_) {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.dailyQuranPaper,
+                      ).then((_) {
                         _loadPlanStates();
                       });
                     },
@@ -73,11 +75,16 @@ class _DailyPlanCardState extends State<DailyPlanCard> {
                   const SizedBox(height: 18),
                   Builder(
                     builder: (context) {
-                      final dhikrIndex = DailyContent.getDayOfYearIndex(DailyContent.adhkhar.length);
+                      final dhikrIndex = DailyContent.getDayOfYearIndex(
+                        DailyContent.adhkhar.length,
+                      );
                       final currentDhikr = DailyContent.adhkhar[dhikrIndex];
                       return PlanItem(
                         onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.dailyDhikr).then((_) {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.dailyDhikr,
+                          ).then((_) {
                             _loadPlanStates();
                           });
                         },
@@ -86,12 +93,14 @@ class _DailyPlanCardState extends State<DailyPlanCard> {
                         subtitle: currentDhikr['subtitle'] as String,
                         isDone: _dhikrDone,
                       );
-                    }
+                    },
                   ),
                   const SizedBox(height: 18),
                   PlanItem(
                     onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.dailyDua).then((_) {
+                      Navigator.pushNamed(context, AppRoutes.dailyDua).then((
+                        _,
+                      ) {
                         _loadPlanStates();
                       });
                     },

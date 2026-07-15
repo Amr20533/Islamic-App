@@ -169,17 +169,28 @@ class NotificationService {
 
   /// Schedule a prayer (Adhan) notification.
   /// Cancels any existing alarm with the same [id] first.
+  /// If [prayerTime] is in the past, schedules for the next day automatically.
   Future<void> schedulePrayerNotification({
     required int id,
     required String prayerName,
     required DateTime prayerTime,
   }) async {
     await cancelNotification(id);
+
+    var scheduledTime = tz.TZDateTime.from(prayerTime, tz.local);
+    final now = tz.TZDateTime.now(tz.local);
+
+    // If the prayer time has already passed today, schedule for tomorrow
+    if (scheduledTime.isBefore(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+      debugPrint('⏭ Prayer time passed — rescheduled to tomorrow: $scheduledTime');
+    }
+
     await _schedule(
       id: id,
       title: 'حان وقت صلاة $prayerName 🕌',
       body: 'حي على الصلاة، حي على الفلاح',
-      at: tz.TZDateTime.from(prayerTime, tz.local),
+      at: scheduledTime,
       details: _prayerDetails,
     );
   }
@@ -272,7 +283,7 @@ class NotificationService {
     required NotificationDetails details,
     DateTimeComponents? recurring,
   }) async {
-    // Skip past one-shot notifications
+    // Guard: skip only if still in the past after caller adjustments
     if (recurring == null && at.isBefore(tz.TZDateTime.now(tz.local))) {
       debugPrint('⚠️ Skipping past notification id=$id ($at)');
       return;

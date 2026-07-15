@@ -34,6 +34,7 @@ class _ProfileContent extends StatelessWidget {
             children: [
               const SizedBox(height: 24),
 
+              // ── Header ──────────────────────────────────────────────
               const Center(
                 child: Text(
                   'حسابي',
@@ -49,18 +50,6 @@ class _ProfileContent extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── Avatar + Name ────────────────────────────────────────
-
-              // BlocBuilder<UserProfileCubit, UserProfileState>(
-              //   builder: (context, state) {
-              //     if (state.isLoading) {
-              //       return Text(
-              //         'يتم تحميل البيانات...',
-              //         style: AppTextStyles.textTheme.titleLarge!.copyWith(
-              //           height: 1.2,
-              //         ),
-              //       );
-              //     }
-
               BlocBuilder<ProfileCubit, ProfileState>(
                 builder: (context, state) {
                   final name =
@@ -70,7 +59,6 @@ class _ProfileContent extends StatelessWidget {
                   final imagePath = state is ProfileLoaded
                       ? state.profileImagePath
                       : null;
-                  final gender = state is ProfileLoaded ? state.gender : null;
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -85,19 +73,16 @@ class _ProfileContent extends StatelessWidget {
                             width: 2,
                           ),
                         ),
-                        child:
+                        child: ClipOval(
+                          child:
                               imagePath != null && File(imagePath).existsSync()
                               ? Image.file(File(imagePath), fit: BoxFit.cover)
                               : Image.asset(
-                                  gender == 'female'
-                                      ? 'assets/images/Ellipse 12 (1).png'
-                                      : gender == 'male'
-                                      ? 'assets/images/Ellipse 12.png'
-                                      : 'assets/images/avatar_1.jpg',
+                                  'assets/images/avatar_1.jpg',
                                   fit: BoxFit.cover,
                                 ),
                         ),
-
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         name,
@@ -115,10 +100,12 @@ class _ProfileContent extends StatelessWidget {
 
               const SizedBox(height: 24),
 
+              // ── Daily Reminder Card ──────────────────────────────────
               const DailyReminderCard(),
 
               const SizedBox(height: 24),
 
+              // ── Settings Section Title ───────────────────────────────
               const Text(
                 'الاعدادات ',
                 style: TextStyle(
@@ -131,6 +118,7 @@ class _ProfileContent extends StatelessWidget {
 
               const SizedBox(height: 12),
 
+              // ── Settings Card ────────────────────────────────────────
               const ProfileSettingsCard(),
 
               const SizedBox(height: 32),

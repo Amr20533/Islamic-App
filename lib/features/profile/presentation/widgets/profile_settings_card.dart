@@ -6,6 +6,11 @@ import 'package:islamic_app/features/profile/presentation/pages/account_manageme
 import 'package:islamic_app/features/profile/presentation/pages/report_problem_view.dart';
 import 'package:islamic_app/features/profile/presentation/pages/rate_app_view.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:islamic_app/di/locator.dart';
+import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
+
 class ProfileSettingsCard extends StatelessWidget {
   const ProfileSettingsCard({super.key});
 
@@ -94,8 +99,20 @@ class ProfileSettingsCard extends StatelessWidget {
             label: 'تسجيل الخروج',
             labelColor: AppColors.primaryColor,
             iconColor: AppColors.primaryColor,
-            onTap: () =>
-                Navigator.pushReplacementNamed(context, AppRoutes.login),
+            onTap: () async {
+              final prefs = locator<SharedPreferences>();
+              await prefs.clear(); // Clear all user configurations, state, and onboarding status
+              
+              if (context.mounted) {
+                // Reload ProfileCubit to update UI states immediately
+                context.read<ProfileCubit>().loadProfile();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.login, // Will transparently route to Onboarding since prefs are cleared
+                  (route) => false,
+                );
+              }
+            },
           ),
         ],
       ),

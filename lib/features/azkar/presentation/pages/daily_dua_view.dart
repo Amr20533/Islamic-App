@@ -73,7 +73,7 @@ class DailyDuaView extends StatelessWidget {
                 },
                 label: 'تم',
               ),
-              const SizedBox(height: 37),
+              const SizedBox(height: 60),
             ],
           ),
         ),

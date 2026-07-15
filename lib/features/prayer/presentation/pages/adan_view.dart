@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/features/prayer/domain/entities/prayer_alarm_config.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_cubit.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_state.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
 import 'package:islamic_app/features/prayer/presentation/widgets/adan_view_header.dart';
@@ -14,8 +15,8 @@ class AdanView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<PrayerAlarmCubit>(
-      create: (context) => locator<PrayerAlarmCubit>()..loadAlarms(prayerAlarmConfigs),
+    return BlocProvider<PrayerAlarmCubit>.value(
+      value: locator<PrayerAlarmCubit>()..loadAlarms(prayerAlarmConfigs),
       child: const Directionality(
         textDirection: TextDirection.rtl,
         child: _AdanPageContent(),
@@ -32,43 +33,53 @@ class _AdanPageContent extends StatefulWidget {
 }
 
 class _AdanPageContentState extends State<_AdanPageContent> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final prayerState = context.read<PrayerCubit>().state;
-      if (prayerState is PrayerLoaded) {
-        context.read<PrayerAlarmCubit>().rescheduleEnabledAlarms(
-              configs: prayerAlarmConfigs,
-              todayPrayers: prayerState.todayPrayers,
-            );
-      }
-    });
+  bool _rescheduled = false;
+
+  void _tryReschedule(BuildContext context) {
+    if (_rescheduled) return;
+    final alarmState = context.read<PrayerAlarmCubit>().state;
+    if (alarmState is! PrayerAlarmLoaded) return;
+
+    final prayerState = context.read<PrayerCubit>().state;
+    if (prayerState is! PrayerLoaded) return;
+
+    _rescheduled = true;
+    context.read<PrayerAlarmCubit>().rescheduleEnabledAlarms(
+      configs: prayerAlarmConfigs,
+      todayPrayers: prayerState.todayPrayers,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFF7F5F0),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              AdanViewHeader(),
-              SizedBox(height: 24),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: AlarmCard(),
-              ),
-              SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: NextPrayerVirtueCard(),
-              ),
-              SizedBox(height: 24),
-            ],
+    return BlocListener<PrayerAlarmCubit, PrayerAlarmState>(
+      // Reschedule as soon as alarms are loaded from storage
+      listener: (context, state) {
+        if (state is PrayerAlarmLoaded) {
+          _tryReschedule(context);
+        }
+      },
+      child: const Scaffold(
+        backgroundColor: Color(0xFFF7F5F0),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AdanViewHeader(),
+                SizedBox(height: 24),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: AlarmCard(),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: NextPrayerVirtueCard(),
+                ),
+                SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),

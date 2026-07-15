@@ -24,6 +24,9 @@ import 'package:islamic_app/features/prayer/presentation/pages/adan_view.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/azkar_cubit.dart';
 import 'package:islamic_app/features/onbording/presentation/screens/onpording_1.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:islamic_app/di/locator.dart';
+
 class AppRoutes {
   static const splash = '/';
   static const login = '/log-in';
@@ -51,7 +54,12 @@ class AppRoutes {
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        // Temporarily bypass login screen to show the next screens directly
+        final prefs = locator<SharedPreferences>();
+        final isCompleted = prefs.getBool('onboarding_completed') ?? false;
+        return MaterialPageRoute(
+          builder: (_) => isCompleted ? const MainView() : const Onpording1(),
+        );
       case signup:
         return MaterialPageRoute(builder: (_) => const SignupScreen());
       case main:

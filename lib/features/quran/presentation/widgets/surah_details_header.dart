@@ -23,12 +23,12 @@ class SurahDetailsHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _HeaderIconButton(icon: Icons.arrow_back, onTap: onBackPressed),
           _SurahJuzBanner(
             surahName: surahName,
             juzName: juzName,
             pageNumber: pageNumber,
           ),
+          _HeaderIconButton(icon: Icons.arrow_forward_ios, onTap: onBackPressed),
         ],
       ),
     );

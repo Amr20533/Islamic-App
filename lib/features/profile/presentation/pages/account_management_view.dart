@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
-import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
-import 'package:islamic_app/features/auth/cubit/user_profile_states.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
@@ -28,165 +25,23 @@ class AccountManagementView extends StatelessWidget {
 class _AccountManagementContent extends StatelessWidget {
   const _AccountManagementContent();
 
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F0),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F5F0),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.chevron_left,
-            color: Color(0xFF3D3020),
-            size: 32,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-
-        centerTitle: true,
-        title: const Text(
-          'إدارة الحساب',
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.counterColor,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-
-                  // ── Circular Avatar with Edit Overlay ────────────────────
-                  BlocBuilder<ProfileCubit, ProfileState>(
-                      builder: (context, state) {
-
-                        if (state is ProfileLoading || state is ProfileInitial) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        if (state is ProfileError) {
-                          return Center(child: Text(state.message));
-                        }
-                        if (state is ProfileLoaded) {
-
-                          return ProfileAvatarSelector(
-                        imagePath: state.profileImagePath,
-                        onEditTap: () => _pickImage(context),
-                      );
-                    }
-                      return Container();
-                    }
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // ── Name Row ─────────────────────────────────────────────
-                  BlocBuilder<UserProfileCubit, UserProfileState>(
-                      builder: (context, userProfState) {
-                        if (userProfState.isLoading) {
-                          return Text(
-                            'يتم تحميل البيانات...',
-                            style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                              height: 1.2,
-                            ),
-                          );
-                        }
-
-                      final name = userProfState.user?.fullName ?? '';
-                      return AccountFieldRow(
-                        onEdit: () => _showEditDialog(
-                          context: context,
-                          title: 'تعديل الاسم',
-                          initialValue: name,
-                          onSave: (val) =>
-                              context.read<ProfileCubit>().updateProfileName(val),
-                        ),
-
-                        value: name,
-                        icon: SvgPicture.asset(
-                          "assets/icons/user.svg",
-                          width: 20,
-                          height: 20,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.primaryColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      );
-                    }
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // ── Email Row ────────────────────────────────────────────
-                  BlocBuilder<UserProfileCubit, UserProfileState>(
-                      builder: (context, userProfState) {
-                        if (userProfState.isLoading) {
-                          return Text(
-                            'يتم تحميل البيانات...',
-                            style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                              height: 1.2,
-                            ),
-                          );
-                        }
-
-                      final email = userProfState.user?.emailAddress ?? '';
-                      return AccountFieldRow(
-                        value: email,
-                        icon: SvgPicture.asset(
-                          'assets/icons/email.svg',
-                          width: 20,
-                          height: 20,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.primaryColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        onEdit: () => _showEditDialog(
-                          context: context,
-                          title: 'تعديل البريد الإلكتروني',
-                          initialValue: email,
-                          onSave: (val) =>
-                              context.read<ProfileCubit>().updateProfileEmail(val),
-                        ),
-                      );
-                    }
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // ── Password Row ─────────────────────────────────────────
-                  // AccountFieldRow(
-                  //   value: '*' * state.profilePassword.length,
-                  //   icon: SvgPicture.asset(
-                  //     'assets/icons/lock.svg',
-                  //     width: 20,
-                  //     height: 20,
-                  //     colorFilter: const ColorFilter.mode(
-                  //       AppColors.primaryColor,
-                  //       BlendMode.srcIn,
-                  //     ),
-                  //   ),
-                  //   onEdit: () => _showEditDialog(
-                  //     context: context,
-                  //     title: 'تعديل كلمة المرور',
-                  //     initialValue: state.profilePassword,
-                  //     isPassword: true,
-                  //     onSave: (val) => context
-                  //         .read<ProfileCubit>()
-                  //         .updateProfilePassword(val),
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
-    );
+  Future<void> _pickImage(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      try {
+        final directory = await getApplicationDocumentsDirectory();
+        final fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final savedFile = await File(
+          pickedFile.path,
+        ).copy('${directory.path}/$fileName');
+        if (context.mounted) {
+          context.read<ProfileCubit>().updateProfileImage(savedFile.path);
+        }
+      } catch (e) {
+        debugPrint("Error picking/saving image: $e");
+      }
+    }
   }
 
   void _showEditDialog({
@@ -286,23 +141,135 @@ class _AccountManagementContent extends StatelessWidget {
     );
   }
 
-  Future<void> _pickImage(BuildContext context) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      try {
-        final directory = await getApplicationDocumentsDirectory();
-        final fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        final savedFile = await File(
-          pickedFile.path,
-        ).copy('${directory.path}/$fileName');
-        if (context.mounted) {
-          context.read<ProfileCubit>().updateProfileImage(savedFile.path);
-        }
-      } catch (e) {
-        debugPrint("Error picking/saving image: $e");
-      }
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F5F0),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF7F5F0),
+        elevation: 0,
+        leading: Container(),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.primaryTextColor,
+              size: 20,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+        centerTitle: true,
+        title: const Text(
+          'إدارة الحساب',
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.counterColor,
+          ),
+        ),
+      ),
+      body: BlocBuilder<ProfileCubit, ProfileState>(
+        builder: (context, state) {
+          if (state is ProfileLoading || state is ProfileInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is ProfileError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is ProfileLoaded) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 40),
 
+                  // ── Circular Avatar with Edit Overlay ────────────────────
+                  ProfileAvatarSelector(
+                    imagePath: state.profileImagePath,
+                    onEditTap: () => _pickImage(context),
+                  ),
+
+                  const SizedBox(height: 48),
+
+                  // ── Name Row ─────────────────────────────────────────────
+                  AccountFieldRow(
+                    onEdit: () => _showEditDialog(
+                      context: context,
+                      title: 'تعديل الاسم',
+                      initialValue: state.profileName,
+                      onSave: (val) =>
+                          context.read<ProfileCubit>().updateProfileName(val),
+                    ),
+
+                    value: state.profileName,
+                    icon: SvgPicture.asset(
+                      "assets/icons/user.svg",
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ── Email Row ────────────────────────────────────────────
+                  AccountFieldRow(
+                    value: state.profileEmail,
+                    icon: SvgPicture.asset(
+                      'assets/icons/email.svg',
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onEdit: () => _showEditDialog(
+                      context: context,
+                      title: 'تعديل البريد الإلكتروني',
+                      initialValue: state.profileEmail,
+                      onSave: (val) =>
+                          context.read<ProfileCubit>().updateProfileEmail(val),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ── Password Row ─────────────────────────────────────────
+                  AccountFieldRow(
+                    value: '*' * state.profilePassword.length,
+                    icon: SvgPicture.asset(
+                      'assets/icons/lock.svg',
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onEdit: () => _showEditDialog(
+                      context: context,
+                      title: 'تعديل كلمة المرور',
+                      initialValue: state.profilePassword,
+                      isPassword: true,
+                      onSave: (val) => context
+                          .read<ProfileCubit>()
+                          .updateProfilePassword(val),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
 }

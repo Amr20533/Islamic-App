@@ -168,7 +168,7 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
       children: [
         PageView.builder(
           controller: _pageController,
-          reverse: true,
+          reverse: false,
           itemCount: 604,
           onPageChanged: _onPageChanged,
           itemBuilder: (context, index) {
@@ -179,10 +179,7 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            return MushafPageWidget(
-              verses: versesInPage,
-              pageNumber: pageNum,
-            );
+            return MushafPageWidget(verses: versesInPage, pageNumber: pageNum);
           },
         ),
         Positioned(

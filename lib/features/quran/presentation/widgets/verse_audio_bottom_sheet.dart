@@ -6,10 +6,7 @@ import 'package:islamic_app/features/quran/data/models/verse.dart';
 class VerseAudioBottomSheet extends StatefulWidget {
   final Verse verse;
 
-  const VerseAudioBottomSheet({
-    super.key,
-    required this.verse,
-  });
+  const VerseAudioBottomSheet({super.key, required this.verse});
 
   /// Utility method to show the bottom sheet.
   static void show(BuildContext context, Verse verse) {
@@ -92,7 +89,8 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
     final verseNum = widget.verse.number ?? 1;
     final surahStr = surahNum.toString().padLeft(3, '0');
     final verseStr = verseNum.toString().padLeft(3, '0');
-    final audioUrl = 'https://verses.quran.com/Alafasy/mp3/$surahStr$verseStr.mp3';
+    final audioUrl =
+        'https://verses.quran.com/Alafasy/mp3/$surahStr$verseStr.mp3';
 
     setState(() {
       _isLoading = true;
@@ -107,7 +105,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('عذراً، تعذر تشغيل الصوت. يرجى التحقق من اتصالك بالإنترنت.'),
+            content: Text(
+              'عذراً، تعذر تشغيل الصوت. يرجى التحقق من اتصالك بالإنترنت.',
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -152,18 +152,14 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
         color: Color(0xFFFBF9F1),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 15,
-            spreadRadius: 2,
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 15, spreadRadius: 2),
         ],
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: FractionallySizedBox(
-        heightFactor: 0.55,
+        heightFactor: 0.65,
         child: Column(
           children: [
             // Drag handle indicator
@@ -218,163 +214,179 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
             const SizedBox(height: 12),
             const Divider(color: Color(0xFFE5D5C5), height: 1),
 
-            // Main Content Area
+            // Verse Text Display Card — scrollable for long verses
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Verse Text Display Card
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 18,
-                        horizontal: 16,
-                      ),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F1E8),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xFFD4A574).withValues(alpha: 0.6),
-                          width: 1.2,
-                        ),
-                      ),
-                      child: Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: Text(
-                          verseTextAr,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'QuranFont',
-                            color: Color(0xFF2C1C12),
-                            height: 1.6,
-                          ),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F1E8),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFD4A574).withValues(alpha: 0.6),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 18,
+                      horizontal: 16,
+                    ),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Text(
+                        verseTextAr,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'QuranFont',
+                          color: Color(0xFF2C1C12),
+                          height: 1.6,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-
-                    // Slider Progress Bar
-                    Row(
-                      children: [
-                        Text(
-                          _formatDuration(_position),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF5D4037),
-                            fontFamily: 'Tajawal',
-                          ),
-                        ),
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderThemeData(
-                              trackHeight: 3,
-                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                              overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
-                              activeTrackColor: const Color(0xFF8B4513),
-                              inactiveTrackColor: const Color(0xFFD4A574).withValues(alpha: 0.3),
-                              thumbColor: const Color(0xFF8B4513),
-                            ),
-                            child: Slider(
-                              value: _position.inSeconds.toDouble(),
-                              min: 0,
-                              max: _duration.inSeconds.toDouble() > 0
-                                  ? _duration.inSeconds.toDouble()
-                                  : 1,
-                              onChanged: (val) {
-                                _audioPlayer.seek(Duration(seconds: val.toInt()));
-                              },
-                            ),
-                          ),
-                        ),
-                        Text(
-                          _formatDuration(_duration),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF5D4037),
-                            fontFamily: 'Tajawal',
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Controls Panel
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Repeat Button
-                        IconButton(
-                          icon: Icon(
-                            _isRepeat ? Icons.repeat_one_on_outlined : Icons.repeat_outlined,
-                            color: const Color(0xFF8B4513),
-                            size: 26,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isRepeat = !_isRepeat;
-                            });
-                          },
-                        ),
-                        const SizedBox(width: 20),
-
-                        // Play/Pause Button
-                        GestureDetector(
-                          onTap: _isLoading ? null : _togglePlayPause,
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF8B4513),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
-                                )
-                              ],
-                            ),
-                            child: Center(
-                              child: _isLoading
-                                  ? const SizedBox(
-                                      width: 28,
-                                      height: 28,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                      ),
-                                    )
-                                  : Icon(
-                                      _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                                      color: Colors.white,
-                                      size: 40,
-                                    ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-
-                        // Stop Button
-                        IconButton(
-                          icon: const Icon(
-                            Icons.stop_circle_outlined,
-                            color: Color(0xFF8B4513),
-                            size: 28,
-                          ),
-                          onPressed: () {
-                            _audioPlayer.stop();
-                            setState(() {
-                              _position = Duration.zero;
-                              _isPlaying = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
+              ),
+            ),
+
+            // Controls section — always visible at bottom
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 36),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Slider Progress Bar
+                  Row(
+                    children: [
+                      Text(
+                        _formatDuration(_position),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF5D4037),
+                          fontFamily: 'Tajawal',
+                        ),
+                      ),
+                      Expanded(
+                        child: SliderTheme(
+                          data: SliderThemeData(
+                            trackHeight: 3,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 6,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 14,
+                            ),
+                            activeTrackColor: const Color(0xFF8B4513),
+                            inactiveTrackColor: const Color(
+                              0xFFD4A574,
+                            ).withValues(alpha: 0.3),
+                            thumbColor: const Color(0xFF8B4513),
+                          ),
+                          child: Slider(
+                            value: _position.inSeconds.toDouble(),
+                            min: 0,
+                            max: _duration.inSeconds.toDouble() > 0
+                                ? _duration.inSeconds.toDouble()
+                                : 1,
+                            onChanged: (val) {
+                              _audioPlayer.seek(Duration(seconds: val.toInt()));
+                            },
+                          ),
+                        ),
+                      ),
+                      Text(
+                        _formatDuration(_duration),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF5D4037),
+                          fontFamily: 'Tajawal',
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Controls Panel
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Repeat Button
+                      IconButton(
+                        icon: Icon(
+                          _isRepeat
+                              ? Icons.repeat_one_on_outlined
+                              : Icons.repeat_outlined,
+                          color: const Color(0xFF8B4513),
+                          size: 26,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isRepeat = !_isRepeat;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 20),
+
+                      // Play/Pause Button
+                      GestureDetector(
+                        onTap: _isLoading ? null : _togglePlayPause,
+                        child: Container(
+                          width: 68,
+                          height: 60,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF8B4513),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 28,
+                                    height: 28,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    _isPlaying
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                    color: Colors.white,
+                                    size: 40,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+
+                      // Stop Button
+                      IconButton(
+                        icon: const Icon(
+                          Icons.stop_circle_outlined,
+                          color: Color(0xFF8B4513),
+                          size: 28,
+                        ),
+                        onPressed: () {
+                          _audioPlayer.stop();
+                          setState(() {
+                            _position = Duration.zero;
+                            _isPlaying = false;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

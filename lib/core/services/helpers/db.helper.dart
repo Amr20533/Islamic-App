@@ -14,9 +14,7 @@ class DBHelper {
 
   factory DBHelper() => instance;
 
-
   final Map<String, Database> _databases = {};
-
 
   Future<Database> database(DatabaseConfig dbConfig) async {
     if (_databases.containsKey(dbConfig.name)) {
@@ -44,9 +42,11 @@ class DBHelper {
     );
   }
 
-  Future<void> _onCreate(Database db,
-      int version,
-      DatabaseConfig config,) async {
+  Future<void> _onCreate(
+    Database db,
+    int version,
+    DatabaseConfig config,
+  ) async {
     for (final table in config.tables) {
       await db.execute(table.createSql);
     }
@@ -58,11 +58,12 @@ class DBHelper {
     debugPrint('Database opened');
   }
 
-  Future<void> _onUpgrade(Database db,
-      int oldVersion,
-      int newVersion,
-      List<TableSchema> tables,) async {
-  }
+  Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+    List<TableSchema> tables,
+  ) async {}
 
   /// ------------------> Create User <--------------------
   Future<int> insertUser(SignUpModel user) async {
@@ -74,5 +75,4 @@ class DBHelper {
       conflictAlgorithm: ConflictAlgorithm.abort,
     );
   }
-
 }

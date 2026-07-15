@@ -6,6 +6,8 @@ import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/home/presentation/widgets/daily_plan_card.dart';
 import 'package:islamic_app/features/home/presentation/widgets/progress_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_state.dart';
 
@@ -18,126 +20,193 @@ class HomeView extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              BlocBuilder<ProfileCubit, ProfileState>(
-                builder: (context, state) {
-                  final String name = state is ProfileLoaded
-                      ? state.profileName
-                      : '';
-                  final String? imagePath = state is ProfileLoaded
-                      ? state.profileImagePath
-                      : null;
-                  final String? gender = state is ProfileLoaded
-                      ? state.gender
-                      : null;
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                BlocBuilder<ProfileCubit, ProfileState>(
+                  builder: (context, state) {
+                    final String name = state is ProfileLoaded
+                        ? state.profileName
+                        : '';
+                    final String? imagePath = state is ProfileLoaded
+                        ? state.profileImagePath
+                        : null;
+                    final String? gender = state is ProfileLoaded
+                        ? state.gender
+                        : null;
 
-                  final greetingText = name.isNotEmpty
-                      ? "السلام عليكم، $name"
-                      : "السلام عليكم";
+                    final greetingText = name.isNotEmpty
+                        ? "السلام عليكم، $name"
+                        : "السلام عليكم";
 
-                  ImageProvider avatarImage;
-                  if (imagePath != null && File(imagePath).existsSync()) {
-                    avatarImage = FileImage(File(imagePath));
-                  } else if (gender == 'female') {
-                    avatarImage = const AssetImage(
-                      'assets/images/Ellipse 12 (1).png',
-                    );
-                  } else if (gender == 'male') {
-                    avatarImage = const AssetImage(
-                      'assets/images/Ellipse 12.png',
-                    );
-                  } else {
-                    avatarImage = const AssetImage(
-                      'assets/images/avatar_1.jpg',
-                    );
-                  }
+                    ImageProvider avatarImage;
+                    if (imagePath != null && File(imagePath).existsSync()) {
+                      avatarImage = FileImage(File(imagePath));
+                    } else if (gender == 'female') {
+                      avatarImage = const AssetImage(
+                        'assets/images/Ellipse 12 (1).png',
+                      );
+                    } else if (gender == 'male') {
+                      avatarImage = const AssetImage(
+                        'assets/images/Ellipse 12.png',
+                      );
+                    } else {
+                      avatarImage = const AssetImage(
+                        'assets/images/avatar_1.jpg',
+                      );
+                    }
 
-                  return Directionality(
-                    textDirection: TextDirection.rtl,
+                    return Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Row(
+                        spacing: 12,
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundImage: avatarImage,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                greetingText,
+                                style: AppTextStyles.textTheme.titleLarge!
+                                    .copyWith(height: 1.2),
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                spacing: 3,
+                                children: [
+                                  Text(
+                                    "جميل أنك عدت اليوم",
+                                    style: AppTextStyles.textTheme.labelMedium,
+                                  ),
+                                  Image.asset(
+                                    "assets/icons/like.png",
+                                    width: 16,
+                                    height: 16,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 14),
+
+                IntrinsicHeight(
+                  child: SizedBox(
+                    width: 264,
                     child: Row(
-                      spacing: 12,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CircleAvatar(radius: 25, backgroundImage: avatarImage),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              greetingText,
-                              style: AppTextStyles.textTheme.titleLarge!
-                                  .copyWith(height: 1.2),
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              spacing: 3,
-                              children: [
-                                Text(
-                                  "جميل أنك عدت اليوم",
-                                  style: AppTextStyles.textTheme.labelMedium,
-                                ),
-                                Image.asset(
-                                  "assets/icons/like.png",
-                                  width: 16,
-                                  height: 16,
-                                ),
-                              ],
-                            ),
-                          ],
+                        Text(
+                          FormatHelper.getMiladFormattedDate(),
+                          style: AppTextStyles.textTheme.labelMedium,
+                        ),
+                        const VerticalDivider(
+                          width: 24,
+                          thickness: 0.5,
+                          color: AppColors.primaryColor,
+                        ),
+                        Text(
+                          FormatHelper.getHijriFormattedDate(),
+                          style: AppTextStyles.textTheme.labelMedium,
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 14),
-
-              IntrinsicHeight(
-                child: SizedBox(
-                  width: 264,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        FormatHelper.getMiladFormattedDate(),
-                        style: AppTextStyles.textTheme.labelMedium,
-                      ),
-                      const VerticalDivider(
-                        width: 24,
-                        thickness: 0.5,
-                        color: AppColors.primaryColor,
-                      ),
-                      Text(
-                        FormatHelper.getHijriFormattedDate(),
-                        style: AppTextStyles.textTheme.labelMedium,
-                      ),
-                    ],
                   ),
                 ),
-              ),
 
-              Column(
-                children: [
-                  const SizedBox(height: 30),
-                  Text(
-                    "\"أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ\"",
-                    style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.w400,
+                const SizedBox(height: 16),
+                BlocBuilder<PrayerCubit, PrayerState>(
+                  builder: (context, state) {
+                    if (state is PrayerLoaded) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 8,
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  color: AppColors.primaryColor,
+                                  size: 20,
+                                ),
+                                Text(
+                                  "الصلاة القادمة: ${state.nextPrayerName}",
+                                  style: AppTextStyles.textTheme.titleLarge!
+                                      .copyWith(
+                                        color: AppColors.secondaryTextColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              state.countdown,
+                              style: AppTextStyles.textTheme.displayLarge!
+                                  .copyWith(
+                                    fontSize: 25,
+                                    color: AppColors.primaryColor,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                    fontFamily: 'Tajawal',
+                                  ),
+                            ),
+                            Text(
+                              "الوقت المتبقي",
+                              style: AppTextStyles.textTheme.labelSmall!
+                                  .copyWith(color: AppColors.hintTextColor),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+
+                Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      "\"أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ\"",
+                      style: AppTextStyles.textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  const DailyPlanCard(),
-                  const SizedBox(height: 40),
-                  const ProgressCard(
-                    icon: 'assets/icons/progress.png',
-                    leading: 'استمرارك ',
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ],
+                    const SizedBox(height: 20),
+                    const DailyPlanCard(),
+                    const SizedBox(height: 20),
+                    const ProgressCard(
+                      icon: 'assets/icons/progress.png',
+                      leading: 'استمرارك ',
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
