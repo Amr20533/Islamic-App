@@ -126,6 +126,13 @@ class QuranCubit extends Cubit<QuranState> {
             // Keep existing state on error
           }
         }
+      } else {
+        emit(QuranLoaded(
+          pages: Map.from(_cachedPages),
+          reciters: const [],
+          loadedSurahs: Set.from(_loadedSurahs),
+          activeSurahNumber: surahNumber,
+        ));
       }
       return;
     }

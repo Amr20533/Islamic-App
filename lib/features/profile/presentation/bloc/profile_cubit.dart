@@ -74,6 +74,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     if (state is ProfileLoaded) {
       final current = state as ProfileLoaded;
       emit(current.copyWith(gender: gender));
+    } else {
+      await loadProfile();
     }
   }
 

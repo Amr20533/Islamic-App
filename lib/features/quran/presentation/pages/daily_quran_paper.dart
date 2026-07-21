@@ -126,6 +126,11 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                   if (state is QuranLoaded) {
                     final verses = state.pages[_dailyPageNumber];
                     if (verses == null || verses.isEmpty) {
+                      final metadata = QuranMetadata.pageToSurah[_dailyPageNumber];
+                      if (metadata != null) {
+                        final surahNumber = metadata['surahNumber'] as int;
+                        context.read<QuranCubit>().loadSurahIfNeeded(surahNumber);
+                      }
                       return Center(
                         child: Text(
                           "جارٍ تحميل الصفحة...",

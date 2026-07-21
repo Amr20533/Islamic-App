@@ -59,6 +59,13 @@ class _ProfileContent extends StatelessWidget {
                   final imagePath = state is ProfileLoaded
                       ? state.profileImagePath
                       : null;
+                  final gender = state is ProfileLoaded ? state.gender : null;
+
+                  final String defaultAvatarAsset = gender == 'female'
+                      ? 'assets/images/Ellipse 12 (1).png'
+                      : gender == 'male'
+                      ? 'assets/images/Ellipse 12.png'
+                      : 'assets/images/avatar_1.jpg';
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -78,7 +85,7 @@ class _ProfileContent extends StatelessWidget {
                               imagePath != null && File(imagePath).existsSync()
                               ? Image.file(File(imagePath), fit: BoxFit.cover)
                               : Image.asset(
-                                  'assets/images/avatar_1.jpg',
+                                  defaultAvatarAsset,
                                   fit: BoxFit.cover,
                                 ),
                         ),

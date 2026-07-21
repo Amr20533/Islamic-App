@@ -189,6 +189,7 @@ class _AccountManagementContent extends StatelessWidget {
                   // ── Circular Avatar with Edit Overlay ────────────────────
                   ProfileAvatarSelector(
                     imagePath: state.profileImagePath,
+                    gender: state.gender,
                     onEditTap: () => _pickImage(context),
                   ),
 

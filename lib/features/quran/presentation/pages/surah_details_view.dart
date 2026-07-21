@@ -116,7 +116,8 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
       if (meta != null) {
         _currentSurahName = meta['surahName'];
       }
-      context.read<QuranCubit>().loadSurahData(initialSurahNum);
+      final surahToLoad = meta?['surahNumber'] as int? ?? initialSurahNum;
+      context.read<QuranCubit>().loadSurahData(surahToLoad);
       _isInit = true;
     }
 
@@ -176,6 +177,11 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
             final versesInPage = state.pages[pageNum];
 
             if (versesInPage == null || versesInPage.isEmpty) {
+              final metadata = QuranMetadata.pageToSurah[pageNum];
+              if (metadata != null) {
+                final surahNum = metadata['surahNumber'] as int;
+                context.read<QuranCubit>().loadSurahIfNeeded(surahNum);
+              }
               return const Center(child: CircularProgressIndicator());
             }
 
