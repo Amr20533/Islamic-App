@@ -14,23 +14,30 @@ dependencies:
     sdk: flutter
 
   flutter_native_splash:
-  cupertino_icons: ^1.0.8
   flutter_local_notifications:
   timezone:
-  flutter_bloc: ^9.1.0
-  bloc: ^9.0.0
-  equatable: ^2.0.7
+  flutter_bloc:
+  bloc:
+  equatable:
   get_it:
   audioplayers:
   flutter_timezone:
-  hijri_date_time:
-  prayer_times_helper:
   hijri:
   intl:
   adhan_dart:
   geolocator:
   adhan:
   flutter_svg:
+  shared_preferences:
+  sqflite: 
+  image_picker:
+  path_provider:
+  http:
+  share_plus:
+  android_intent_plus:
+  url_launcher: ^6.3.2
+  package_info_plus: ^10.2.1
+  device_info_plus: ^13.2.0
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +68,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - assets/svg/
     - assets/quran_search.json
 
   fonts:

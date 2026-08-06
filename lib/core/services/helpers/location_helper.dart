@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationHelper {
@@ -8,7 +9,10 @@ class LocationHelper {
     // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      print('Location services are disabled.');
+      if (kDebugMode) {
+        debugPrint('Location services are disabled.');
+      }
+
       return null; // Return null instead of throwing
     }
 
@@ -17,18 +21,23 @@ class LocationHelper {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        print('Location permissions are denied.');
+        if (kDebugMode) {
+          debugPrint('Location permissions are denied.');
+        }
         return null;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      print('Location permissions are permanently denied.');
+      if (kDebugMode) {
+        debugPrint('Location permissions are permanently denied.');
+      }
       return null;
     }
 
     // Get current position
     return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
 }

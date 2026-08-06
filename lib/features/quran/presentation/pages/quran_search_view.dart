@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_search_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
-import 'package:islamic_app/features/quran/presentation/pages/surah_details_view.dart';
+import 'package:islamic_app/core/static_files/app_routes.dart';
 
 class QuranSearchView extends StatefulWidget {
   const QuranSearchView({super.key});
@@ -30,14 +30,13 @@ class _QuranSearchViewState extends State<QuranSearchView> {
   void _navigateToSurah(SearchResult result) {
     if (result.surahNumber <= 0) return;
     context.read<QuranCubit>().loadSurahData(result.surahNumber);
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (_) => SurahDetailsView(
-          surahName: result.surahName,
-          initialPageNumber: result.page,
-        ),
-      ),
+      AppRoutes.surahDetails,
+      arguments: {
+        'surahName': result.surahName,
+        'initialPageNumber': result.page,
+      },
     );
   }
 
@@ -51,7 +50,11 @@ class _QuranSearchViewState extends State<QuranSearchView> {
           backgroundColor: const Color(0xFFFBF9F1),
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+              size: 20,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           title: Container(
@@ -115,8 +118,7 @@ class _QuranSearchViewState extends State<QuranSearchView> {
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: results.length,
-                separatorBuilder: (context, index) =>
-                    const Divider(height: 24),
+                separatorBuilder: (context, index) => const Divider(height: 24),
                 itemBuilder: (context, index) {
                   final result = results[index];
 
@@ -136,10 +138,15 @@ class _QuranSearchViewState extends State<QuranSearchView> {
                           ),
                           child: Center(
                             child: result.isSurah
-                                ? Icon(Icons.menu_book,
-                                    color: AppColors.thirdColor)
-                                : const Icon(Icons.format_list_numbered,
-                                    color: Colors.grey, size: 20),
+                                ? Icon(
+                                    Icons.menu_book,
+                                    color: AppColors.thirdColor,
+                                  )
+                                : const Icon(
+                                    Icons.format_list_numbered,
+                                    color: Colors.grey,
+                                    size: 20,
+                                  ),
                           ),
                         ),
                         const SizedBox(width: 12),

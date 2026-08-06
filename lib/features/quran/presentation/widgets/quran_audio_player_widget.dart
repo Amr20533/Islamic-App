@@ -26,12 +26,14 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
   AudioReciter? _selectedReciter;
   double _playbackRate = 1.0;
   bool _isRepeat = false;
+  List<AudioReciter> _filteredReciters = [];
 
   @override
   void initState() {
     super.initState();
-    if (widget.reciters.isNotEmpty) {
-      _selectedReciter = widget.reciters.first;
+    _filterReciters();
+    if (_filteredReciters.isNotEmpty) {
+      _selectedReciter = _filteredReciters.first;
     }
 
     _audioPlayer.onPlayerStateChanged.listen((state) {
@@ -69,6 +71,63 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
         }
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant QuranAudioPlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.reciters != widget.reciters) {
+      _filterReciters();
+      if (_selectedReciter != null) {
+        final exists = _filteredReciters.any(
+          (r) => r.reciterNameAr == _selectedReciter!.reciterNameAr,
+        );
+        if (!exists && _filteredReciters.isNotEmpty) {
+          _selectedReciter = _filteredReciters.first;
+        } else if (exists) {
+          _selectedReciter = _filteredReciters.firstWhere(
+            (r) => r.reciterNameAr == _selectedReciter!.reciterNameAr,
+          );
+        }
+      } else if (_filteredReciters.isNotEmpty) {
+        _selectedReciter = _filteredReciters.first;
+      }
+    }
+  }
+
+  void _filterReciters() {
+    final allowedKeywords = [
+      'العفاسي',
+      'الدوسري',
+      'فارس عباد',
+      'المعيقلي',
+      'سعد الغامدي',
+      'العجمي',
+      'القطامي',
+      'المنشاوي',
+      'الحصري',
+      'عبدالباسط',
+    ];
+
+    final List<AudioReciter> result = [];
+    final Set<String> seenNames = {};
+
+    for (final keyword in allowedKeywords) {
+      for (final reciter in widget.reciters) {
+        final cleanName = reciter.reciterNameAr.trim().replaceAll(
+          RegExp(r'\s+'),
+          ' ',
+        );
+        if (cleanName.contains(keyword)) {
+          if (!seenNames.contains(cleanName)) {
+            seenNames.add(cleanName);
+            result.add(reciter);
+          }
+        }
+      }
+    }
+
+    _filteredReciters = result;
   }
 
   @override
@@ -132,9 +191,9 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: widget.reciters.length,
+                  itemCount: _filteredReciters.length,
                   itemBuilder: (context, index) {
-                    final reciter = widget.reciters[index];
+                    final reciter = _filteredReciters[index];
                     final isSelected = _selectedReciter?.id == reciter.id;
                     return ListTile(
                       title: Text(

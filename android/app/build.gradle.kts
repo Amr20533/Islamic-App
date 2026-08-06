@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.islamic_app"
+    namespace = "com.maab.islamic_app"
     compileSdk = 36
 //    compileSdk = flutter.compileSdkVersion
 //    ndkVersion = flutter.ndkVersion
@@ -30,12 +30,12 @@ android {
     }
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.islamic_app"
+        applicationId = "com.maab.islamic_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
 //        minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        targetSdk = 36
 //        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -47,6 +47,8 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
 }

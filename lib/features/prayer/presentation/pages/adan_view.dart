@@ -1,33 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
-import 'package:islamic_app/features/prayer/presentation/bloc/adhan_event.dart';
+import 'package:islamic_app/di/locator.dart';
+import 'package:islamic_app/features/prayer/domain/entities/prayer_alarm_config.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_cubit.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_state.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
+import 'package:islamic_app/features/prayer/presentation/widgets/adan_view_header.dart';
+import 'package:islamic_app/features/prayer/presentation/widgets/alarm_card.dart';
+import 'package:islamic_app/features/prayer/presentation/widgets/next_prayer_virtue_card.dart';
 
 class AdanView extends StatelessWidget {
   const AdanView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.notifications_active, size: 100, color: Colors.teal),
-            const SizedBox(height: 20),
-            const Text(
-              "نظام تنبيه الأذان",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return BlocProvider<PrayerAlarmCubit>.value(
+      value: locator<PrayerAlarmCubit>()..loadAlarms(prayerAlarmConfigs),
+      child: const Directionality(
+        textDirection: TextDirection.rtl,
+        child: _AdanPageContent(),
+      ),
+    );
+  }
+}
+
+class _AdanPageContent extends StatefulWidget {
+  const _AdanPageContent();
+
+  @override
+  State<_AdanPageContent> createState() => _AdanPageContentState();
+}
+
+class _AdanPageContentState extends State<_AdanPageContent> {
+  bool _rescheduled = false;
+
+  void _tryReschedule(BuildContext context) {
+    if (_rescheduled) return;
+    final alarmState = context.read<PrayerAlarmCubit>().state;
+    if (alarmState is! PrayerAlarmLoaded) return;
+
+    final prayerState = context.read<PrayerCubit>().state;
+    if (prayerState is! PrayerLoaded) return;
+
+    _rescheduled = true;
+    context.read<PrayerAlarmCubit>().rescheduleEnabledAlarms(
+      configs: prayerAlarmConfigs,
+      todayPrayers: prayerState.todayPrayers,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<PrayerAlarmCubit, PrayerAlarmState>(
+      // Reschedule as soon as alarms are loaded from storage
+      listener: (context, state) {
+        if (state is PrayerAlarmLoaded) {
+          _tryReschedule(context);
+        }
+      },
+      child: const Scaffold(
+        backgroundColor: Color(0xFFF7F5F0),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AdanViewHeader(),
+                SizedBox(height: 24),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: AlarmCard(),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: NextPrayerVirtueCard(),
+                ),
+                SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                context.read<AdhanBloc>().add(const AdhanPlayEvent("العصر"));
-              },
-              child: const Text("تشغيل تجريبي"),
-            ),
-          ],
+          ),
         ),
       ),
     );

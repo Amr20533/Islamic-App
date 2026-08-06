@@ -2,50 +2,149 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/azkar/data/models/azkar_category.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/azkar_cubit.dart';
-import 'azkar_details_screen.dart';
+import 'package:islamic_app/features/azkar/presentation/widgets/azkar_search_bar.dart';
+import 'package:islamic_app/features/azkar/presentation/widgets/electronic_tasbeeh_card.dart';
+import 'package:islamic_app/features/azkar/presentation/widgets/featured_azkar_grid.dart';
+import 'package:islamic_app/features/azkar/presentation/widgets/other_azkar_list.dart';
+import 'package:islamic_app/features/azkar/presentation/widgets/zikr_header.dart';
+import 'package:islamic_app/core/static_files/app_routes.dart';
 
-class ZikrView extends StatelessWidget {
+class ZikrView extends StatefulWidget {
   const ZikrView({super.key});
+
+  @override
+  State<ZikrView> createState() => _ZikrViewState();
+}
+
+class _ZikrViewState extends State<ZikrView> {
+  String _searchQuery = "";
+  final Set<int> _featuredIds = {27, 28, 1, 15};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AzkarCubit>().loadCategories();
+    });
+  }
+
+  void _navigateToDetail(String title, int categoryId) {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.azkarDetail,
+      arguments: {'categoryTitle': title, 'categoryId': categoryId},
+    ).then((_) {
+      if (mounted) {
+        context.read<AzkarCubit>().loadCategories();
+      }
+    });
+  }
+
+  String _normalizeArabic(String text) {
+    var result = text;
+    // Remove diacritics (tashkeel)
+    result = result.replaceAll(RegExp(r'[\u064B-\u065F\u0670]'), '');
+    // Normalize alef variants
+    result = result.replaceAll('أ', 'ا');
+    result = result.replaceAll('إ', 'ا');
+    result = result.replaceAll('آ', 'ا');
+    result = result.replaceAll('ى', 'ي');
+    // Normalize taa marbuta
+    result = result.replaceAll('ة', 'ه');
+    // Normalize hamza variants
+    result = result.replaceAll('ؤ', 'و');
+    result = result.replaceAll('ئ', 'ي');
+    return result.trim();
+  }
+
+  List<AzkarCategory> _filterCategories(List<AzkarCategory> categories) {
+    if (_searchQuery.isEmpty) return categories;
+    final normalizedQuery = _normalizeArabic(_searchQuery);
+    return categories
+        .where((cat) => _normalizeArabic(cat.title).contains(normalizedQuery))
+        .toList();
+  }
+
+  List<AzkarCategory> _getRemainingCategories(List<AzkarCategory> categories) {
+    return categories.where((cat) => !_featuredIds.contains(cat.id)).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: BlocBuilder<AzkarCubit, AzkarState>(
-        builder: (context, state) {
-          List<AzkarCategory> categories = [];
-          if (state is AzkarCategoriesLoaded) {
-            categories = state.categories;
-          } else if (state is AzkarLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFCFBF9),
+        body: SafeArea(
+          bottom: false,
+          child: BlocBuilder<AzkarCubit, AzkarState>(
+            builder: (context, state) {
+              if (state is AzkarLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          final list = categories.isNotEmpty ? categories : AzkarCategory.azkar;
+              final List<AzkarCategory> categories =
+                  state is AzkarCategoriesLoaded ? state.categories : [];
 
-          return ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              final cat = list[index];
-              return ListTile(
-                title: Text(cat.title, textAlign: TextAlign.right),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                        value: context.read<AzkarCubit>(),
-                        child: AzkarDetailScreen(
-                          title: cat.title,
-                          categoryId: cat.id,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+              return CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  const SliverToBoxAdapter(child: ZikrHeader()),
+                  _buildSearchBar(),
+                  ..._buildContent(categories),
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
               );
             },
-          );
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        child: AzkarSearchBar(
+          onChanged: (value) => setState(() => _searchQuery = value),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildContent(List<AzkarCategory> categories) {
+    if (_searchQuery.isNotEmpty) {
+      final filteredList = _filterCategories(categories);
+      return [
+        OtherAzkarList(
+          title: "نتائج البحث (${filteredList.length})",
+          categories: filteredList,
+          onNavigate: _navigateToDetail,
+          isSearchMode: true,
+        ),
+      ];
+    }
+
+    return [
+      SliverToBoxAdapter(
+        child: FeaturedAzkarGrid(onNavigate: _navigateToDetail),
+      ),
+      SliverToBoxAdapter(child: _buildElectronicTasbeehCard()),
+      OtherAzkarList(
+        title: "باقي الأذكار والأدعية",
+        categories: _getRemainingCategories(categories),
+        onNavigate: _navigateToDetail,
+      ),
+    ];
+  }
+
+  Widget _buildElectronicTasbeehCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: ElectronicTasbeehCard(
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.electronicTasbeeh);
         },
       ),
     );

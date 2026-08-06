@@ -3,13 +3,15 @@ import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_shadows.dart';
 import 'package:islamic_app/features/home/presentation/widgets/bottom_nav_item.dart';
 import 'package:islamic_app/features/home/presentation/pages/home_view.dart';
+import 'package:islamic_app/features/profile/presentation/pages/my_profile_view.dart';
 import 'package:islamic_app/features/quran/presentation/pages/quran_view.dart';
 import 'package:islamic_app/features/azkar/presentation/pages/zikr_view.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_state.dart';
 import 'package:islamic_app/features/prayer/presentation/widgets/adhan_overlay.dart';
+
+import 'package:islamic_app/features/calendar/presentation/pages/calendar_view.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -21,13 +23,19 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int currentIndex = 0;
 
-  final List<Widget> pages = [
-    HomeView(),
-    const QuranView(),
-    ZikrView(),
-    const QuranView(), // Placeholder for Calendar
-    const Center(child: SizedBox.shrink()), // Placeholder for More
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      const HomeView(),
+      const QuranView(),
+      ZikrView(),
+      const CalendarView(),
+      const MyProfileView(),
+    ];
+  }
 
   void changePage(int index) {
     setState(() {
@@ -100,8 +108,8 @@ class _MainViewState extends State<MainView> {
                 BottomNavItem(
                   index: 4,
                   currentIndex: currentIndex,
-                  iconPath: 'assets/icons/dots-horizontal.png',
-                  label: 'المزيد',
+                  iconPath: 'assets/icons/lucide_user.png',
+                  label: 'حسابي',
                   onTap: () => changePage(4),
                 ),
               ],

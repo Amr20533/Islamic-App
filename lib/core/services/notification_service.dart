@@ -1,57 +1,210 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:islamic_app/core/static_files/app_routes.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_all.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
+
+enum NotificationPermissionStatus {
+  unknown,
+  granted,
+  notificationsDenied,
+  exactAlarmDenied,
+}
 
 class NotificationService {
-  final List<String> motivationalMessages = [
-    "هل صليت على النبي اليوم؟",
-    "استعن بالله ولا تعجز، وردك القرآني بانتظارك.",
-    "قال تعالى: 'ألا بذكر الله تطمئن القلوب'.. اذكر الله.",
-    "نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل.",
-  ];
-
-  NotificationService._internal();
-  static final NotificationService _instance = NotificationService._internal();
+  // Singleton
+  NotificationService._();
+  static final NotificationService _instance = NotificationService._();
   factory NotificationService() => _instance;
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  // ── Constants ───────────────────────────────────────────────────────────────
 
-  Future<void> scheduleDailyReminders() async {
-    // جدولة التنبيه بعد دقيقتين من الآن بالضبط
-    final scheduledDate = tz.TZDateTime.now(
-      tz.local,
-    ).add(const Duration(minutes: 2));
+  static const String prayerChannelId = 'prayer_channel_final';
+  static const String defaultChannelId = 'default_channel';
+  static const int dailyReminderId = 123;
 
-    print("--- Final Test Debug ---");
-    print("Now: ${tz.TZDateTime.now(tz.local)}");
-    print("Target: $scheduledDate");
-    print("------------------------");
+  static const _messages = [
+    'هل صليت على النبي اليوم؟',
+    'استعن بالله ولا تعجز، وردك القرآني بانتظارك.',
+    "قال تعالى: 'ألا بذكر الله تطمئن القلوب'.. اذكر الله.",
+    'نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل.',
+    'خطوة صغيرة اليوم قد تقربك أكثر، افتح مآب وأكمل رحلتك.',
+    "لا تأجل عمل اليوم للغد، فقد يفتنك التسويف.",
+    "هون عليك، فالقليل المستمر خير من الكثير المنقطع.",
+    'الاستغفار يفتح مغاليق الخير، استغفر ربك.',
+    "الدنيا دار ممر لا دار مقر",
+    "من كان يؤمن بالله واليوم الآخر فليقل خيراً أو ليصمت",
+    "يا ابن آدم، عش ما شئت فإنك ميت، وأحبب من شئت فإنك مفارقه، واعمل ما شئت فإنك مجازى به.",
+    "خير الأعمال أدومها وإن قل.",
+    "وَقُل رَّبِّ زِدْنِي عِلْمًا",
+    "قال تعالى: 'وَفِي ذَٰلِكَ فَلْيَتَنَافَسِ الْمُتَنَافِسُونَ'",
+  ];
 
-    await _notificationsPlugin.zonedSchedule(
-      id: 123,
-      title: 'رسالة تحفيزية',
-      body: motivationalMessages[1],
-      scheduledDate: scheduledDate,
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'default_channel',
-          'Default Notifications',
-          importance: Importance.max,
-          priority: Priority.high,
-          showWhen: true,
+  // ── State ───────────────────────────────────────────────────────────────────
+
+  final _plugin = FlutterLocalNotificationsPlugin();
+  final _permissionStream =
+      StreamController<NotificationPermissionStatus>.broadcast();
+
+  Stream<NotificationPermissionStatus> get permissionStatusStream =>
+      _permissionStream.stream;
+  NotificationPermissionStatus get permissionStatus => _permissionStatus;
+  NotificationPermissionStatus _permissionStatus =
+      NotificationPermissionStatus.unknown;
+
+  bool _initialized = false;
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+
+  Future<void> init() async {
+    if (_initialized) return;
+
+    try {
+      // 1. Timezone
+      tz_data.initializeTimeZones();
+      await _initTimezone();
+
+      // 2. Plugin initialize (must come before any resolvePlatformSpecificImplementation call)
+      final ok = await _plugin.initialize(
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: true,
+            requestBadgePermission: true,
+            requestSoundPermission: true,
+          ),
         ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
-    print("Scheduled for 2 minutes from now!");
+        onDidReceiveNotificationResponse: _onTap,
+        onDidReceiveBackgroundNotificationResponse: _onBackgroundTap,
+      );
+      if (ok != true) return;
+
+      // 3. Channels (must exist before showing any notification on Android 8+)
+      await _createChannels();
+
+      // 4. Permissions (after initialize so resolvePlatformSpecificImplementation works)
+      await _requestPermissions();
+
+      _initialized = true;
+      debugPrint('✅ NotificationService initialized');
+    } catch (e) {
+      debugPrint('❌ NotificationService.init: $e');
+    }
   }
 
-  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(
+  Future<void> _initTimezone() async {
+    try {
+      final info = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(info.identifier));
+      debugPrint('📍 Timezone: ${info.identifier}');
+    } catch (_) {
+      try {
+        tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
+      } catch (_) {
+        tz.setLocalLocation(tz.UTC);
+      }
+    }
+  }
+
+  Future<void> _createChannels() async {
+    final android = _android;
+    if (android == null) return;
+
+    await android.createNotificationChannel(
+      const AndroidNotificationChannel(
+        prayerChannelId,
+        'Adhan Alerts',
+        description: 'تنبيهات مواقيت الصلاة والأذان',
+        importance: Importance.max,
+        enableVibration: true,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('adhan'),
+      ),
+    );
+
+    await android.createNotificationChannel(
+      const AndroidNotificationChannel(
+        defaultChannelId,
+        'Default Notifications',
+        description: 'تنبيهات التذكير اليومي والرسائل التحفيزية',
+        importance: Importance.max,
+        enableVibration: true,
+        playSound: true,
+      ),
+    );
+  }
+
+  Future<void> _requestPermissions() async {
+    final android = _android;
+    if (android == null) return;
+
+    final notif = await android.requestNotificationsPermission(); // Android 13+
+    final exact = await android.requestExactAlarmsPermission(); // Android 12+
+    _setPermissionStatus(notif, exact);
+  }
+
+  // ── Public Permission API ────────────────────────────────────────────────────
+
+  /// Re-check permissions when the app resumes (user may have changed Settings).
+  Future<void> onAppResumed() async {
+    final android = _android;
+    if (android == null) return;
+    _setPermissionStatus(
+      await android.areNotificationsEnabled(),
+      await android.canScheduleExactNotifications(),
+    );
+  }
+
+  /// Whether the OS allows exact alarms right now.
+  Future<bool> canScheduleExact() async {
+    if (!Platform.isAndroid) return true;
+    return await _android?.canScheduleExactNotifications() ?? false;
+  }
+
+  // ── Scheduling ───────────────────────────────────────────────────────────────
+
+  /// Schedule a prayer (Adhan) notification.
+  /// Cancels any existing alarm with the same [id] first.
+  /// If [prayerTime] is in the past, schedules for the next day automatically.
+  Future<void> schedulePrayerNotification({
+    required int id,
+    required String prayerName,
+    required DateTime prayerTime,
+  }) async {
+    await cancelNotification(id);
+
+    var scheduledTime = tz.TZDateTime.from(prayerTime, tz.local);
+    final now = tz.TZDateTime.now(tz.local);
+
+    // If the prayer time has already passed today, schedule for tomorrow
+    if (scheduledTime.isBefore(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+      debugPrint('⏭ Prayer time passed — rescheduled to tomorrow: $scheduledTime');
+    }
+
+    await _schedule(
+      id: id,
+      title: 'حان وقت صلاة $prayerName 🕌',
+      body: 'حي على الصلاة، حي على الفلاح',
+      at: scheduledTime,
+      details: _prayerDetails,
+    );
+  }
+
+  /// Schedule (or re-schedule) the daily motivational reminder.
+  /// Uses [DateTimeComponents.time] so it recurs every day and survives reboots.
+  Future<void> scheduleDailyReminderAt({
+    required int hour,
+    required int minute,
+  }) async {
+    await cancelNotification(dailyReminderId);
+
+    final now = tz.TZDateTime.now(tz.local);
+    var target = tz.TZDateTime(
       tz.local,
       now.year,
       now.month,
@@ -59,121 +212,175 @@ class NotificationService {
       hour,
       minute,
     );
+    if (target.isBefore(now)) target = target.add(const Duration(days: 1));
 
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-    return scheduledDate;
-  }
-
-  Future<void> init() async {
-    tz.initializeTimeZones();
-
-    try {
-      final String timeZoneName = await FlutterTimezone.getLocalTimezone().then(
-        (info) => info.identifier,
-      );
-      tz.setLocalLocation(tz.getLocation(timeZoneName));
-      print("Timezone set to: $timeZoneName");
-    } catch (e) {
-      tz.setLocalLocation(tz.getLocation('UTC'));
-    }
-
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const DarwinInitializationSettings iosSettings =
-        DarwinInitializationSettings(
-          requestAlertPermission: true,
-          requestBadgePermission: true,
-          requestSoundPermission: true,
-        );
-
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
-
-    await _notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
-
-    await _notificationsPlugin.initialize(
-      settings: initSettings,
-      onDidReceiveNotificationResponse: (details) {},
-    );
-
-    // تنبيه فوري للتأكد
-    await showNotification(
-      id: 0,
-      title: "نظام التنبيهات",
-      body: "تم تفعيل نظام التنبيهات بنجاح!",
+    await _schedule(
+      id: dailyReminderId,
+      title: 'تذكيرك اليومي 🌿',
+      body: await _nextMessage(),
+      at: target,
+      details: _defaultDetails,
+      recurring: DateTimeComponents.time,
     );
   }
 
+  /// Show an instant (non-scheduled) notification.
   Future<void> showNotification({
     required int id,
     String? title,
     String? body,
-  }) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-          'default_channel',
-          'Default Notifications',
-          channelDescription: 'General notifications',
-          importance: Importance.max,
-          priority: Priority.high,
-        );
+    String? payload,
+  }) => _plugin.show(
+    id: id,
+    title: title,
+    body: body,
+    notificationDetails: _defaultDetails,
+    payload: payload,
+  );
 
-    const NotificationDetails details = NotificationDetails(
-      android: androidDetails,
-    );
+  // ── Cancellation ─────────────────────────────────────────────────────────────
 
-    await _notificationsPlugin.show(
-      id: id,
-      title: title,
-      body: body,
-      notificationDetails: details,
-      payload: AppRoutes.details,
-    );
+  Future<void> cancelNotification(int id) async {
+    await _plugin.cancel(id: id);
+    debugPrint('🗑 Cancelled notification $id');
   }
 
-  Future<void> scheduleNotification({
+  Future<void> cancelAll() async {
+    await _plugin.cancelAll();
+    debugPrint('🗑 All notifications cancelled');
+  }
+
+  // ── Battery Optimization ─────────────────────────────────────────────────────
+
+  /// Ask the OS to whitelist this app from battery optimization.
+  /// Only shows once; stores the flag in SharedPreferences.
+  Future<void> requestBatteryOptimizationExemption({
+    required String packageName,
+  }) async {
+    if (!Platform.isAndroid) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool('battery_opt_requested') == true) return;
+
+      await AndroidIntent(
+        action: 'android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS',
+        data: 'package:$packageName',
+      ).launch();
+
+      await prefs.setBool('battery_opt_requested', true);
+    } catch (e) {
+      debugPrint('⚠️ Battery optimization request failed: $e');
+    }
+  }
+
+  // ── Core Scheduler ───────────────────────────────────────────────────────────
+
+  Future<void> _schedule({
     required int id,
     required String title,
     required String body,
-    required DateTime scheduledTime,
+    required tz.TZDateTime at,
+    required NotificationDetails details,
+    DateTimeComponents? recurring,
   }) async {
-    try {
-      tz.local;
-    } catch (_) {
-      tz.initializeTimeZones();
-      final String timeZoneName = await FlutterTimezone.getLocalTimezone().then(
-        (info) => info.identifier,
-      );
-      tz.setLocalLocation(tz.getLocation(timeZoneName));
+    // Guard: skip only if still in the past after caller adjustments
+    if (recurring == null && at.isBefore(tz.TZDateTime.now(tz.local))) {
+      debugPrint('⚠️ Skipping past notification id=$id ($at)');
+      return;
     }
 
-    await _notificationsPlugin.zonedSchedule(
-      id: id,
-      title: title,
-      body: body,
-      scheduledDate: tz.TZDateTime.from(scheduledTime, tz.local),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'prayer_channel_final',
-          'Adhan Alerts',
-          importance: Importance.max,
-          priority: Priority.high,
-          fullScreenIntent: true,
-          playSound: true,
-          sound: RawResourceAndroidNotificationSound('adhan'),
-        ),
-        iOS: DarwinNotificationDetails(sound: 'adhan.aiff'),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
+    // Choose exact vs inexact based on current OS permission
+    final exact = await canScheduleExact();
+    if (!exact) {
+      debugPrint('⚠️ Exact alarms unavailable for id=$id — using inexact');
+      _permissionStream.add(NotificationPermissionStatus.exactAlarmDenied);
+    }
+
+    try {
+      await _plugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: at,
+        notificationDetails: details,
+        androidScheduleMode: exact
+            ? AndroidScheduleMode.exactAllowWhileIdle
+            : AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: recurring,
+      );
+      debugPrint(
+        '✅ Scheduled id=$id at $at (exact: $exact, recurring: ${recurring != null})',
+      );
+    } catch (e) {
+      debugPrint('❌ zonedSchedule failed id=$id: $e');
+    }
   }
+
+  // ── Notification Details ─────────────────────────────────────────────────────
+
+  static final _prayerDetails = const NotificationDetails(
+    android: AndroidNotificationDetails(
+      'prayer_channel_final',
+      'Adhan Alerts',
+      importance: Importance.max,
+      priority: Priority.high,
+      fullScreenIntent: true,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('adhan'),
+      enableVibration: true,
+    ),
+    iOS: DarwinNotificationDetails(
+      sound: 'adhan.aiff',
+      presentAlert: true,
+      presentSound: true,
+    ),
+  );
+
+  static final _defaultDetails = const NotificationDetails(
+    android: AndroidNotificationDetails(
+      'default_channel',
+      'Default Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+    ),
+    iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+  );
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  AndroidFlutterLocalNotificationsPlugin? get _android => _plugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >();
+
+  void _setPermissionStatus(bool? notifications, bool? exact) {
+    _permissionStatus = notifications == false
+        ? NotificationPermissionStatus.notificationsDenied
+        : exact == false
+        ? NotificationPermissionStatus.exactAlarmDenied
+        : NotificationPermissionStatus.granted;
+    _permissionStream.add(_permissionStatus);
+  }
+
+  Future<String> _nextMessage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final i = prefs.getInt('motivational_index') ?? 0;
+      await prefs.setInt('motivational_index', i + 1);
+      return _messages[i % _messages.length];
+    } catch (_) {
+      return _messages[0];
+    }
+  }
+
+  // ── Tap Handlers ─────────────────────────────────────────────────────────────
+
+  static void _onTap(NotificationResponse r) =>
+      debugPrint('🔔 Notification tapped: id=${r.id}, payload=${r.payload}');
+
+  @pragma('vm:entry-point')
+  static void _onBackgroundTap(NotificationResponse r) =>
+      debugPrint('🔔 Background notification tapped: id=${r.id}');
+
+  void dispose() => _permissionStream.close();
 }

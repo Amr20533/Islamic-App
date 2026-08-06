@@ -9,6 +9,7 @@ class AppTextField extends StatefulWidget {
   final String prefixIcon;
   final bool isPassword;
   final TextInputType keyboardType;
+  final void Function(String)? onChanged;
 
   const AppTextField({
     super.key,
@@ -16,6 +17,7 @@ class AppTextField extends StatefulWidget {
     required this.hintText,
     required this.prefixIcon,
     this.isPassword = false,
+    this.onChanged,
     this.keyboardType = TextInputType.text,
   });
 
@@ -96,6 +98,7 @@ class _AppTextFieldState extends State<AppTextField> {
             borderSide: const BorderSide(color: Color(0xFF8B6B4F), width: 1.2),
           ),
         ),
+        onChanged: widget.onChanged
       ),
     );
   }

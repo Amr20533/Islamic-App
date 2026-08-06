@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
@@ -12,15 +14,17 @@ class AppPrimaryButton extends StatelessWidget {
   final double radius;
   final Color bgColor;
   final Color foregroundColor;
+  final bool isLoading;
 
   const AppPrimaryButton({
     super.key,
     required this.label,
     required this.onPressed,
-    this.width = double.infinity,
+    this.width = 124,
     this.height = 40,
     this.radius = 12.47,
     this.fontSize = 16,
+    this.isLoading = false,
     this.bgColor = AppColors.primaryColor,
     this.foregroundColor = AppColors.secondaryColor,
   });
@@ -42,15 +46,24 @@ class AppPrimaryButton extends StatelessWidget {
           ),
           padding: EdgeInsets.zero,
         ),
-        child: Text(
-          label,
-          style: AppTextStyles.textTheme.titleLarge?.copyWith(
-            color: context.surfaceColor,
-            fontSize: fontSize,
-            height: 1.0,
+        child: isLoading
+        ? const SizedBox(
+        width: 22,
+        height: 22,
+        child: CircularProgressIndicator(
+          color: Colors.white,
+          strokeWidth: 2.5,
           ),
-          textAlign: TextAlign.center,
+        )
+            : Text(
+        label,
+        style: AppTextStyles.textTheme.titleLarge?.copyWith(
+          color: context.surfaceColor,
+          fontSize: fontSize,
+          height: 1.0,
         ),
+        textAlign: TextAlign.center,
+      ),
       ),
     );
   }

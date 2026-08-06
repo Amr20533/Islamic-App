@@ -4,15 +4,18 @@ import 'package:adhan_dart/adhan_dart.dart';
 import 'prayer_state.dart';
 
 class PrayerCubit extends Cubit<PrayerState> {
-  final double latitude;
-  final double longitude;
+  double latitude;
+  double longitude;
   Timer? _timer;
 
-  PrayerCubit({required this.latitude, required this.longitude}) : super(PrayerInitial()) {
+  PrayerCubit({required this.latitude, required this.longitude})
+      : super(PrayerInitial()) {
     init();
   }
 
-  final CalculationParameters _params = CalculationMethodParameters.egyptian();
+
+  final CalculationParameters _params = CalculationMethodParameters.egyptian()
+    ..madhab = Madhab.shafi;
 
   void init() {
     emit(PrayerLoading());
@@ -22,6 +25,7 @@ class PrayerCubit extends Cubit<PrayerState> {
       _updatePrayerTimes();
     });
   }
+
 
   void _updatePrayerTimes() {
     try {
@@ -43,7 +47,7 @@ class PrayerCubit extends Cubit<PrayerState> {
       };
 
       String nextName = '';
-      DateTime? nextTime;
+      late DateTime nextTime;
 
       // Filter prayers that are in the future
       List<MapEntry<String, DateTime>> futurePrayers = prayers.entries
@@ -66,14 +70,24 @@ class PrayerCubit extends Cubit<PrayerState> {
         nextTime = tomorrowPrayerTimes.fajr;
       }
 
-      if (nextTime != null) {
-        final countdown = _calculateCountdown(nextTime!);
-        emit(PrayerLoaded(
+      final todayPrayers = {
+        "الفجر": prayerTimes.fajr,
+        "الشروق": prayerTimes.sunrise,
+        "الظهر": prayerTimes.dhuhr,
+        "العصر": prayerTimes.asr,
+        "المغرب": prayerTimes.maghrib,
+        "العشاء": prayerTimes.isha,
+      };
+
+      final countdown = _calculateCountdown(nextTime);
+      emit(
+        PrayerLoaded(
           nextPrayerName: nextName,
-          nextPrayerTime: nextTime!,
+          nextPrayerTime: nextTime,
           countdown: countdown,
-        ));
-      }
+          todayPrayers: todayPrayers,
+        ),
+      );
     } catch (e) {
       emit(PrayerError(e.toString()));
     }
@@ -82,12 +96,22 @@ class PrayerCubit extends Cubit<PrayerState> {
   String _calculateCountdown(DateTime nextTime) {
     final now = DateTime.now();
     final diff = nextTime.difference(now);
-    
+
     final hours = diff.inHours;
     final minutes = diff.inMinutes % 60;
     final seconds = diff.inSeconds % 60;
-    
+
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+
+  void updateLocation(double lat, double lng) {
+    if ((latitude - lat).abs() < 0.01 && (longitude - lng).abs() < 0.01) {
+      return;
+    }
+    latitude = lat;
+    longitude = lng;
+    init(); // re-run prayer time calculation with new coords
   }
 
   @override
