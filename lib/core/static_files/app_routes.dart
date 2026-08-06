@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:islamic_app/features/auth/presentation/pages/login_screen.dart';
-import 'package:islamic_app/features/auth/presentation/pages/signup_screen.dart';
 import 'package:islamic_app/features/azkar/presentation/pages/daily_dua_view.dart';
 import 'package:islamic_app/features/azkar/presentation/pages/daily_zikr.dart';
 import 'package:islamic_app/features/home/presentation/pages/main_view.dart';
@@ -60,8 +58,6 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => isCompleted ? const MainView() : const Onpording1(),
         );
-      case signup:
-        return MaterialPageRoute(builder: (_) => const SignupScreen());
       case main:
         return MaterialPageRoute(builder: (_) => const MainView());
       case details:

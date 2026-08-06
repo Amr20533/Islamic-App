@@ -79,11 +79,15 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
     if (oldWidget.reciters != widget.reciters) {
       _filterReciters();
       if (_selectedReciter != null) {
-        final exists = _filteredReciters.any((r) => r.reciterNameAr == _selectedReciter!.reciterNameAr);
+        final exists = _filteredReciters.any(
+          (r) => r.reciterNameAr == _selectedReciter!.reciterNameAr,
+        );
         if (!exists && _filteredReciters.isNotEmpty) {
           _selectedReciter = _filteredReciters.first;
         } else if (exists) {
-          _selectedReciter = _filteredReciters.firstWhere((r) => r.reciterNameAr == _selectedReciter!.reciterNameAr);
+          _selectedReciter = _filteredReciters.firstWhere(
+            (r) => r.reciterNameAr == _selectedReciter!.reciterNameAr,
+          );
         }
       } else if (_filteredReciters.isNotEmpty) {
         _selectedReciter = _filteredReciters.first;
@@ -103,39 +107,27 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
       'المنشاوي',
       'الحصري',
       'عبدالباسط',
-      'عبد الباسط',
     ];
 
-    _filteredReciters = widget.reciters.where((reciter) {
-      final name = reciter.reciterNameAr;
-      return allowedKeywords.any((keyword) => name.contains(keyword));
-    }).toList();
+    final List<AudioReciter> result = [];
+    final Set<String> seenNames = {};
 
-    final orderMap = {
-      'العفاسي': 1,
-      'الدوسري': 2,
-      'فارس عباد': 3,
-      'المعيقلي': 4,
-      'سعد الغامدي': 5,
-      'العجمي': 6,
-      'القطامي': 7,
-      'المنشاوي': 8,
-      'الحصري': 9,
-      'عبدالباسط': 10,
-      'عبد الباسط': 10,
-    };
-
-    _filteredReciters.sort((a, b) {
-      int getWeight(String name) {
-        for (final entry in orderMap.entries) {
-          if (name.contains(entry.key)) {
-            return entry.value;
+    for (final keyword in allowedKeywords) {
+      for (final reciter in widget.reciters) {
+        final cleanName = reciter.reciterNameAr.trim().replaceAll(
+          RegExp(r'\s+'),
+          ' ',
+        );
+        if (cleanName.contains(keyword)) {
+          if (!seenNames.contains(cleanName)) {
+            seenNames.add(cleanName);
+            result.add(reciter);
           }
         }
-        return 99;
       }
-      return getWeight(a.reciterNameAr).compareTo(getWeight(b.reciterNameAr));
-    });
+    }
+
+    _filteredReciters = result;
   }
 
   @override

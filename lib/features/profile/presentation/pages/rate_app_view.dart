@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_app/core/services/email_service.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/features/profile/presentation/widgets/interactive_rating_stars.dart';
 import 'package:islamic_app/features/profile/presentation/widgets/rating_comment_field.dart';
 import 'package:islamic_app/features/profile/presentation/widgets/rating_success_dialog.dart';
 
@@ -12,8 +12,8 @@ class RateAppView extends StatefulWidget {
 }
 
 class _RateAppViewState extends State<RateAppView> {
+  final _formKey = GlobalKey<FormState>();
   final _commentController = TextEditingController();
-  int _selectedRating = 0;
   bool _isLoading = false;
 
   @override
@@ -22,40 +22,43 @@ class _RateAppViewState extends State<RateAppView> {
     super.dispose();
   }
 
-  void _submitRating() {
-    if (_selectedRating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'يرجى اختيار التقييم بالنجوم أولاً',
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.right,
-          ),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-        ),
+  Future<void> _submitFeedback() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final success = await EmailService.sendFeedback(
+        feedbackText: _commentController.text.trim(),
       );
-      return;
-    }
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Mimic API/Database call
-    Future.delayed(const Duration(seconds: 1), () {
       if (!mounted) return;
 
       setState(() {
         _isLoading = false;
       });
 
-      // Show Custom Success/Thank you Dialog helper
-      showRatingSuccessDialog(context);
-    });
+      if (success) {
+        _commentController.clear();
+        showRatingSuccessDialog(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'تعذر فتح تطبيق البريد الإلكتروني.',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.right,
+            ),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -92,91 +95,82 @@ class _RateAppViewState extends State<RateAppView> {
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 12),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 12),
 
-                // Instructions / Header
-                const Text(
-                  'يسعدنا أن نعرف رأيك في تطبيقنا لكي نتمكن من تحسين خدماتنا وتقديم الأفضل لك دائماً.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryTextColor,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 36),
-
-                // Reusable Interactive Stars Widget
-                InteractiveRatingStars(
-                  rating: _selectedRating,
-                  onRatingChanged: (value) {
-                    setState(() {
-                      _selectedRating = value;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 28),
-
-                // Optional comment section title
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'التعليق (اختياري)',
+                  // Instructions / Header
+                  const Text(
+                    'يسعدنا أن نعرف رأيك في تطبيقنا لكي نتمكن من تحسين خدماتنا وتقديم الأفضل لك دائماً.',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.counterColor,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryTextColor,
+                      height: 1.4,
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
+                  const SizedBox(height: 28),
 
-                // Reusable Comment Field Widget
-                RatingCommentField(controller: _commentController),
-
-                const SizedBox(height: 40),
-
-                // Submit button
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _submitRating,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  // Comment section title
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'الرأي أو الملاحظات',
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.counterColor,
                       ),
-                      elevation: 0,
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                        : const Text(
-                            'إرسال التقييم',
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+
+                  // Reusable Comment Field Widget
+                  RatingCommentField(controller: _commentController),
+
+                  const SizedBox(height: 40),
+
+                  // Submit button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submitFeedback,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                          : const Text(
+                              'إرسال التقييم',
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -27,9 +27,6 @@ import 'package:islamic_app/features/prayer/data/repositories/prayer_alarm_repos
 import 'package:islamic_app/features/prayer/domain/repositories/prayer_alarm_repository.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_cubit.dart';
 
-// Prayer Cubit
-import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
-
 // Profile
 import 'package:islamic_app/features/profile/data/datasources/profile_local_datasource.dart';
 import 'package:islamic_app/features/profile/data/repositories/profile_repository_impl.dart';
@@ -104,33 +101,22 @@ void setupLocator(SharedPreferences sharedPreferences) {
   );
 
   locator.registerFactory<LoginCubit>(
-        () => LoginCubit(
-      locator<UserRepository>(),
-    ),
+    () => LoginCubit(locator<UserRepository>()),
   );
 
   locator.registerFactory<SignUpCubit>(
-        () => SignUpCubit(
-      locator<UserRepository>(),
-    ),
+    () => SignUpCubit(locator<UserRepository>()),
   );
 
   locator.registerLazySingleton<UserRepository>(
-        () => UserRepository(
-      prefs: sharedPreferences,
-    ),
+    () => UserRepository(prefs: sharedPreferences),
   );
 
-  locator.registerLazySingleton<DBHelper>(
-        () => DBHelper.instance,
-  );
+  locator.registerLazySingleton<DBHelper>(() => DBHelper.instance);
 
   locator.registerFactory<UserProfileCubit>(
-        () => UserProfileCubit(
-      locator<UserRepository>(),
-    ),
+    () => UserProfileCubit(locator<UserRepository>()),
   );
-
 
   locator.registerLazySingleton<StreakNotifier>(
     () => StreakNotifier(locator<SharedPreferences>()),

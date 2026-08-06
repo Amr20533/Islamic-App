@@ -1,4 +1,5 @@
 import 'package:adhan_dart/adhan_dart.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   final coordinates = Coordinates(30.0444, 31.2357);
@@ -10,19 +11,21 @@ void main() {
     calculationParameters: params,
   );
 
-  print("UTC Times:");
-  print("Fajr: ${prayerTimes.fajr}");
-  print("Sunrise: ${prayerTimes.sunrise}");
-  print("Dhuhr: ${prayerTimes.dhuhr}");
-  print("Asr: ${prayerTimes.asr}");
-  print("Maghrib: ${prayerTimes.maghrib}");
-  print("Isha: ${prayerTimes.isha}");
+  if (kDebugMode) {
+    debugPrint("UTC Times:");
+    debugPrint("Fajr: ${prayerTimes.fajr}");
+    debugPrint("Sunrise: ${prayerTimes.sunrise}");
+    debugPrint("Dhuhr: ${prayerTimes.dhuhr}");
+    debugPrint("Asr: ${prayerTimes.asr}");
+    debugPrint("Maghrib: ${prayerTimes.maghrib}");
+    debugPrint("Isha: ${prayerTimes.isha}");
 
-  print("\nLocal Times (via toLocal()):");
-  print("Fajr: ${prayerTimes.fajr.toLocal()}");
-  print("Sunrise: ${prayerTimes.sunrise.toLocal()}");
-  print("Dhuhr: ${prayerTimes.dhuhr.toLocal()}");
-  print("Asr: ${prayerTimes.asr.toLocal()}");
-  print("Maghrib: ${prayerTimes.maghrib.toLocal()}");
-  print("Isha: ${prayerTimes.isha.toLocal()}");
+    debugPrint("\nLocal Times (via toLocal()):");
+    debugPrint("Fajr: ${prayerTimes.fajr.toLocal()}");
+    debugPrint("Sunrise: ${prayerTimes.sunrise.toLocal()}");
+    debugPrint("Dhuhr: ${prayerTimes.dhuhr.toLocal()}");
+    debugPrint("Asr: ${prayerTimes.asr.toLocal()}");
+    debugPrint("Maghrib: ${prayerTimes.maghrib.toLocal()}");
+    debugPrint("Isha: ${prayerTimes.isha.toLocal()}");
+  }
 }

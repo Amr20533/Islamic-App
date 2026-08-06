@@ -6,8 +6,6 @@ import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/home/presentation/widgets/daily_plan_card.dart';
 import 'package:islamic_app/features/home/presentation/widgets/progress_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
-import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_state.dart';
 
@@ -121,68 +119,6 @@ class HomeView extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 16),
-                BlocBuilder<PrayerCubit, PrayerState>(
-                  builder: (context, state) {
-                    if (state is PrayerLoaded) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              spacing: 8,
-                              children: [
-                                const Icon(
-                                  Icons.access_time,
-                                  color: AppColors.primaryColor,
-                                  size: 20,
-                                ),
-                                Text(
-                                  "الصلاة القادمة: ${state.nextPrayerName}",
-                                  style: AppTextStyles.textTheme.titleLarge!
-                                      .copyWith(
-                                        color: AppColors.secondaryTextColor,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              state.countdown,
-                              style: AppTextStyles.textTheme.displayLarge!
-                                  .copyWith(
-                                    fontSize: 25,
-                                    color: AppColors.primaryColor,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 2,
-                                    fontFamily: 'Tajawal',
-                                  ),
-                            ),
-                            Text(
-                              "الوقت المتبقي",
-                              style: AppTextStyles.textTheme.labelSmall!
-                                  .copyWith(color: AppColors.hintTextColor),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
                 ),
 
                 Column(

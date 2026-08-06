@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_app/core/services/email_service.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/profile/presentation/widgets/problem_type_dropdown.dart';
 import 'package:islamic_app/features/profile/presentation/widgets/problem_description_field.dart';
@@ -25,7 +26,7 @@ class _ReportProblemViewState extends State<ReportProblemView> {
     super.dispose();
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedProblemType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -49,19 +50,28 @@ class _ReportProblemViewState extends State<ReportProblemView> {
         _isLoading = true;
       });
 
-      // Mimic API/Database submission delay
-      Future.delayed(const Duration(seconds: 1), () {
-        if (!mounted) return;
+      final success = await EmailService.sendBugReport(
+        problemType: _selectedProblemType!,
+        problemDescription: _descriptionController.text,
+      );
 
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (success) {
+        _descriptionController.clear();
         setState(() {
-          _isLoading = false;
+          _selectedProblemType = null;
         });
-
-        // Show Success SnackBar
+        Navigator.pop(context);
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'تم إرسال بلاغك بنجاح. شكراً لك!',
+              'تعذر فتح تطبيق البريد الإلكتروني.',
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontWeight: FontWeight.w600,
@@ -69,24 +79,11 @@ class _ReportProblemViewState extends State<ReportProblemView> {
               ),
               textAlign: TextAlign.right,
             ),
-            backgroundColor: AppColors.successColor800,
+            backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
           ),
         );
-
-        // Clear Form fields
-        _descriptionController.clear();
-        setState(() {
-          _selectedProblemType = null;
-        });
-
-        // Optional: Go back after submission
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.pop(context);
-          }
-        });
-      });
+      }
     }
   }
 

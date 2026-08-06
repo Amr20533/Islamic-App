@@ -241,29 +241,6 @@ class _AccountManagementContent extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-
-                  // ── Password Row ─────────────────────────────────────────
-                  AccountFieldRow(
-                    value: '*' * state.profilePassword.length,
-                    icon: SvgPicture.asset(
-                      'assets/icons/lock.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onEdit: () => _showEditDialog(
-                      context: context,
-                      title: 'تعديل كلمة المرور',
-                      initialValue: state.profilePassword,
-                      isPassword: true,
-                      onSave: (val) => context
-                          .read<ProfileCubit>()
-                          .updateProfilePassword(val),
-                    ),
-                  ),
                 ],
               ),
             );

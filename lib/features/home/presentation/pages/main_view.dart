@@ -6,7 +6,6 @@ import 'package:islamic_app/features/home/presentation/pages/home_view.dart';
 import 'package:islamic_app/features/profile/presentation/pages/my_profile_view.dart';
 import 'package:islamic_app/features/quran/presentation/pages/quran_view.dart';
 import 'package:islamic_app/features/azkar/presentation/pages/zikr_view.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_state.dart';
@@ -24,13 +23,19 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int currentIndex = 0;
 
-  final List<Widget> pages = [
-    HomeView(),
-    const QuranView(),
-    ZikrView(),
-    const CalendarView(),
-    const MyProfileView(),
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      const HomeView(),
+      const QuranView(),
+      ZikrView(),
+      const CalendarView(),
+      const MyProfileView(),
+    ];
+  }
 
   void changePage(int index) {
     setState(() {
