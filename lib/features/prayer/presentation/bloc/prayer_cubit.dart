@@ -9,10 +9,9 @@ class PrayerCubit extends Cubit<PrayerState> {
   Timer? _timer;
 
   PrayerCubit({required this.latitude, required this.longitude})
-      : super(PrayerInitial()) {
+    : super(PrayerInitial()) {
     init();
   }
-
 
   final CalculationParameters _params = CalculationMethodParameters.egyptian()
     ..madhab = Madhab.shafi;
@@ -26,7 +25,6 @@ class PrayerCubit extends Cubit<PrayerState> {
     });
   }
 
-
   void _updatePrayerTimes() {
     try {
       final coordinates = Coordinates(latitude, longitude);
@@ -38,12 +36,17 @@ class PrayerCubit extends Cubit<PrayerState> {
       );
 
       final now = DateTime.now();
+      // adhan_dart returns UTC DateTime objects (isUtc == true) whose
+      // hour/minute values already represent local prayer times.
+      // We call .toLocal() to set isUtc = false so that
+      // tz.TZDateTime.from(prayerTime, tz.local) in NotificationService
+      // does NOT add the UTC offset a second time.
       Map<String, DateTime> prayers = {
-        "الفجر": prayerTimes.fajr,
-        "الظهر": prayerTimes.dhuhr,
-        "العصر": prayerTimes.asr,
-        "المغرب": prayerTimes.maghrib,
-        "العشاء": prayerTimes.isha,
+        "الفجر": prayerTimes.fajr.toLocal(),
+        "الظهر": prayerTimes.dhuhr.toLocal(),
+        "العصر": prayerTimes.asr.toLocal(),
+        "المغرب": prayerTimes.maghrib.toLocal(),
+        "العشاء": prayerTimes.isha.toLocal(),
       };
 
       String nextName = '';
@@ -67,16 +70,16 @@ class PrayerCubit extends Cubit<PrayerState> {
           calculationParameters: _params,
         );
         nextName = "الفجر";
-        nextTime = tomorrowPrayerTimes.fajr;
+        nextTime = tomorrowPrayerTimes.fajr.toLocal();
       }
 
       final todayPrayers = {
-        "الفجر": prayerTimes.fajr,
-        "الشروق": prayerTimes.sunrise,
-        "الظهر": prayerTimes.dhuhr,
-        "العصر": prayerTimes.asr,
-        "المغرب": prayerTimes.maghrib,
-        "العشاء": prayerTimes.isha,
+        "الفجر": prayerTimes.fajr.toLocal(),
+        "الشروق": prayerTimes.sunrise.toLocal(),
+        "الظهر": prayerTimes.dhuhr.toLocal(),
+        "العصر": prayerTimes.asr.toLocal(),
+        "المغرب": prayerTimes.maghrib.toLocal(),
+        "العشاء": prayerTimes.isha.toLocal(),
       };
 
       final countdown = _calculateCountdown(nextTime);
@@ -103,7 +106,6 @@ class PrayerCubit extends Cubit<PrayerState> {
 
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
-
 
   void updateLocation(double lat, double lng) {
     if ((latitude - lat).abs() < 0.01 && (longitude - lng).abs() < 0.01) {

@@ -183,7 +183,9 @@ class NotificationService {
     // If the prayer time has already passed today, schedule for tomorrow
     if (scheduledTime.isBefore(now)) {
       scheduledTime = scheduledTime.add(const Duration(days: 1));
-      debugPrint('⏭ Prayer time passed — rescheduled to tomorrow: $scheduledTime');
+      debugPrint(
+        '⏭ Prayer time passed — rescheduled to tomorrow: $scheduledTime',
+      );
     }
 
     await _schedule(
@@ -324,7 +326,6 @@ class NotificationService {
       'Adhan Alerts',
       importance: Importance.max,
       priority: Priority.high,
-      fullScreenIntent: true,
       playSound: true,
       sound: RawResourceAndroidNotificationSound('adhan'),
       enableVibration: true,
