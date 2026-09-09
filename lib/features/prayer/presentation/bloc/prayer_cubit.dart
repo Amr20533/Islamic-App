@@ -1,119 +1,192 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:adhan_dart/adhan_dart.dart';
+import 'package:islamic_app/core/services/helpers/location_helper.dart';
+import 'package:islamic_app/core/services/prayer_calculation_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'prayer_state.dart';
 
 class PrayerCubit extends Cubit<PrayerState> {
-  double latitude;
-  double longitude;
+  double? latitude;
+  double? longitude;
   Timer? _timer;
+  bool _isCalculating = false;
 
-  PrayerCubit({required this.latitude, required this.longitude})
-    : super(PrayerInitial()) {
+  // Cached prayer data — recalculated only when location/settings change
+  // or when the next prayer time passes.
+  Map<String, DateTime>? _cachedTodayPrayers;
+  String? _nextPrayerName;
+  DateTime? _nextPrayerTime;
+
+  PrayerCubit({this.latitude, this.longitude}) : super(PrayerInitial()) {
     init();
   }
 
-  final CalculationParameters _params = CalculationMethodParameters.egyptian()
-    ..madhab = Madhab.shafi;
-
-  void init() {
+  Future<void> init() async {
     emit(PrayerLoading());
-    _updatePrayerTimes();
-    // Refresh every second for the real-time countdown
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _updatePrayerTimes();
-    });
+
+    // 1. Try to read from SharedPreferences if coordinates were not provided
+    if (latitude == null || longitude == null) {
+      final prefs = await SharedPreferences.getInstance();
+      latitude = prefs.getDouble('last_lat');
+      longitude = prefs.getDouble('last_lng');
+    }
+
+    // 2. Try to get device location via LocationHelper if still null
+    if (latitude == null || longitude == null) {
+      final position = await LocationHelper.getCurrentLocation();
+      if (position != null) {
+        latitude = position.latitude;
+        longitude = position.longitude;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setDouble('last_lat', latitude!);
+        await prefs.setDouble('last_lng', longitude!);
+      }
+    }
+
+    await _recalculate();
+    _startTimer();
   }
 
-  void _updatePrayerTimes() {
-    try {
-      final coordinates = Coordinates(latitude, longitude);
-      final date = DateTime.now();
-      final prayerTimes = PrayerTimes(
-        coordinates: coordinates,
-        date: date,
-        calculationParameters: _params,
-      );
-
-      final now = DateTime.now();
-      // adhan_dart returns UTC DateTime objects (isUtc == true) whose
-      // hour/minute values already represent local prayer times.
-      // We call .toLocal() to set isUtc = false so that
-      // tz.TZDateTime.from(prayerTime, tz.local) in NotificationService
-      // does NOT add the UTC offset a second time.
-      Map<String, DateTime> prayers = {
-        "الفجر": prayerTimes.fajr.toLocal(),
-        "الظهر": prayerTimes.dhuhr.toLocal(),
-        "العصر": prayerTimes.asr.toLocal(),
-        "المغرب": prayerTimes.maghrib.toLocal(),
-        "العشاء": prayerTimes.isha.toLocal(),
-      };
-
-      String nextName = '';
-      late DateTime nextTime;
-
-      // Filter prayers that are in the future
-      List<MapEntry<String, DateTime>> futurePrayers = prayers.entries
-          .where((e) => e.value.isAfter(now))
-          .toList();
-
-      if (futurePrayers.isNotEmpty) {
-        futurePrayers.sort((a, b) => a.value.compareTo(b.value));
-        nextName = futurePrayers.first.key;
-        nextTime = futurePrayers.first.value;
-      } else {
-        // If after Isha, get tomorrow's Fajr
-        final tomorrow = DateTime.now().add(const Duration(days: 1));
-        final tomorrowPrayerTimes = PrayerTimes(
-          coordinates: coordinates,
-          date: tomorrow,
-          calculationParameters: _params,
-        );
-        nextName = "الفجر";
-        nextTime = tomorrowPrayerTimes.fajr.toLocal();
-      }
-
-      final todayPrayers = {
-        "الفجر": prayerTimes.fajr.toLocal(),
-        "الشروق": prayerTimes.sunrise.toLocal(),
-        "الظهر": prayerTimes.dhuhr.toLocal(),
-        "العصر": prayerTimes.asr.toLocal(),
-        "المغرب": prayerTimes.maghrib.toLocal(),
-        "العشاء": prayerTimes.isha.toLocal(),
-      };
-
-      final countdown = _calculateCountdown(nextTime);
-      emit(
-        PrayerLoaded(
-          nextPrayerName: nextName,
-          nextPrayerTime: nextTime,
-          countdown: countdown,
-          todayPrayers: todayPrayers,
-        ),
-      );
-    } catch (e) {
-      emit(PrayerError(e.toString()));
+  /// Manually trigger location refresh (e.g. from UI button).
+  Future<void> refreshLocation() async {
+    emit(PrayerLoading());
+    final position = await LocationHelper.getCurrentLocation(openSettingsIfDisabled: true);
+    if (position != null) {
+      latitude = position.latitude;
+      longitude = position.longitude;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble('last_lat', latitude!);
+      await prefs.setDouble('last_lng', longitude!);
+      await _recalculate();
+    } else {
+      emit(const PrayerError('خدمات الموقع (GPS) مغلقة أو الإذن غير مفعل. يرجى تفعيل الموقع من إعدادات الجهاز وإعادة المحاولة.'));
     }
   }
 
-  String _calculateCountdown(DateTime nextTime) {
-    final now = DateTime.now();
-    final diff = nextTime.difference(now);
+  /// Saves new calculation settings (method + madhab) and recalculates.
+  Future<void> updateCalculationSettings(
+    String methodKey,
+    String madhabKey,
+  ) async {
+    _timer?.cancel();
+    _timer = null;
 
-    final hours = diff.inHours;
-    final minutes = diff.inMinutes % 60;
-    final seconds = diff.inSeconds % 60;
-
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    emit(PrayerLoading());
+    await PrayerCalculationService.saveMethodKey(methodKey);
+    await PrayerCalculationService.saveMadhabKey(madhabKey);
+    await _recalculate();
+    _startTimer();
   }
 
+  /// Updates coordinates when the device location changes.
   void updateLocation(double lat, double lng) {
-    if ((latitude - lat).abs() < 0.01 && (longitude - lng).abs() < 0.01) {
-      return;
+    if (latitude != null &&
+        longitude != null &&
+        (latitude! - lat).abs() < 0.01 &&
+        (longitude! - lng).abs() < 0.01) {
+      return; // Movement too small to matter
     }
     latitude = lat;
     longitude = lng;
-    init(); // re-run prayer time calculation with new coords
+    init();
+  }
+
+  /// Full async recalculation via PrayerCalculationService.
+  Future<void> _recalculate() async {
+    if (latitude == null || longitude == null) {
+      emit(
+        const PrayerError('يرجى تفعيل خدمات الموقع (GPS) لحساب مواقيت الصلاة'),
+      );
+      return;
+    }
+    if (_isCalculating) return;
+    _isCalculating = true;
+    try {
+      final todayPrayers = await PrayerCalculationService.calculatePrayerTimes(
+        latitude: latitude!,
+        longitude: longitude!,
+      );
+
+      final now = DateTime.now();
+      final fivePrayers = <String, DateTime>{
+        "الفجر": todayPrayers["الفجر"]!,
+        "الظهر": todayPrayers["الظهر"]!,
+        "العصر": todayPrayers["العصر"]!,
+        "المغرب": todayPrayers["المغرب"]!,
+        "العشاء": todayPrayers["العشاء"]!,
+      };
+
+      final futurePrayers =
+          fivePrayers.entries
+              .where((e) => e.value.isAfter(now))
+              .toList()
+            ..sort((a, b) => a.value.compareTo(b.value));
+
+      if (futurePrayers.isNotEmpty) {
+        _nextPrayerName = futurePrayers.first.key;
+        _nextPrayerTime = futurePrayers.first.value;
+      } else {
+        // After Isha — next prayer is tomorrow's Fajr
+        final tomorrow = DateTime.now().add(const Duration(days: 1));
+        final tomorrowPrayers =
+            await PrayerCalculationService.calculatePrayerTimes(
+              latitude: latitude!,
+              longitude: longitude!,
+              date: tomorrow,
+            );
+        _nextPrayerName = "الفجر";
+        _nextPrayerTime = tomorrowPrayers["الفجر"]!;
+      }
+
+      _cachedTodayPrayers = todayPrayers;
+      _emitCurrent();
+    } catch (e) {
+      emit(PrayerError(e.toString()));
+    } finally {
+      _isCalculating = false;
+    }
+  }
+
+  /// Emits current state using cached data (fast — no async work).
+  void _emitCurrent() {
+    if (_cachedTodayPrayers == null ||
+        _nextPrayerName == null ||
+        _nextPrayerTime == null) {
+      return;
+    }
+    emit(
+      PrayerLoaded(
+        nextPrayerName: _nextPrayerName!,
+        nextPrayerTime: _nextPrayerTime!,
+        countdown: _calculateCountdown(_nextPrayerTime!),
+        todayPrayers: _cachedTodayPrayers!,
+      ),
+    );
+  }
+
+  /// Starts a 1-second timer that updates the countdown display.
+  /// Only triggers a full recalculation when the next prayer time passes.
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_nextPrayerTime != null &&
+          DateTime.now().isAfter(_nextPrayerTime!)) {
+        // The next prayer has passed — recalculate to find the new next one
+        _recalculate();
+      } else {
+        // Just update the countdown string (no async work)
+        _emitCurrent();
+      }
+    });
+  }
+
+  String _calculateCountdown(DateTime nextTime) {
+    final diff = nextTime.difference(DateTime.now());
+    if (diff.isNegative) return '00:00:00';
+    final h = diff.inHours.toString().padLeft(2, '0');
+    final m = (diff.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (diff.inSeconds % 60).toString().padLeft(2, '0');
+    return '$h:$m:$s';
   }
 
   @override

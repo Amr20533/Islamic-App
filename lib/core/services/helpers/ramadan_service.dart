@@ -1,6 +1,7 @@
 import 'package:adhan/adhan.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
+import 'package:islamic_app/core/services/prayer_calculation_service.dart';
 
 class RamadanService {
   Future<PrayerTimes> getTodayTimes() async {
@@ -31,9 +32,13 @@ class RamadanService {
       desiredAccuracy: LocationAccuracy.high,
     );
 
+    // Use PrayerCalculationService to resolve the user's saved/auto settings
+    final params = await PrayerCalculationService.resolveCalculationParameters(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+
     final myCoordinates = Coordinates(position.latitude, position.longitude);
-    final params = CalculationMethod.egyptian.getParameters();
-    params.madhab = Madhab.shafi;
     final date = DateComponents.from(DateTime.now());
 
     return PrayerTimes(myCoordinates, date, params);

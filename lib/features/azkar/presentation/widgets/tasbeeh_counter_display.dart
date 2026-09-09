@@ -10,13 +10,16 @@ class TasbeehCounterDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Text(
       "$counter",
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'Tajawal',
         fontSize: 76,
         fontWeight: FontWeight.w400,
-        color: Color(0xFF5D483A),
+        color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF5D483A),
         letterSpacing: 1.2,
       ),
     );

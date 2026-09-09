@@ -19,6 +19,8 @@ class ProblemDescriptionField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: controller,
       minLines: minLines,
@@ -32,26 +34,30 @@ class ProblemDescriptionField extends StatelessWidget {
       },
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDark ? const Color(0xFF242220) : Colors.white,
         hintText: hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 14,
-          color: AppColors.hintTextColor,
+          color: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
         ),
         contentPadding: const EdgeInsets.all(16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderColor2),
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderColor2),
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primaryColor,
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
             width: 1.5,
           ),
         ),
@@ -69,10 +75,10 @@ class ProblemDescriptionField extends StatelessWidget {
           ),
         ),
       ),
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'Tajawal',
         fontSize: 15,
-        color: AppColors.primaryTextColor,
+        color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
       ),
     );
   }

@@ -22,12 +22,23 @@ class ZikrCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final effectiveTextColor = isDark ? const Color(0xFFF5F2EE) : textColor;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 162,
         height: 186.5,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF242220) : null,
+          borderRadius: BorderRadius.circular(22),
+          border: isDark
+              ? Border.all(color: const Color(0xFF383430), width: 1)
+              : null,
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(22),
           child: Stack(
@@ -35,7 +46,7 @@ class ZikrCategoryCard extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: Opacity(
-                  opacity: 0.25,
+                  opacity: isDark ? 0.35 : 0.25,
                   child: Image.asset(backgroundImage, fit: BoxFit.cover),
                 ),
               ),
@@ -57,7 +68,7 @@ class ZikrCategoryCard extends StatelessWidget {
                       textDirection: TextDirection.rtl,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: textColor,
+                        color: effectiveTextColor,
                         fontSize: fontSize,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Tajawal',

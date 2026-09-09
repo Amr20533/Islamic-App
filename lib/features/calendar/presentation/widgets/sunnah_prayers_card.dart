@@ -24,26 +24,36 @@ class SunnahPrayersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF242220) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
+        border: isDark ? Border.all(color: const Color(0xFF383430), width: 1) : null,
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                )
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.stars, color: AppColors.primaryColor, size: 24),
+              Icon(
+                Icons.stars,
+                color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
+                size: 24,
+              ),
               const SizedBox(width: 8),
               Text(
                 'السنن الرواتب',
@@ -51,7 +61,7 @@ class SunnahPrayersCard extends StatelessWidget {
                   fontFamily: 'Tajawal',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryTextColor,
+                  color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
                 ),
               ),
             ],
@@ -62,10 +72,13 @@ class SunnahPrayersCard extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 12,
-              color: Colors.grey[500],
+              color: isDark ? const Color(0xFFB8AEA5) : Colors.grey[500],
             ),
           ),
-          const Divider(height: 24),
+          Divider(
+            height: 24,
+            color: isDark ? const Color(0xFF383430) : null,
+          ),
 
           // List of 5 Sunnah items
           ...List.generate(5, (index) {
@@ -89,7 +102,9 @@ class SunnahPrayersCard extends StatelessWidget {
                               fontFamily: 'Tajawal',
                               fontSize: 15,
                               fontWeight: isChecked ? FontWeight.bold : FontWeight.w500,
-                              color: isChecked ? AppColors.primaryColor : AppColors.primaryTextColor,
+                              color: isChecked
+                                  ? (isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor)
+                                  : (isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor),
                             ),
                           ),
                           Text(
@@ -97,7 +112,7 @@ class SunnahPrayersCard extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 12,
-                              color: Colors.grey[400],
+                              color: isDark ? const Color(0xFFB8AEA5) : Colors.grey[400],
                             ),
                           ),
                         ],

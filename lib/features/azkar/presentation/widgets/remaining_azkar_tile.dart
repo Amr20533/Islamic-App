@@ -15,30 +15,54 @@ class RemainingAzkarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final containerBg = isDark ? const Color(0xFF242220) : Colors.white;
+    final borderColor = isDark
+        ? const Color(0xFF383430)
+        : AppColors.borderColor.withOpacity(0.35);
+    final badgeBg = isDark
+        ? const Color(0xFFC8A88A).withOpacity(0.15)
+        : AppColors.primaryColor.withOpacity(0.07);
+    final badgeBorder = isDark
+        ? const Color(0xFFC8A88A).withOpacity(0.5)
+        : AppColors.primaryColor.withOpacity(0.4);
+    final textColor = isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor;
+    final arrowColor = isDark
+        ? const Color(0xFFC8A88A)
+        : AppColors.primaryColor.withOpacity(0.8);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: containerBg,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.borderColor.withOpacity(0.35),
+          color: borderColor,
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
-          splashColor: AppColors.primaryColor.withOpacity(0.05),
-          highlightColor: AppColors.primaryColor.withOpacity(0.02),
+          splashColor: isDark
+              ? const Color(0xFFC8A88A).withOpacity(0.1)
+              : AppColors.primaryColor.withOpacity(0.05),
+          highlightColor: isDark
+              ? const Color(0xFFC8A88A).withOpacity(0.05)
+              : AppColors.primaryColor.withOpacity(0.02),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
@@ -52,9 +76,9 @@ class RemainingAzkarTile extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withOpacity(0.07),
+                          color: badgeBg,
                           border: Border.all(
-                            color: AppColors.primaryColor.withOpacity(0.4),
+                            color: badgeBorder,
                             width: 1.5,
                           ),
                           borderRadius: BorderRadius.circular(4),
@@ -65,9 +89,9 @@ class RemainingAzkarTile extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.07),
+                        color: badgeBg,
                         border: Border.all(
-                          color: AppColors.primaryColor.withOpacity(0.4),
+                          color: badgeBorder,
                           width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(4),
@@ -75,11 +99,11 @@ class RemainingAzkarTile extends StatelessWidget {
                     ),
                     Text(
                       "$index",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryTextColor,
+                        color: textColor,
                       ),
                     ),
                   ],
@@ -88,18 +112,18 @@ class RemainingAzkarTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryTextColor,
+                      color: textColor,
                     ),
                   ),
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,
-                  color: AppColors.primaryColor.withOpacity(0.8),
+                  color: arrowColor,
                 ),
               ],
             ),

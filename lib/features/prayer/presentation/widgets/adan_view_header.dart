@@ -7,6 +7,9 @@ class AdanViewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -14,14 +17,16 @@ class AdanViewHeader extends StatelessWidget {
         Row(
           children: [
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: AppColors.counterColor,
+                color: isDark
+                    ? const Color(0xFFF5F2EE)
+                    : AppColors.counterColor,
                 size: 20,
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            const Expanded(
+            Expanded(
               child: Text(
                 'تنبيهات الصلاة',
                 textAlign: TextAlign.center,
@@ -29,7 +34,9 @@ class AdanViewHeader extends StatelessWidget {
                   fontFamily: 'Tajawal',
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.counterColor,
+                  color: isDark
+                      ? const Color(0xFFC8A88A)
+                      : AppColors.counterColor,
                 ),
               ),
             ),
@@ -40,11 +47,11 @@ class AdanViewHeader extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           FormatHelper.getMiladFormattedDate(),
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.thirdTextColor,
+            color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
           ),
         ),
       ],

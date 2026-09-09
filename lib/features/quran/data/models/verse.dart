@@ -31,7 +31,7 @@ class Verse {
   int? juz, surahNumber;
   String? surahNameAr; // الاسم العربي للسورة
   bool? sajda;
-  final int page;
+  int page;
 
 
   Verse({this.number, this.text, this.juz, required this.page, this.sajda, this.surahNameAr, this.surahNumber});

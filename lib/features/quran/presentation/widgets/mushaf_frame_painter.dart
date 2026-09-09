@@ -9,6 +9,10 @@ class MushafPageFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: _kBeige, child: child);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      color: isDark ? const Color(0xFF1B1A18) : _kBeige,
+      child: child,
+    );
   }
 }

@@ -31,7 +31,6 @@ class _CalendarPageContent extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F5F0),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -69,6 +68,41 @@ class _CalendarPageContent extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: BlocBuilder<PrayerCubit, PrayerState>(
                     builder: (context, state) {
+                      if (state is PrayerLoading || state is PrayerInitial) {
+                        return const Padding(
+                          padding: EdgeInsets.all(30),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (state is PrayerError) {
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF242220)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                state.message,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14),
+                              ),
+                              const SizedBox(height: 12),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  context.read<PrayerCubit>().refreshLocation();
+                                },
+                                icon: const Icon(Icons.my_location, size: 16),
+                                label: const Text('تحديث الموقع', style: TextStyle(fontFamily: 'Tajawal')),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
                       final todayPrayers = state is PrayerLoaded
                           ? state.todayPrayers
                           : <String, DateTime>{};

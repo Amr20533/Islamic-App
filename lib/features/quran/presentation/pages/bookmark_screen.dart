@@ -57,35 +57,38 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFBF9F1), // Clean warm background
         appBar: AppBar(
-          backgroundColor: const Color(0xFFFBF9F1),
           elevation: 0,
+          backgroundColor: isDark ? const Color(0xFF1B1A18) : null,
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: Color(0xFF8B4513),
+              color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
               size: 20,
             ),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             "الآيات المفضلة",
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontWeight: FontWeight.bold,
               fontSize: 20,
-              color: Color(0xFF3E2723),
+              color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3E2723),
             ),
           ),
         ),
         body: _isLoading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B4513)),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
+                  ),
                 ),
               )
             : _bookmarks.isEmpty
@@ -98,10 +101,12 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5F1E8),
+                          color: isDark ? const Color(0xFF242220) : const Color(0xFFF5F1E8),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: const Color(0xFFD4A574).withValues(alpha: 0.5),
+                            color: isDark
+                                ? const Color(0xFF383430)
+                                : const Color(0xFFD4A574).withValues(alpha: 0.5),
                             width: 1,
                           ),
                         ),
@@ -128,19 +133,23 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                                   children: [
                                     Text(
                                       'سورة ${bookmark.surahName} - آية ${bookmark.verseNumber}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontFamily: 'Tajawal',
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF8B4513),
+                                        color: isDark
+                                            ? const Color(0xFFC8A88A)
+                                            : const Color(0xFF8B4513),
                                       ),
                                     ),
                                     IconButton(
                                       constraints: const BoxConstraints(),
                                       padding: EdgeInsets.zero,
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.bookmark_remove_rounded,
-                                        color: Color(0xFFC62828),
+                                        color: isDark
+                                            ? const Color(0xFFE57373)
+                                            : const Color(0xFFC62828),
                                         size: 22,
                                       ),
                                       onPressed: () => _removeBookmark(bookmark),
@@ -148,16 +157,23 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                const Divider(color: Color(0xFFE5D5C5), height: 1),
+                                Divider(
+                                  color: isDark
+                                      ? const Color(0xFF383430)
+                                      : const Color(0xFFE5D5C5),
+                                  height: 1,
+                                ),
                                 const SizedBox(height: 12),
                                 // Verse Arabic text
                                 Text(
                                   bookmark.verseText,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'QuranFont',
                                     fontSize: 18,
-                                    color: Color(0xFF2C1C12),
+                                    color: isDark
+                                        ? const Color(0xFFF5F2EE)
+                                        : const Color(0xFF2C1C12),
                                     height: 1.6,
                                   ),
                                 ),
@@ -178,18 +194,26 @@ class EmptyBookmark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             "لا توجد علامات محفوظة بعد",
-            style: AppTextStyles.textTheme.labelMedium!.copyWith(fontSize: 16),
+            style: AppTextStyles.textTheme.labelMedium!.copyWith(
+              fontSize: 16,
+              color: isDark ? const Color(0xFFB8AEA5) : null,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             "ابدأ بحفظ الآيات التي تريد الرجوع إليها 🌱",
-            style: AppTextStyles.textTheme.labelMedium!.copyWith(fontSize: 16),
+            style: AppTextStyles.textTheme.labelMedium!.copyWith(
+              fontSize: 16,
+              color: isDark ? const Color(0xFFB8AEA5) : null,
+            ),
           ),
         ],
       ),

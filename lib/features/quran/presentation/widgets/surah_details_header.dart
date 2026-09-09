@@ -43,17 +43,25 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F1E8),
+          color: isDark ? const Color(0xFF242220) : const Color(0xFFF5F1E8),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFD4A574), width: 1.5),
+          border: Border.all(
+            color: isDark ? const Color(0xFF383430) : const Color(0xFFD4A574),
+            width: 1.5,
+          ),
         ),
-        child: Icon(icon, color: const Color(0xFF2C1C12)),
+        child: Icon(
+          icon,
+          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
+        ),
       ),
     );
   }
@@ -73,48 +81,61 @@ class _SurahJuzBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F1E8),
+        color: isDark ? const Color(0xFF242220) : const Color(0xFFF5F1E8),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD4A574), width: 1.5),
+        border: Border.all(
+          color: isDark ? const Color(0xFF383430) : const Color(0xFFD4A574),
+          width: 1.5,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             "سورة $surahName",
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'QuranFont',
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2C1C12),
+              color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
             ),
           ),
           const SizedBox(width: 8),
-          Container(width: 1.5, height: 20, color: const Color(0xFFD4A574)),
+          Container(
+            width: 1.5,
+            height: 20,
+            color: isDark ? const Color(0xFF383430) : const Color(0xFFD4A574),
+          ),
           const SizedBox(width: 8),
           Text(
             juzName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'QuranFont',
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2C1C12),
+              color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
             ),
           ),
           const SizedBox(width: 8),
-          Container(width: 1.5, height: 20, color: const Color(0xFFD4A574)),
+          Container(
+            width: 1.5,
+            height: 20,
+            color: isDark ? const Color(0xFF383430) : const Color(0xFFD4A574),
+          ),
           const SizedBox(width: 8),
           Text(
             '$pageNumber',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'QuranFont',
               fontWeight: FontWeight.bold,
-              color: Color(0xFF8B6B4F),
+              color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B6B4F),
             ),
           ),
         ],

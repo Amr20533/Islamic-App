@@ -637,4 +637,14 @@ class QuranMetadata {
     29: {"surahNumber": 67, "surahName": "الملك", "pageNumber": 562},
     30: {"surahNumber": 78, "surahName": "النبأ", "pageNumber": 582},
   };
+
+  static int getStartingPageForSurah(int surahNumber) {
+    for (var entry in pageToSurah.entries) {
+      if (entry.value['surahNumber'] == surahNumber) {
+        return entry.key;
+      }
+    }
+    return 1;
+  }
 }
+

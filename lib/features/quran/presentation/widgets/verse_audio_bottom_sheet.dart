@@ -143,17 +143,20 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final surahName = widget.verse.surahNameAr ?? '';
     final verseNum = widget.verse.number ?? 1;
     final verseTextAr = widget.verse.text?['ar'] ?? '';
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBF9F1),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 15, spreadRadius: 2),
-        ],
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF211F1D) : const Color(0xFFFBF9F1),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: isDark
+            ? const []
+            : const [
+                BoxShadow(color: Colors.black12, blurRadius: 15, spreadRadius: 2),
+              ],
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -168,7 +171,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
               width: 50,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFD4A574).withValues(alpha: 0.5),
+                color: isDark
+                    ? const Color(0xFF383430)
+                    : const Color(0xFFD4A574).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -181,29 +186,32 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF2C1C12)),
+                    icon: Icon(
+                      Icons.close,
+                      color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text(
+                      Text(
                         'الاستماع للآية',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Tajawal',
-                          color: Color(0xFF3E2723),
+                          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3E2723),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'سورة $surahName - آية $verseNum (الشيخ مشاري العفاسي)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Tajawal',
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF8B4513),
+                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                         ),
                       ),
                     ],
@@ -212,7 +220,10 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
               ),
             ),
             const SizedBox(height: 12),
-            const Divider(color: Color(0xFFE5D5C5), height: 1),
+            Divider(
+              color: isDark ? const Color(0xFF383430) : const Color(0xFFE5D5C5),
+              height: 1,
+            ),
 
             // Verse Text Display Card — scrollable for long verses
             Expanded(
@@ -221,10 +232,12 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F1E8),
+                    color: isDark ? const Color(0xFF282522) : const Color(0xFFF5F1E8),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFFD4A574).withValues(alpha: 0.6),
+                      color: isDark
+                          ? const Color(0xFF383430)
+                          : const Color(0xFFD4A574).withValues(alpha: 0.6),
                       width: 1.2,
                     ),
                   ),
@@ -238,10 +251,10 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                       child: Text(
                         verseTextAr,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontFamily: 'QuranFont',
-                          color: Color(0xFF2C1C12),
+                          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
                           height: 1.6,
                         ),
                       ),
@@ -262,9 +275,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                     children: [
                       Text(
                         _formatDuration(_position),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF5D4037),
+                          color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF5D4037),
                           fontFamily: 'Tajawal',
                         ),
                       ),
@@ -278,11 +291,11 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                             overlayShape: const RoundSliderOverlayShape(
                               overlayRadius: 14,
                             ),
-                            activeTrackColor: const Color(0xFF8B4513),
-                            inactiveTrackColor: const Color(
-                              0xFFD4A574,
-                            ).withValues(alpha: 0.3),
-                            thumbColor: const Color(0xFF8B4513),
+                            activeTrackColor: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
+                            inactiveTrackColor: isDark
+                                ? const Color(0xFF383430)
+                                : const Color(0xFFD4A574).withValues(alpha: 0.3),
+                            thumbColor: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                           ),
                           child: Slider(
                             value: _position.inSeconds.toDouble(),
@@ -298,9 +311,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                       ),
                       Text(
                         _formatDuration(_duration),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF5D4037),
+                          color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF5D4037),
                           fontFamily: 'Tajawal',
                         ),
                       ),
@@ -317,7 +330,7 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                           _isRepeat
                               ? Icons.repeat_one_on_outlined
                               : Icons.repeat_outlined,
-                          color: const Color(0xFF8B4513),
+                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                           size: 26,
                         ),
                         onPressed: () {
@@ -334,26 +347,28 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                         child: Container(
                           width: 68,
                           height: 60,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF8B4513),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
+                            boxShadow: isDark
+                                ? const []
+                                : const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
                           ),
                           child: Center(
                             child: _isLoading
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 28,
                                     height: 28,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                                        isDark ? const Color(0xFF141312) : Colors.white,
                                       ),
                                     ),
                                   )
@@ -361,7 +376,7 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                                     _isPlaying
                                         ? Icons.pause_rounded
                                         : Icons.play_arrow_rounded,
-                                    color: Colors.white,
+                                    color: isDark ? const Color(0xFF141312) : Colors.white,
                                     size: 40,
                                   ),
                           ),
@@ -371,9 +386,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
 
                       // Stop Button
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.stop_circle_outlined,
-                          color: Color(0xFF8B4513),
+                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                           size: 28,
                         ),
                         onPressed: () {

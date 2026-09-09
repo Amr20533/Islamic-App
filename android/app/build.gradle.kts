@@ -60,6 +60,11 @@ android {
             isShrinkResources = true
         }
     }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 flutter {

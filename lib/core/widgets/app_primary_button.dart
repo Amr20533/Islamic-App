@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
@@ -47,23 +45,23 @@ class AppPrimaryButton extends StatelessWidget {
           padding: EdgeInsets.zero,
         ),
         child: isLoading
-        ? const SizedBox(
-        width: 22,
-        height: 22,
-        child: CircularProgressIndicator(
-          color: Colors.white,
-          strokeWidth: 2.5,
-          ),
-        )
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
             : Text(
-        label,
-        style: AppTextStyles.textTheme.titleLarge?.copyWith(
-          color: context.surfaceColor,
-          fontSize: fontSize,
-          height: 1.0,
-        ),
-        textAlign: TextAlign.center,
-      ),
+                label,
+                style: AppTextStyles.textTheme.titleLarge?.copyWith(
+                  color: context.surfaceColor,
+                  fontSize: fontSize,
+                  height: 1.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
       ),
     );
   }

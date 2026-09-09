@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:islamic_app/core/services/helpers/db.helper.dart';
+import 'package:islamic_app/core/theme/theme_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/login_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/singup_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
@@ -40,6 +41,10 @@ void setupLocator(SharedPreferences sharedPreferences) {
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
 
   locator.registerSingleton<NotificationService>(NotificationService());
+
+  locator.registerLazySingleton<ThemeCubit>(
+    () => ThemeCubit(locator<SharedPreferences>()),
+  );
 
   locator.registerLazySingleton<AdhanBloc>(() => AdhanBloc());
 

@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
-import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/home/presentation/widgets/daily_plan_card.dart';
 import 'package:islamic_app/features/home/presentation/widgets/progress_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -69,8 +67,8 @@ class HomeView extends StatelessWidget {
                             children: [
                               Text(
                                 greetingText,
-                                style: AppTextStyles.textTheme.titleLarge!
-                                    .copyWith(height: 1.2),
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(height: 1.2),
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -78,7 +76,7 @@ class HomeView extends StatelessWidget {
                                 children: [
                                   Text(
                                     "جميل أنك عدت اليوم",
-                                    style: AppTextStyles.textTheme.labelMedium,
+                                    style: Theme.of(context).textTheme.labelMedium,
                                   ),
                                   Image.asset(
                                     "assets/icons/like.png",
@@ -105,16 +103,16 @@ class HomeView extends StatelessWidget {
                       children: [
                         Text(
                           FormatHelper.getMiladFormattedDate(),
-                          style: AppTextStyles.textTheme.labelMedium,
+                          style: Theme.of(context).textTheme.labelMedium,
                         ),
-                        const VerticalDivider(
+                        VerticalDivider(
                           width: 24,
                           thickness: 0.5,
-                          color: AppColors.primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         Text(
                           FormatHelper.getHijriFormattedDate(),
-                          style: AppTextStyles.textTheme.labelMedium,
+                          style: Theme.of(context).textTheme.labelMedium,
                         ),
                       ],
                     ),
@@ -126,7 +124,7 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       "\"أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ\"",
-                      style: AppTextStyles.textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.center,

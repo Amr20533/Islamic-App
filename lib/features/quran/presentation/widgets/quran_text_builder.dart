@@ -31,11 +31,17 @@ class QuranTextBuilder {
     required List<Verse> verses,
     required int? selectedVerseNumber,
     required GestureRecognizer Function(Verse verse) getRecognizer,
+    bool isDark = false,
   }) {
+    final verseNumberColor =
+        isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513);
+    final selectedHighlightColor =
+        isDark ? const Color(0xFF383430) : const Color(0xFFEDE0CD);
+
     return TextSpan(
       children: verses.map((verse) {
         final isSelected = verse.number == selectedVerseNumber;
-        final highlightColor = isSelected ? const Color(0xFFEDE0CD) : null;
+        final highlightColor = isSelected ? selectedHighlightColor : null;
         final recognizer = getRecognizer(verse);
 
         return TextSpan(
@@ -44,6 +50,7 @@ class QuranTextBuilder {
               "${verse.text?['ar']} ",
               highlightColor,
               recognizer,
+              isDark: isDark,
             ),
             TextSpan(
               text:
@@ -52,7 +59,7 @@ class QuranTextBuilder {
               style: TextStyle(
                 fontSize: verseNumberFontSize,
                 height: baseLineHeight,
-                color: const Color(0xFF8B4513),
+                color: verseNumberColor,
                 fontFamily: 'QuranFont',
                 backgroundColor: highlightColor,
               ),
@@ -67,15 +74,18 @@ class QuranTextBuilder {
   static List<TextSpan> _buildColoredSpans(
     String text,
     Color? highlightColor,
-    GestureRecognizer recognizer,
-  ) {
+    GestureRecognizer recognizer, {
+    bool isDark = false,
+  }) {
+    final textColor = isDark ? const Color(0xFFF5F2EE) : Colors.black;
+    final allahColor = isDark ? const Color(0xFFFF6B6B) : Colors.red;
     final matches = _allahRegex.allMatches(text);
 
     if (matches.isEmpty) {
       return [
         _quranSpan(
           text: text,
-          color: Colors.black,
+          color: textColor,
           highlightColor: highlightColor,
           recognizer: recognizer,
         ),
@@ -90,7 +100,7 @@ class QuranTextBuilder {
       if (match.start > currentIndex) {
         spans.add(_quranSpan(
           text: text.substring(currentIndex, match.start),
-          color: Colors.black,
+          color: textColor,
           highlightColor: highlightColor,
           recognizer: recognizer,
         ));
@@ -99,7 +109,7 @@ class QuranTextBuilder {
       // "Allah" — same size, red color
       spans.add(_quranSpan(
         text: text.substring(match.start, match.end),
-        color: Colors.red,
+        color: allahColor,
         highlightColor: highlightColor,
         recognizer: recognizer,
       ));
@@ -111,7 +121,7 @@ class QuranTextBuilder {
     if (currentIndex < text.length) {
       spans.add(_quranSpan(
         text: text.substring(currentIndex),
-        color: Colors.black,
+        color: textColor,
         highlightColor: highlightColor,
         recognizer: recognizer,
       ));

@@ -24,8 +24,9 @@ class _ProfileContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -35,14 +36,14 @@ class _ProfileContent extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── Header ──────────────────────────────────────────────
-              const Center(
+              Center(
                 child: Text(
                   'حسابي',
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.counterColor,
+                    color: isDark ? const Color(0xFFC8A88A) : AppColors.counterColor,
                   ),
                 ),
               ),
@@ -93,11 +94,11 @@ class _ProfileContent extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryTextColor,
+                          color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
                         ),
                       ),
                     ],
@@ -113,13 +114,13 @@ class _ProfileContent extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── Settings Section Title ───────────────────────────────
-              const Text(
+              Text(
                 'الاعدادات ',
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.counterColor,
+                  color: isDark ? const Color(0xFFC8A88A) : AppColors.counterColor,
                 ),
               ),
 

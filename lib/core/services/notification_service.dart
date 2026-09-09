@@ -28,18 +28,24 @@ class NotificationService {
   static const int dailyReminderId = 123;
 
   static const _messages = [
-    'هل صليت على النبي اليوم؟',
-    'استعن بالله ولا تعجز، وردك القرآني بانتظارك.',
-    "قال تعالى: 'ألا بذكر الله تطمئن القلوب'.. اذكر الله.",
-    'نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل.',
-    'خطوة صغيرة اليوم قد تقربك أكثر، افتح مآب وأكمل رحلتك.',
-    "لا تأجل عمل اليوم للغد، فقد يفتنك التسويف.",
-    "هون عليك، فالقليل المستمر خير من الكثير المنقطع.",
-    'الاستغفار يفتح مغاليق الخير، استغفر ربك.',
-    "الدنيا دار ممر لا دار مقر",
-    "من كان يؤمن بالله واليوم الآخر فليقل خيراً أو ليصمت",
-    "يا ابن آدم، عش ما شئت فإنك ميت، وأحبب من شئت فإنك مفارقه، واعمل ما شئت فإنك مجازى به.",
-    "خير الأعمال أدومها وإن قل.",
+    'وردك القرآني بانتظارك، افتح مآب وأكمل من حيث توقفت 📖',
+    'لا تجعل يومك يمضي دون أن تنور قلبك بآيات من القرآن، افتح مآب الآن 🌱',
+    'صفحة واحدة من المصحف قد تكفي لإضاءة يومك، افتح مآب وأكمل وردك 🕊️',
+    'هل صليت على النبي اليوم؟ اللهم صلِّ وسلم على نبينا محمد ﷺ',
+    'استعن بالله ولا تعجز، وردك القرآني بانتظارك 🌿',
+    "قال تعالى: 'ألا بذكر الله تطمئن القلوب'.. اذكر الله ✨",
+    'دقائق قليلة مع كتاب الله تمنحك طمأنينة لا تنتهي، افتح مآب وأكمل قراءتك 📖',
+    'خطوة صغيرة اليوم تقربك أكثر، افتح مآب وأكمل رحلتك 🚀',
+    'الاستغفار يفتح مغاليق الخير، أستغفر الله العظيم وأتوب إليه 🌿',
+    'جدد نيتك وافتح المصحف الآن لقراءة وردك اليومي 📖',
+    'خير الأعمال أدومها وإن قل، لا تنسَ قراءة وردك اليوم 🌸',
+    'نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل 💚',
+    'تذكر أن القرآن شفيع لأصحابه يوم القيامة، افتح مآب واقرأ آياتك 🕊️',
+    'لا تؤجل وردك اليومي، ابدأ الآن واقرأ ما تيسر من القرآن 📖',
+    'سبحان الله وبحمده، سبحان الله العظيم.. جدد لسانك بذكر الله 💫',
+    'قال رسول الله ﷺ: «من قرأ حرفاً من كتاب الله فله به حسنة».. افتح مآب واكسب الحسنات 🌿',
+    'هون عليك، فالقليل المستمر خير من الكثير المنقطع',
+    'ساعة إجابة أو لحظة تدبر قد تغير حياتك، افتح مآب واذكر ربك 🤍',
     "وَقُل رَّبِّ زِدْنِي عِلْمًا",
     "قال تعالى: 'وَفِي ذَٰلِكَ فَلْيَتَنَافَسِ الْمُتَنَافِسُونَ'",
   ];
@@ -101,12 +107,10 @@ class NotificationService {
       final info = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(info.identifier));
       debugPrint('📍 Timezone: ${info.identifier}');
-    } catch (_) {
-      try {
-        tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
-      } catch (_) {
-        tz.setLocalLocation(tz.UTC);
-      }
+    } catch (e) {
+      // Cannot determine device timezone — keep the default system local.
+      // Do NOT hardcode Africa/Cairo or tz.UTC as a fallback.
+      debugPrint('⚠️ Could not detect timezone: $e — using system default');
     }
   }
 
@@ -193,6 +197,25 @@ class NotificationService {
       title: 'حان وقت صلاة $prayerName 🕌',
       body: 'حي على الصلاة، حي على الفلاح',
       at: scheduledTime,
+      details: _prayerDetails,
+    );
+  }
+
+  /// Schedule a test Adhan notification [seconds] into the future.
+  /// Used for manual testing of alarm, notification, and sound playback.
+  Future<void> scheduleTestNotification({int seconds = 10}) async {
+    const testId = 9999;
+    await cancelNotification(testId);
+
+    final testTime = tz.TZDateTime.now(
+      tz.local,
+    ).add(Duration(seconds: seconds));
+
+    await _schedule(
+      id: testId,
+      title: 'اختبار الأذان التجريبي 🕌',
+      body: 'حي على الصلاة، حي على الفلاح - نجاح تجربة الأذان والصوت',
+      at: testTime,
       details: _prayerDetails,
     );
   }
@@ -315,6 +338,22 @@ class NotificationService {
       );
     } catch (e) {
       debugPrint('❌ zonedSchedule failed id=$id: $e');
+      if (exact) {
+        try {
+          await _plugin.zonedSchedule(
+            id: id,
+            title: title,
+            body: body,
+            scheduledDate: at,
+            notificationDetails: details,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            matchDateTimeComponents: recurring,
+          );
+          debugPrint('⚠️ Retry with inexact succeeded for id=$id');
+        } catch (retryError) {
+          debugPrint('❌ zonedSchedule retry failed id=$id: $retryError');
+        }
+      }
     }
   }
 
@@ -328,6 +367,7 @@ class NotificationService {
       priority: Priority.high,
       playSound: true,
       sound: RawResourceAndroidNotificationSound('adhan'),
+      audioAttributesUsage: AudioAttributesUsage.notification,
       enableVibration: true,
     ),
     iOS: DarwinNotificationDetails(

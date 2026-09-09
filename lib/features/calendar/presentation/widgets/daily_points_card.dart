@@ -21,33 +21,41 @@ class DailyPointsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primaryColor, AppColors.secondaryColor],
+        gradient: LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF383028), const Color(0xFF24201C)]
+              : [AppColors.primaryColor, AppColors.secondaryColor],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-                ),
+        ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          )
-        ],
+        border: isDark ? Border.all(color: const Color(0xFF383430), width: 1) : null,
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'مجموع نقاط اليوم',
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: isDark ? const Color(0xFFC8A88A) : Colors.white,
             ),
           ),
           const SizedBox(height: 8),
@@ -58,21 +66,21 @@ class DailyPointsCard extends StatelessWidget {
             children: [
               Text(
                 FormatHelper.replaceWithArabicNumbers(totalPoints.toString()),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 42,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFFF5F2EE) : Colors.white,
                 ),
               ),
               const SizedBox(width: 4),
-              const Text(
+              Text(
                 'نقطة',
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white70,
+                  color: isDark ? const Color(0xFFB8AEA5) : Colors.white70,
                 ),
               ),
             ],
@@ -81,10 +89,10 @@ class DailyPointsCard extends StatelessWidget {
           Text(
             _getMotivationalQuote(totalPoints),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 13,
-              color: Colors.white,
+              color: isDark ? const Color(0xFFF5F2EE) : Colors.white,
               fontWeight: FontWeight.w500,
             ),
           ),

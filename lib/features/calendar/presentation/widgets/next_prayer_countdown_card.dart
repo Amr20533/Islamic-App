@@ -17,26 +17,40 @@ class NextPrayerCountdownCard extends StatelessWidget {
     final hours = parts.isNotEmpty ? parts[0] : '00';
     final minutes = parts.length > 1 ? parts[1] : '00';
     final seconds = parts.length > 2 ? parts[2] : '00';
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       height: 140,
       width: double.infinity,
       decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF242220) : null,
         borderRadius: BorderRadius.circular(20),
-        image: const DecorationImage(
-          image: ResizeImage(
-              width: 800,
-              AssetImage('assets/images/image.png'),
+        border: isDark
+            ? Border.all(color: const Color(0xFF383430), width: 1)
+            : null,
+        image: DecorationImage(
+          image: const ResizeImage(
+            width: 800,
+            AssetImage('assets/images/image.png'),
           ),
           fit: BoxFit.cover,
+          colorFilter: isDark
+              ? ColorFilter.mode(
+                  Colors.black.withValues(alpha: 0.7),
+                  BlendMode.darken,
+                )
+              : null,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       padding: const EdgeInsets.symmetric(
         vertical: 10,
@@ -45,23 +59,23 @@ class NextPrayerCountdownCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             "الصلاة القادمة",
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: AppColors.thirdTextColor,
+              color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             nextPrayerName,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.counterColor,
+              color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
             ),
           ),
           const SizedBox(height: 10),
@@ -70,11 +84,11 @@ class NextPrayerCountdownCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _TimeUnit(value: hours, label: "ساعة"),
-                const _Colon(),
-                _TimeUnit(value: minutes, label: "دقيقة"),
-                const _Colon(),
-                _TimeUnit(value: seconds, label: "ثانيه"),
+                _TimeUnit(value: hours, label: "ساعة", isDark: isDark),
+                _Colon(isDark: isDark),
+                _TimeUnit(value: minutes, label: "دقيقة", isDark: isDark),
+                _Colon(isDark: isDark),
+                _TimeUnit(value: seconds, label: "ثانيه", isDark: isDark),
               ],
             ),
           ),
@@ -87,10 +101,12 @@ class NextPrayerCountdownCard extends StatelessWidget {
 class _TimeUnit extends StatelessWidget {
   final String value;
   final String label;
+  final bool isDark;
 
   const _TimeUnit({
     required this.value,
     required this.label,
+    this.isDark = false,
   });
 
   @override
@@ -100,21 +116,21 @@ class _TimeUnit extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.counterColor,
+            color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
           ),
         ),
         const SizedBox(height: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: AppColors.thirdTextColor,
+            color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
             height: 1.0,
           ),
         ),
@@ -124,20 +140,22 @@ class _TimeUnit extends StatelessWidget {
 }
 
 class _Colon extends StatelessWidget {
-  const _Colon();
+  final bool isDark;
+
+  const _Colon({this.isDark = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           ':',
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.primaryTextColor,
+            color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryTextColor,
             height: 1.0,
           ),
         ),

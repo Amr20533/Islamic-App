@@ -13,6 +13,8 @@ class SurahTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         context.read<QuranCubit>().loadSurahData(surahModel.number);
@@ -28,7 +30,12 @@ class SurahTile extends StatelessWidget {
         decoration: BoxDecoration(
           border: !isLast
               ? Border(
-                  bottom: BorderSide(width: 1, color: AppColors.borderColor),
+                  bottom: BorderSide(
+                    width: 1,
+                    color: isDark
+                        ? const Color(0xFF383430)
+                        : AppColors.borderColor,
+                  ),
                 )
               : const Border(),
         ),
@@ -38,13 +45,17 @@ class SurahTile extends StatelessWidget {
             Stack(
               alignment: Alignment.center,
               children: [
-                Image.asset('assets/icons/surah_number_container.png'),
+                Image.asset(
+                  'assets/icons/surah_number_container.png',
+                  color: isDark ? const Color(0xFFC8A88A) : null,
+                ),
                 Text(
                   '${surahModel.number}',
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: isDark ? const Color(0xFFF5F2EE) : null,
+                      ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -54,9 +65,13 @@ class SurahTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  surahModel.name,
-                  style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                    color: AppColors.thirdTextColor,
+                  surahModel.name.startsWith('سورة')
+                      ? surahModel.name
+                      : 'سورة ${surahModel.name}',
+                  style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
+                    color: isDark
+                        ? const Color(0xFFF5F2EE)
+                        : AppColors.thirdTextColor,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -64,21 +79,27 @@ class SurahTile extends StatelessWidget {
                   children: [
                     Text(
                       "${surahModel.number}",
-                      style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                        color: AppColors.hintTextColor,
+                      style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
+                        color: isDark
+                            ? const Color(0xFFB8AEA5)
+                            : AppColors.hintTextColor,
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: CircleAvatar(
                         radius: 2,
-                        backgroundColor: AppColors.hintTextColor,
+                        backgroundColor: isDark
+                            ? const Color(0xFFB8AEA5)
+                            : AppColors.hintTextColor,
                       ),
                     ),
                     Text(
                       '${surahModel.versesCount} ايات ',
-                      style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                        color: AppColors.hintTextColor,
+                      style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
+                        color: isDark
+                            ? const Color(0xFFB8AEA5)
+                            : AppColors.hintTextColor,
                       ),
                     ),
                   ],

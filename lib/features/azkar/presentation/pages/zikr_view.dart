@@ -74,7 +74,6 @@ class _ZikrViewState extends State<ZikrView> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFCFBF9),
         body: SafeArea(
           bottom: false,
           child: BlocBuilder<AzkarCubit, AzkarState>(

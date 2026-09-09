@@ -14,12 +14,19 @@ class BookmarkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       height: 62,
       padding: const EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
         border: !isLast
-            ? Border(bottom: BorderSide(width: 1, color: AppColors.borderColor))
+            ? Border(
+                bottom: BorderSide(
+                  width: 1,
+                  color: isDark ? const Color(0xFF383430) : AppColors.borderColor,
+                ),
+              )
             : const Border(),
       ),
       child: Row(
@@ -28,13 +35,17 @@ class BookmarkTile extends StatelessWidget {
           Stack(
             alignment: Alignment.center,
             children: [
-              Image.asset('assets/icons/surah_number_container.png'),
+              Image.asset(
+                'assets/icons/surah_number_container.png',
+                color: isDark ? const Color(0xFFC8A88A) : null,
+              ),
               Text(
                 '${surahModel.number}',
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: isDark ? const Color(0xFFF5F2EE) : null,
+                    ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -47,7 +58,7 @@ class BookmarkTile extends StatelessWidget {
               Text(
                 surahModel.name,
                 style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                  color: AppColors.thirdTextColor,
+                  color: isDark ? const Color(0xFFF5F2EE) : AppColors.thirdTextColor,
                 ),
               ),
               const SizedBox(height: 4),
@@ -56,20 +67,20 @@ class BookmarkTile extends StatelessWidget {
                   Text(
                     "${surahModel.number}",
                     style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                      color: AppColors.hintTextColor,
+                      color: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5),
                     child: CircleAvatar(
                       radius: 2,
-                      backgroundColor: AppColors.hintTextColor,
+                      backgroundColor: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
                     ),
                   ),
                   Text(
                     '${surahModel.versesCount} ايات ',
                     style: AppTextStyles.textTheme.labelMedium!.copyWith(
-                      color: AppColors.hintTextColor,
+                      color: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
                     ),
                   ),
                 ],
@@ -79,7 +90,10 @@ class BookmarkTile extends StatelessWidget {
           const Spacer(),
           Text(
             "${surahModel.wordsCount} حرف ",
-            style: AppTextStyles.textTheme.labelMedium!.copyWith(fontSize: 16),
+            style: AppTextStyles.textTheme.labelMedium!.copyWith(
+              fontSize: 16,
+              color: isDark ? const Color(0xFFB8AEA5) : null,
+            ),
           ),
         ],
       ),

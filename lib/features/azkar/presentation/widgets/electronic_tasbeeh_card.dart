@@ -13,6 +13,9 @@ class _ElectronicTasbeehCardState extends State<ElectronicTasbeehCard>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         widget.onTap();
@@ -21,20 +24,29 @@ class _ElectronicTasbeehCardState extends State<ElectronicTasbeehCard>
         height: 135,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          gradient: const LinearGradient(
-            colors: [Color(0xFFF7F3EE), Color(0xFFEEE5DB)],
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF282522), const Color(0xFF1E1C1A)]
+                : [const Color(0xFFF7F3EE), const Color(0xFFEEE5DB)],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF8B6B4F).withOpacity(0.08),
+              color: isDark
+                  ? Colors.black.withOpacity(0.2)
+                  : const Color(0xFF8B6B4F).withOpacity(0.08),
               blurRadius: 18,
               spreadRadius: -2,
               offset: const Offset(0, 8),
             ),
           ],
-          border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
+          border: Border.all(
+            color: isDark
+                ? const Color(0xFF383430)
+                : Colors.white.withOpacity(0.6),
+            width: 1.5,
+          ),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
@@ -43,7 +55,7 @@ class _ElectronicTasbeehCardState extends State<ElectronicTasbeehCard>
               // 1. Decorative background overlay pattern
               Positioned.fill(
                 child: Opacity(
-                  opacity: 0.18,
+                  opacity: isDark ? 0.08 : 0.18,
                   child: Image.asset(
                     'assets/images/bg_pattern.png',
                     fit: BoxFit.cover,
@@ -66,13 +78,15 @@ class _ElectronicTasbeehCardState extends State<ElectronicTasbeehCard>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "المسبحة الإلكترونية",
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.thirdTextColor,
+                              color: isDark
+                                  ? const Color(0xFFF5F2EE)
+                                  : AppColors.thirdTextColor,
                             ),
                           ),
                           Text(
@@ -80,9 +94,9 @@ class _ElectronicTasbeehCardState extends State<ElectronicTasbeehCard>
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 13,
-                              color: AppColors.primaryTextColor.withOpacity(
-                                0.65,
-                              ),
+                              color: isDark
+                                  ? const Color(0xFFB8AEA5)
+                                  : AppColors.primaryTextColor.withOpacity(0.65),
                               height: 1.4,
                             ),
                           ),
@@ -93,7 +107,7 @@ class _ElectronicTasbeehCardState extends State<ElectronicTasbeehCard>
                     Container(
                       width: 145,
                       height: 162,
-                      decoration: BoxDecoration(),
+                      decoration: const BoxDecoration(),
                       child: Padding(
                         padding: const EdgeInsets.only(right: 50),
                         child: Image.asset('assets/images/download (1) 1.png'),

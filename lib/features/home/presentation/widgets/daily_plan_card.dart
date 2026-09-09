@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/home/presentation/widgets/daily_plan_painter.dart';
 import 'package:islamic_app/features/home/presentation/widgets/plan_item.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/core/static_files/app_shadows.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/core/constants/daily_content.dart';
 import 'package:islamic_app/di/locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,13 +39,19 @@ class _DailyPlanCardState extends State<DailyPlanCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cardBgColor = isDark ? const Color(0xFF282522) : AppColors.thirdColor;
+
     return Container(
-      decoration: BoxDecoration(boxShadow: AppShadows.customShadow),
+      decoration: BoxDecoration(
+        boxShadow: isDark ? const [] : AppShadows.customShadow,
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: CustomPaint(
           size: const Size(342, 310),
-          painter: DailyPlanPainter(),
+          painter: DailyPlanPainter(backgroundColor: cardBgColor),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 29),
             width: 342,
@@ -56,7 +62,13 @@ class _DailyPlanCardState extends State<DailyPlanCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('خطتك اليوم', style: AppTextStyles.textTheme.bodyLarge),
+                  Text(
+                    'خطتك اليوم',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? const Color(0xFFF5F2EE) : null,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   PlanItem(
                     onTap: () {

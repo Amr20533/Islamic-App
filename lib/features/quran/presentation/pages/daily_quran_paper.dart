@@ -55,25 +55,27 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFBF9F1),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFFBF9F1),
           leading: GestureDetector(
             onTap: () {
               Navigator.pop(context);
             },
             child: Icon(
               Icons.arrow_back_ios_sharp,
-              color: context.primaryColor,
+              color: isDark ? const Color(0xFFF5F2EE) : context.primaryColor,
               size: 18,
             ),
           ),
           title: Text(
             "صفحة من القرآن",
-            style: AppTextStyles.textTheme.titleLarge,
+            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
+              color: isDark ? const Color(0xFFC8A88A) : null,
+            ),
           ),
         ),
         body: Column(
@@ -86,8 +88,8 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                 children: [
                   Text(
                     "سورة $_surahName",
-                    style: AppTextStyles.textTheme.labelMedium?.copyWith(
-                      color: AppColors.primaryColor,
+                    style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
+                      color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -97,13 +99,15 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withAlpha(20),
+                      color: isDark
+                          ? const Color(0xFFC8A88A).withOpacity(0.18)
+                          : AppColors.primaryColor.withAlpha(20),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       "صفحة $_dailyPageNumber",
-                      style: AppTextStyles.textTheme.labelSmall?.copyWith(
-                        color: AppColors.primaryColor,
+                      style: (AppTextStyles.textTheme.labelSmall ?? const TextStyle()).copyWith(
+                        color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                       ),
                     ),
                   ),

@@ -23,12 +23,14 @@ class ZikrDetailBottomNav extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildNavButton(
+            context: context,
             icon: Icons.chevron_left,
             label: "السابق",
             onTap: onPrev,
           ),
-          _buildPageIndicator(),
+          _buildPageIndicator(context),
           _buildNavButton(
+            context: context,
             icon: Icons.chevron_right,
             label: "التالي",
             onTap: onNext,
@@ -39,10 +41,13 @@ class ZikrDetailBottomNav extends StatelessWidget {
   }
 
   Widget _buildNavButton({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -52,19 +57,23 @@ class ZikrDetailBottomNav extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: AppColors.lightGreyColor,
+              color: isDark ? const Color(0xFF282522) : AppColors.lightGreyColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF6B5040), size: 24),
+            child: Icon(
+              icon,
+              color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF6B5040),
+              size: 24,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF6B5040),
+              color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF6B5040),
             ),
           ),
         ],
@@ -72,20 +81,22 @@ class ZikrDetailBottomNav extends StatelessWidget {
     );
   }
 
-  Widget _buildPageIndicator() {
+  Widget _buildPageIndicator(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
       decoration: BoxDecoration(
-        color: AppColors.lightGreyColor,
+        color: isDark ? const Color(0xFF282522) : AppColors.lightGreyColor,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Text(
         "${currentIndex + 1} / $totalPages",
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF6B5040),
+          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF6B5040),
         ),
       ),
     );

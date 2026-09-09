@@ -9,26 +9,41 @@ class NextPrayerVirtueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF242220) : null,
         borderRadius: BorderRadius.circular(10),
-        image: const DecorationImage(
-          image: ResizeImage(
+        border: isDark
+            ? Border.all(color: const Color(0xFF383430), width: 1)
+            : null,
+        image: DecorationImage(
+          image: const ResizeImage(
             width: 800,
             AssetImage(
-            'assets/images/Gemini_Generated_Image_1vp5pk1vp5pk1vp5 (1) 1.png',
+              'assets/images/Gemini_Generated_Image_1vp5pk1vp5pk1vp5 (1) 1.png',
             ),
           ),
           fit: BoxFit.cover,
+          colorFilter: isDark
+              ? ColorFilter.mode(
+                  Colors.black.withValues(alpha: 0.75),
+                  BlendMode.darken,
+                )
+              : null,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -45,13 +60,13 @@ class NextPrayerVirtueCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'الصلاة القادمة',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.counterColor,
+                        color: isDark ? const Color(0xFFC8A88A) : AppColors.counterColor,
                       ),
                     ),
                     Container(
@@ -60,37 +75,39 @@ class NextPrayerVirtueCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withValues(alpha: 0.1),
+                        color: isDark
+                            ? const Color(0xFFC8A88A).withOpacity(0.15)
+                            : AppColors.primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         nextPrayerName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryColor,
+                          color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                         ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Divider(
+                Divider(
                   height: 1,
                   thickness: 0.5,
-                  color: AppColors.borderColor,
+                  color: isDark ? const Color(0xFF383430) : AppColors.borderColor,
                 ),
                 const SizedBox(height: 12),
-                const Row(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
                       Icons.favorite_rounded,
-                      color: AppColors.primaryColor,
+                      color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                       size: 20,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,17 +118,17 @@ class NextPrayerVirtueCard extends StatelessWidget {
                               fontFamily: 'Tajawal',
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.counterColor,
+                              color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'عن ابن مسعود رضي الله عنه قال: سألت رسول الله صلى الله عليه وسلم: أي العمل أحب إلى الله؟ قال: «الصلاة على وقتها». (رواه البخاري ومسلم)',
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.primaryTextColor,
+                              color: isDark ? const Color(0xFFB8AEA5) : AppColors.primaryTextColor,
                               height: 1.4,
                             ),
                           ),

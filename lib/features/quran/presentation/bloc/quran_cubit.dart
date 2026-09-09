@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:islamic_app/features/quran/data/models/verse.dart';
 import 'package:islamic_app/features/quran/data/models/audio_reciter.dart';
+import 'package:islamic_app/features/quran/data/models/quran_metadata.dart';
 
 abstract class QuranState extends Equatable {
   const QuranState();
@@ -68,10 +69,15 @@ class QuranCubit extends Cubit<QuranState> {
         _cachedPages[page]!.removeWhere((v) => v.surahNumber == surahNum);
       }
 
+      final startPage = QuranMetadata.getStartingPageForSurah(surahNum);
+
       for (var v in versesData) {
         Verse verse = Verse.fromJson(v);
         verse.surahNameAr = surahNameAr;
         verse.surahNumber = surahNum;
+        if (startPage > 1 && verse.page < startPage) {
+          verse.page = startPage;
+        }
         _cachedPages[verse.page] ??= [];
         _cachedPages[verse.page]!.add(verse);
       }

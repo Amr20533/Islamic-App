@@ -60,7 +60,6 @@ class _AdanPageContentState extends State<_AdanPageContent> {
         }
       },
       child: const Scaffold(
-        backgroundColor: Color(0xFFF7F5F0),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(

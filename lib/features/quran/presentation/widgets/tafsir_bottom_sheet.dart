@@ -39,17 +39,20 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final surahName = widget.verse.surahNameAr ?? '';
     final verseNum = widget.verse.number ?? 1;
     final verseText = widget.verse.text?['ar'] ?? '';
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBF9F1),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 15, spreadRadius: 2),
-        ],
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF211F1D) : const Color(0xFFFBF9F1),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: isDark
+            ? const []
+            : const [
+                BoxShadow(color: Colors.black12, blurRadius: 15, spreadRadius: 2),
+              ],
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -64,7 +67,9 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
               width: 50,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFD4A574).withValues(alpha: 0.5),
+                color: isDark
+                    ? const Color(0xFF383430)
+                    : const Color(0xFFD4A574).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -77,29 +82,32 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF2C1C12)),
+                    icon: Icon(
+                      Icons.close,
+                      color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text(
+                      Text(
                         'تفسير السعدي',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Tajawal',
-                          color: Color(0xFF3E2723),
+                          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3E2723),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'سورة $surahName - آية $verseNum',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontFamily: 'Tajawal',
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF8B4513),
+                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                         ),
                       ),
                     ],
@@ -108,7 +116,10 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
               ),
             ),
             const SizedBox(height: 12),
-            const Divider(color: Color(0xFFE5D5C5), height: 1),
+            Divider(
+              color: isDark ? const Color(0xFF383430) : const Color(0xFFE5D5C5),
+              height: 1,
+            ),
 
             // Main Content Area
             Expanded(
@@ -124,10 +135,12 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F1E8),
+                        color: isDark ? const Color(0xFF282522) : const Color(0xFFF5F1E8),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFFD4A574).withValues(alpha: 0.6),
+                          color: isDark
+                              ? const Color(0xFF383430)
+                              : const Color(0xFFD4A574).withValues(alpha: 0.6),
                           width: 1.2,
                         ),
                       ),
@@ -136,10 +149,10 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
                         child: Text(
                           verseText,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'QuranFont',
-                            color: Color(0xFF2C1C12),
+                            color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
                             height: 1.6,
                           ),
                         ),
@@ -155,12 +168,12 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Center(
+                            return Center(
                               child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 40),
+                                padding: const EdgeInsets.symmetric(vertical: 40),
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xFF8B4513),
+                                    isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                                   ),
                                 ),
                               ),
@@ -175,33 +188,33 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFD4A574,
-                                    ).withValues(alpha: 0.1),
+                                    color: isDark
+                                        ? const Color(0xFFC8A88A).withOpacity(0.15)
+                                        : const Color(0xFFD4A574).withValues(alpha: 0.1),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.wifi_off_rounded,
                                     size: 40,
-                                    color: Color(0xFF8B4513),
+                                    color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
                                   ),
                                 ),
 
                                 const SizedBox(height: 8),
-                                const Text(
+                                Text(
                                   'يرجى التحقق من اتصالك بالشبكة ثم إعادة المحاولة لتحميل التفسير.',
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 13,
-                                    color: Color(0xFF7D6B5D),
+                                    color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF7D6B5D),
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 20),
                                 ElevatedButton.icon(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.borderColor2,
-                                    foregroundColor: Colors.white,
+                                    backgroundColor: isDark ? const Color(0xFFC8A88A) : AppColors.borderColor2,
+                                    foregroundColor: isDark ? const Color(0xFF141312) : Colors.white,
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
@@ -237,10 +250,10 @@ class _TafsirBottomSheetState extends State<TafsirBottomSheet> {
 
                           return Text(
                             tafsirText,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontFamily: 'Tajawal',
-                              color: Color(0xFF3E2723),
+                              color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3E2723),
                               height: 1.8,
                             ),
                           );

@@ -75,41 +75,43 @@ class _ElectronicTasbeehScreenContentState
     final state = cubit.state;
     if (state is TasbeehLoaded && state.counter == 0) return;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            backgroundColor: const Color(0xFFEDEAE3),
+            backgroundColor: isDark ? const Color(0xFF282522) : const Color(0xFFEDEAE3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            title: const Text(
+            title: Text(
               "إعادة ضبط المسبحة",
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF3D3020),
+                color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
               ),
             ),
-            content: const Text(
+            content: Text(
               "هل أنت متأكد من رغبتك في إعادة تعيين العداد إلى صفر؟",
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 15,
-                color: Color(0xFF8A7560),
+                color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF8A7560),
               ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   "إلغاء",
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF8A7560),
+                    color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF8A7560),
                   ),
                 ),
               ),
@@ -120,17 +122,17 @@ class _ElectronicTasbeehScreenContentState
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8C6D53),
+                  backgroundColor: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8C6D53),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   "تأكيد",
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF141312) : Colors.white,
                   ),
                 ),
               ),
@@ -143,33 +145,50 @@ class _ElectronicTasbeehScreenContentState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F2EC),
-        body: SafeArea(
-          child: BlocBuilder<TasbeehCubit, TasbeehState>(
-            builder: (context, state) {
-              final int counter = state is TasbeehLoaded ? state.counter : 0;
+        backgroundColor: isDark ? const Color(0xFF1B1A18) : const Color(0xFFF5F2EC),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: isDark ? 0.05 : 0.12,
+                child: Image.asset(
+                  'assets/images/bg_pattern.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: BlocBuilder<TasbeehCubit, TasbeehState>(
+                builder: (context, state) {
+                  final int counter = state is TasbeehLoaded ? state.counter : 0;
 
-              return Column(
-                children: [
-                  TasbeehHeader(onReset: _resetCounterDialog),
-                  const SizedBox(height: 30),
-                  const InstructionText(),
-                  const Spacer(flex: 2),
-                  TasbeehCounterDisplay(counter: counter),
-                  const Spacer(flex: 1),
-                  TasbeehBeadsArea(
-                    onIncrement: _incrementCounter,
-                    animationProgress: _animationProgress,
-                  ),
-                  const Spacer(flex: 2),
-                  const TasbeehFooterText(),
-                ],
-              );
-            },
-          ),
+                  return Column(
+                    children: [
+                      TasbeehHeader(onReset: _resetCounterDialog),
+                      const SizedBox(height: 30),
+                      const InstructionText(),
+                      const Spacer(flex: 2),
+                      TasbeehCounterDisplay(counter: counter),
+                      const Spacer(flex: 1),
+                      TasbeehBeadsArea(
+                        onIncrement: _incrementCounter,
+                        animationProgress: _animationProgress,
+                      ),
+                      const Spacer(flex: 2),
+                      const TasbeehFooterText(),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -181,15 +200,17 @@ class InstructionText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 32.0),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32.0),
       child: Text(
         "اذكر الله في أي وقت وبأي صيغة تحب.",
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 16,
-          color: Color(0xFF8A7560),
+          color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF8A7560),
         ),
       ),
     );
@@ -201,14 +222,16 @@ class TasbeehFooterText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 40.0),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 40.0),
       child: Text(
         "إضغط أو اسحب للعد",
         style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 15,
-          color: Color(0xFF8A7560),
+          color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF8A7560),
           fontWeight: FontWeight.w500,
         ),
       ),

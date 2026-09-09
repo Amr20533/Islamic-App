@@ -15,24 +15,24 @@ class DailyDuaView extends StatelessWidget {
   Widget build(BuildContext context) {
     final index = DailyContent.getDayOfYearIndex(DailyContent.duas.length);
     final dailyDua = DailyContent.duas[index];
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.lightGreyColor,
         appBar: AppBar(
-          backgroundColor: AppColors.lightGreyColor,
           leading: GestureDetector(
             onTap: () {
               Navigator.pop(context);
             },
             child: Icon(
               Icons.arrow_back_ios_sharp,
-              color: context.primaryColor,
+              color: isDark ? const Color(0xFFC8A88A) : context.primaryColor,
               size: 18,
             ),
           ),
-          title: Text("دعاء اليوم", style: AppTextStyles.textTheme.titleLarge),
+          title: Text("دعاء اليوم", style: theme.textTheme.titleLarge),
         ),
         body: Center(
           child: Column(
@@ -45,10 +45,10 @@ class DailyDuaView extends StatelessWidget {
                 ),
                 child: Text(
                   dailyDua,
-                  style: AppTextStyles.textTheme.labelSmall!.copyWith(
+                  style: theme.textTheme.labelSmall!.copyWith(
                     fontSize: 24,
                     height: 1.6,
-                    color: AppColors.primaryTextColor,
+                    color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
                     fontFamily: 'Tajawal',
                   ),
                   textAlign: TextAlign.center,

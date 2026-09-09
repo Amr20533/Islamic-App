@@ -89,32 +89,34 @@ class _ReportProblemViewState extends State<ReportProblemView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F5F0),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF7F5F0),
           elevation: 0,
           leading: Container(),
           actions: [
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_forward_ios,
-                color: AppColors.primaryTextColor,
+                color: isDark
+                    ? const Color(0xFFF5F2EE)
+                    : AppColors.primaryTextColor,
                 size: 20,
               ),
               onPressed: () => Navigator.pop(context),
             ),
           ],
           centerTitle: true,
-          title: const Text(
+          title: Text(
             'الإبلاغ عن مشكلة',
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.counterColor,
+              color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
             ),
           ),
         ),
@@ -129,25 +131,29 @@ class _ReportProblemViewState extends State<ReportProblemView> {
                   const SizedBox(height: 8),
 
                   // Instruction text
-                  const Text(
+                  Text(
                     'يسعدنا سماع ملاحظاتك لحل أي مشكلة تواجهك في أسرع وقت.',
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.primaryTextColor,
+                      color: isDark
+                          ? const Color(0xFFB8AEA5)
+                          : AppColors.primaryTextColor,
                     ),
                   ),
                   const SizedBox(height: 28),
 
                   // Dropdown Header
-                  const Text(
+                  Text(
                     'نوع المشكلة',
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.counterColor,
+                      color: isDark
+                          ? const Color(0xFFF5F2EE)
+                          : AppColors.counterColor,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -166,13 +172,15 @@ class _ReportProblemViewState extends State<ReportProblemView> {
                   const SizedBox(height: 24),
 
                   // Description Header
-                  const Text(
+                  Text(
                     'وصف المشكلة',
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.counterColor,
+                      color: isDark
+                          ? const Color(0xFFF5F2EE)
+                          : AppColors.counterColor,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -189,19 +197,25 @@ class _ReportProblemViewState extends State<ReportProblemView> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submitForm,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        foregroundColor: Colors.white,
+                        backgroundColor: isDark
+                            ? const Color(0xFFC8A88A)
+                            : AppColors.primaryColor,
+                        foregroundColor: isDark
+                            ? const Color(0xFF141312)
+                            : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
                       ),
                       child: _isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: isDark
+                                    ? const Color(0xFF141312)
+                                    : Colors.white,
                                 strokeWidth: 2.5,
                               ),
                             )

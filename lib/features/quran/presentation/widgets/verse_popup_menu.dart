@@ -110,20 +110,27 @@ class _VersePopupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: 220,
       height: 275,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDFBF7),
+        color: isDark ? const Color(0xFF242220) : const Color(0xFFFDFBF7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD2B48C), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        border: Border.all(
+          color: isDark ? const Color(0xFF383430) : const Color(0xFFD2B48C),
+          width: 1.5,
+        ),
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -183,6 +190,8 @@ class _PopupMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -192,14 +201,18 @@ class _PopupMenuItem extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF3E2723),
+                color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3E2723),
               ),
             ),
-            Icon(icon, color: const Color(0xFF8B4513), size: 18),
+            Icon(
+              icon,
+              color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
+              size: 18,
+            ),
           ],
         ),
       ),
@@ -213,7 +226,12 @@ class _PopupDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, color: Color(0xFFE5D5C5), thickness: 0.8);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Divider(
+      height: 1,
+      color: isDark ? const Color(0xFF383430) : const Color(0xFFE5D5C5),
+      thickness: 0.8,
+    );
   }
 }
 
@@ -225,28 +243,31 @@ class _PopupArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? const Color(0xFF383430) : const Color(0xFFD2B48C);
+
     return Transform.rotate(
       angle: 3.14159 / 4,
       child: Container(
         width: 16,
         height: 16,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDFBF7),
+          color: isDark ? const Color(0xFF242220) : const Color(0xFFFDFBF7),
           border: Border(
             top: BorderSide(
-              color: const Color(0xFFD2B48C),
+              color: borderColor,
               width: showAbove ? 0 : 1.5,
             ),
             left: BorderSide(
-              color: const Color(0xFFD2B48C),
+              color: borderColor,
               width: showAbove ? 0 : 1.5,
             ),
             bottom: BorderSide(
-              color: const Color(0xFFD2B48C),
+              color: borderColor,
               width: showAbove ? 1.5 : 0,
             ),
             right: BorderSide(
-              color: const Color(0xFFD2B48C),
+              color: borderColor,
               width: showAbove ? 1.5 : 0,
             ),
           ),

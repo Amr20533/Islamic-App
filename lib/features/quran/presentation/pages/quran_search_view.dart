@@ -42,17 +42,17 @@ class _QuranSearchViewState extends State<QuranSearchView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFBF9F1),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFFBF9F1),
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios,
-              color: Colors.black,
+              color: isDark ? const Color(0xFFF5F2EE) : Colors.black,
               size: 20,
             ),
             onPressed: () => Navigator.pop(context),
@@ -60,23 +60,38 @@ class _QuranSearchViewState extends State<QuranSearchView> {
           title: Container(
             height: 45,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF211F1D) : Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(
+                color: isDark ? const Color(0xFF383430) : AppColors.borderColor,
+              ),
             ),
             child: TextField(
               controller: _searchController,
               autofocus: true,
               textDirection: TextDirection.rtl,
+              style: TextStyle(
+                color: isDark ? const Color(0xFFF5F2EE) : Colors.black,
+              ),
               onChanged: (value) {
                 context.read<QuranSearchCubit>().search(value);
               },
               decoration: InputDecoration(
                 hintText: "ابحث عن سورة أو آية ...",
-                hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? const Color(0xFFB8AEA5) : Colors.grey,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: isDark ? const Color(0xFFC8A88A) : Colors.grey,
+                ),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey, size: 20),
+                  icon: Icon(
+                    Icons.clear,
+                    color: isDark ? const Color(0xFFB8AEA5) : Colors.grey,
+                    size: 20,
+                  ),
                   onPressed: () {
                     _searchController.clear();
                     context.read<QuranSearchCubit>().search('');
@@ -98,19 +113,25 @@ class _QuranSearchViewState extends State<QuranSearchView> {
               final results = state.searchResults;
 
               if (_searchController.text.isNotEmpty && results.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
                     "لم يتم العثور على نتائج",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark ? const Color(0xFFF5F2EE) : null,
+                    ),
                   ),
                 );
               }
 
               if (results.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
                     "ابدأ بكتابة اسم السورة أو الآية للبحث",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? const Color(0xFFB8AEA5) : Colors.grey,
+                    ),
                   ),
                 );
               }
@@ -118,7 +139,10 @@ class _QuranSearchViewState extends State<QuranSearchView> {
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: results.length,
-                separatorBuilder: (context, index) => const Divider(height: 24),
+                separatorBuilder: (context, index) => Divider(
+                  height: 24,
+                  color: isDark ? const Color(0xFF383430) : null,
+                ),
                 itemBuilder: (context, index) {
                   final result = results[index];
 
@@ -132,7 +156,9 @@ class _QuranSearchViewState extends State<QuranSearchView> {
                           height: 40,
                           decoration: BoxDecoration(
                             color: result.isSurah
-                                ? AppColors.thirdColor.withValues(alpha: 0.2)
+                                ? (isDark
+                                    ? const Color(0xFFC8A88A).withOpacity(0.2)
+                                    : AppColors.thirdColor.withValues(alpha: 0.2))
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -140,11 +166,15 @@ class _QuranSearchViewState extends State<QuranSearchView> {
                             child: result.isSurah
                                 ? Icon(
                                     Icons.menu_book,
-                                    color: AppColors.thirdColor,
+                                    color: isDark
+                                        ? const Color(0xFFC8A88A)
+                                        : AppColors.thirdColor,
                                   )
-                                : const Icon(
+                                : Icon(
                                     Icons.format_list_numbered,
-                                    color: Colors.grey,
+                                    color: isDark
+                                        ? const Color(0xFFB8AEA5)
+                                        : Colors.grey,
                                     size: 20,
                                   ),
                           ),
@@ -161,7 +191,9 @@ class _QuranSearchViewState extends State<QuranSearchView> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.thirdTextColor,
+                                  color: isDark
+                                      ? const Color(0xFFF5F2EE)
+                                      : AppColors.thirdTextColor,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -170,10 +202,13 @@ class _QuranSearchViewState extends State<QuranSearchView> {
                                   result.text!.isNotEmpty)
                                 Text(
                                   result.text!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'QuranFont',
                                     fontSize: 18,
                                     height: 1.5,
+                                    color: isDark
+                                        ? const Color(0xFFF5F2EE)
+                                        : Colors.black,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -183,15 +218,22 @@ class _QuranSearchViewState extends State<QuranSearchView> {
                                 result.isSurah
                                     ? "تبدأ في الصفحة ${result.page ?? '-'}"
                                     : "آية ${result.verseNumber ?? '-'} • صفحة ${result.page ?? '-'}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: isDark
+                                      ? const Color(0xFFB8AEA5)
+                                      : Colors.grey,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right, color: Colors.grey),
+                        Icon(
+                          Icons.chevron_right,
+                          color: isDark
+                              ? const Color(0xFFB8AEA5)
+                              : Colors.grey,
+                        ),
                       ],
                     ),
                   );

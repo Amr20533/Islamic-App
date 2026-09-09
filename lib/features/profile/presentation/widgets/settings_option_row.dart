@@ -22,8 +22,9 @@ class SettingsOptionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveLabelColor = labelColor ?? AppColors.primaryTextColor;
-    final effectiveIconColor = iconColor ?? AppColors.counterColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveLabelColor = labelColor ?? (isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor);
+    final effectiveIconColor = iconColor ?? (isDark ? const Color(0xFFC8A88A) : AppColors.counterColor);
 
     return GestureDetector(
       onTap: onTap,
@@ -65,10 +66,10 @@ class SettingsOptionRow extends StatelessWidget {
                 ),
               ],
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
               size: 14,
-              color: AppColors.greyColor,
+              color: isDark ? const Color(0xFFB8AEA5) : AppColors.greyColor,
             ),
           ],
         ),

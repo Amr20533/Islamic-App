@@ -63,32 +63,34 @@ class _RateAppViewState extends State<RateAppView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F5F0),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF7F5F0),
           elevation: 0,
           leading: Container(),
           actions: [
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_forward_ios,
-                color: AppColors.primaryTextColor,
+                color: isDark
+                    ? const Color(0xFFF5F2EE)
+                    : AppColors.primaryTextColor,
                 size: 20,
               ),
               onPressed: () => Navigator.pop(context),
             ),
           ],
           centerTitle: true,
-          title: const Text(
+          title: Text(
             'تقييم التطبيق',
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.counterColor,
+              color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
             ),
           ),
         ),
@@ -103,21 +105,23 @@ class _RateAppViewState extends State<RateAppView> {
                   const SizedBox(height: 12),
 
                   // Instructions / Header
-                  const Text(
+                  Text(
                     'يسعدنا أن نعرف رأيك في تطبيقنا لكي نتمكن من تحسين خدماتنا وتقديم الأفضل لك دائماً.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.primaryTextColor,
+                      color: isDark
+                          ? const Color(0xFFB8AEA5)
+                          : AppColors.primaryTextColor,
                       height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 28),
 
                   // Comment section title
-                  const Align(
+                  Align(
                     alignment: Alignment.centerRight,
                     child: Text(
                       'الرأي أو الملاحظات',
@@ -125,7 +129,9 @@ class _RateAppViewState extends State<RateAppView> {
                         fontFamily: 'Tajawal',
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.counterColor,
+                        color: isDark
+                            ? const Color(0xFFF5F2EE)
+                            : AppColors.counterColor,
                       ),
                     ),
                   ),
@@ -143,19 +149,25 @@ class _RateAppViewState extends State<RateAppView> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submitFeedback,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        foregroundColor: Colors.white,
+                        backgroundColor: isDark
+                            ? const Color(0xFFC8A88A)
+                            : AppColors.primaryColor,
+                        foregroundColor: isDark
+                            ? const Color(0xFF141312)
+                            : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
                       ),
                       child: _isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: isDark
+                                    ? const Color(0xFF141312)
+                                    : Colors.white,
                                 strokeWidth: 2.5,
                               ),
                             )
