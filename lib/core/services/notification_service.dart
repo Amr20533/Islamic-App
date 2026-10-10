@@ -64,6 +64,9 @@ class NotificationService {
 
   bool _initialized = false;
 
+  /// Whether [init] has completed successfully.
+  bool get isInitialized => _initialized;
+
   // ── Init ─────────────────────────────────────────────────────────────────────
 
   Future<void> init() async {
@@ -249,6 +252,142 @@ class NotificationService {
     );
   }
 
+  /// Schedule multiple daily motivational notifications at specific hours.
+  /// Each notification gets a unique ID (base 300+index).
+  /// Cancels any previously scheduled reminders in the same slot range.
+  ///
+  /// Example: [8, 13, 18] schedules at 8:00, 13:00, and 18:00 every day.
+  Future<void> scheduleMultipleDailyReminders(List<int> hours) async {
+    // Cancel old reminders in the slots 300-319
+    for (int i = 300; i < 320; i++) {
+      await cancelNotification(i);
+    }
+
+    final now = tz.TZDateTime.now(tz.local);
+
+    for (int i = 0; i < hours.length; i++) {
+      final hour = hours[i];
+      var target = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        0,
+      );
+      if (target.isBefore(now)) target = target.add(const Duration(days: 1));
+
+      await _schedule(
+        id: 300 + i,
+        title: 'تذكيرك الإسلامي 🌿',
+        body: await _nextMessage(),
+        at: target,
+        details: _defaultDetails,
+        recurring: DateTimeComponents.time,
+      );
+      debugPrint('📅 Scheduled daily reminder #$i at $hour:00');
+    }
+    debugPrint('✅ ${hours.length} daily reminders scheduled at hours: $hours');
+  }
+
+  /// Schedule a custom daily repeating reminder at a specific hour and minute.
+  /// Uses [DateTimeComponents.time] so it repeats automatically every day at the given time.
+  Future<void> scheduleDailyCustomReminder({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) async {
+    await cancelNotification(id);
+
+    final now = tz.TZDateTime.now(tz.local);
+    var target = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+    if (target.isBefore(now)) target = target.add(const Duration(days: 1));
+
+    await _schedule(
+      id: id,
+      title: title,
+      body: body,
+      at: target,
+      details: _defaultDetails,
+      recurring: DateTimeComponents.time,
+      payload: payload,
+    );
+    debugPrint(
+      '⏰ Scheduled daily reminder "$title" (id=$id) at ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
+    );
+  }
+
+  /// Schedule the standard Islamic daily reminders throughout the day:
+  /// 1. أذكار الصباح (07:00 AM)
+  /// 2. صلاة الضحى (10:30 AM)
+  /// 3. أذكار المساء (05:00 PM)
+  /// 4. ورد القرآن اليومي (09:00 PM)
+  /// 5. صلاة الوتر وأذكار النوم (11:00 PM)
+  Future<void> scheduleIslamicDailyReminders() async {
+    // 1. Morning Azkar (07:00 AM)
+    await scheduleDailyCustomReminder(
+      id: 401,
+      title: 'أذكار الصباح ☀️',
+      body: 'أصبحنا وأصبح الملك لله.. حان وقت أذكار الصباح لحفظك وبركة يومك 🌿',
+      hour: 7,
+      minute: 0,
+      payload: 'azkar_morning',
+    );
+
+    // 2. Duha Prayer (10:30 AM)
+    await scheduleDailyCustomReminder(
+      id: 402,
+      title: 'صلاة الضحى ☀️',
+      body: 'صلاة الأوابين.. ركعتان تجزئ عن 360 صدقة فلا تفوت أجرها ✨',
+      hour: 10,
+      minute: 30,
+      payload: 'duha_prayer',
+    );
+
+    // 3. Evening Azkar (05:00 PM)
+    await scheduleDailyCustomReminder(
+      id: 403,
+      title: 'أذكار المساء 🌙',
+      body: 'أمسينا وأمسى الملك لله.. حصّن نفسك وأهلك بأذكار المساء 🕊️',
+      hour: 17,
+      minute: 0,
+      payload: 'azkar_evening',
+    );
+
+    // 4. Daily Quran (09:00 PM)
+    await scheduleDailyCustomReminder(
+      id: 404,
+      title: 'وردك القرآني اليومي ',
+      body:
+          'دقائق قليلة مع كتاب الله تمنحك طمأنينة لا تنتهي.. افتح مآب واقرأ وردك ',
+      hour: 21,
+      minute: 0,
+      payload: 'quran_reading',
+    );
+
+    // 5. Witr Prayer & Sleep Azkar (11:00 PM)
+    await scheduleDailyCustomReminder(
+      id: 405,
+      title: 'صلاة الوتر وأذكار النوم ',
+      body: 'أوتر ولو بركعة واختم يومك بذكر الله.. باسمك ربي وضعت جنبي ',
+      hour: 23,
+      minute: 0,
+      payload: 'sleep_azkar',
+    );
+
+    debugPrint('✅ All 5 Islamic daily reminders scheduled successfully');
+  }
+
   /// Show an instant (non-scheduled) notification.
   Future<void> showNotification({
     required int id,
@@ -307,6 +446,7 @@ class NotificationService {
     required tz.TZDateTime at,
     required NotificationDetails details,
     DateTimeComponents? recurring,
+    String? payload,
   }) async {
     // Guard: skip only if still in the past after caller adjustments
     if (recurring == null && at.isBefore(tz.TZDateTime.now(tz.local))) {
@@ -332,6 +472,7 @@ class NotificationService {
             ? AndroidScheduleMode.exactAllowWhileIdle
             : AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: recurring,
+        payload: payload,
       );
       debugPrint(
         '✅ Scheduled id=$id at $at (exact: $exact, recurring: ${recurring != null})',
@@ -348,6 +489,7 @@ class NotificationService {
             notificationDetails: details,
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
             matchDateTimeComponents: recurring,
+            payload: payload,
           );
           debugPrint('⚠️ Retry with inexact succeeded for id=$id');
         } catch (retryError) {

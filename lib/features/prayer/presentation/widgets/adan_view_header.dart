@@ -40,7 +40,7 @@ class AdanViewHeader extends StatelessWidget {
                 ),
               ),
             ),
-            // Balances the back button so the title stays centred
+            // Placeholder to keep the title centered opposite the back button
             const SizedBox(width: 48),
           ],
         ),

@@ -21,6 +21,8 @@ dependencies:
   equatable:
   get_it:
   audioplayers:
+  just_audio: ^0.9.46
+  just_audio_background: ^0.0.1-beta.15
   flutter_timezone:
   hijri:
   intl:

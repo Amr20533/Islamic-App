@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:islamic_app/di/locator.dart' as service_locator;
 import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/surah_selector_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/azkar_cubit.dart';
-import 'package:islamic_app/features/audio/presentation/bloc/audio_cubit.dart';
 import 'package:islamic_app/features/ramadan/presentation/bloc/ramadan_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
@@ -24,27 +25,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Run independent, fast inits in parallel instead of sequentially
+  // Initialize background audio (must be before runApp)
+  try {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.islamic.app.audio',
+      androidNotificationChannelName: 'تلاوة القرآن الكريم',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    );
+  } catch (e) {
+    debugPrint('⚠️ JustAudioBackground init failed: $e');
+  }
+
+  // Fast initializations
   final sharedPreferences = await SharedPreferences.getInstance();
-  await Future.wait([initializeDateFormatting('ar', null)]);
+  await initializeDateFormatting('ar', null);
 
   service_locator.setupLocator(sharedPreferences);
 
-  // Use the last saved location for instant startup (no Cairo fallback).
+  // Use the last saved location for instant startup
   double? cachedLat = sharedPreferences.getDouble('last_lat');
   double? cachedLng = sharedPreferences.getDouble('last_lng');
-
-  // First launch: no cached location — try to get GPS position before starting.
-  if (cachedLat == null || cachedLng == null) {
-    final position = await LocationHelper.getCurrentLocation();
-    if (position != null) {
-      cachedLat = position.latitude;
-      cachedLng = position.longitude;
-      await sharedPreferences.setDouble('last_lat', cachedLat);
-      await sharedPreferences.setDouble('last_lng', cachedLng);
-    }
-    // If still null, PrayerCubit will emit an error requesting location.
-  }
 
   service_locator.locator.registerLazySingleton<PrayerCubit>(
     () => PrayerCubit(latitude: cachedLat, longitude: cachedLng),
@@ -54,7 +55,7 @@ void main() async {
 
   // Everything below runs AFTER first frame — doesn't block startup.
   _updateLocationInBackground(sharedPreferences);
-  _initNotificationsInBackground();
+  unawaited(_initNotificationsInBackground());
 }
 
 class MyApp extends StatefulWidget {
@@ -101,7 +102,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) =>
               service_locator.locator<AzkarCubit>()..loadCategories(),
         ),
-        BlocProvider(create: (_) => service_locator.locator<AudioCubit>()),
         BlocProvider(
           create: (_) =>
               service_locator.locator<RamadanCubit>()..fetchPrayerTimes(),
@@ -162,6 +162,13 @@ Future<void> _updateLocationInBackground(SharedPreferences prefs) async {
 Future<void> _initNotificationsInBackground() async {
   debugPrint('🔔 Initializing notifications...');
   await NotificationService().init();
+
+  // Single daily reminder at 8:00 (from profile setting)
   await NotificationService().scheduleDailyReminderAt(hour: 8, minute: 0);
+
+  // Schedule specific Islamic daily reminders throughout the day
+  // (Morning Azkar, Duha prayer, Evening Azkar, Quran reading, Sleep Azkar & Witr)
+  await NotificationService().scheduleIslamicDailyReminders();
+
   debugPrint('✅ Notifications ready');
 }

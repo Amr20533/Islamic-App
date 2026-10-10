@@ -65,8 +65,8 @@ class DailyDuaView extends StatelessWidget {
                     "daily_dua_done_$dateStr",
                     true,
                   );
-                  // Auto-refresh the streak card on home screen
-                  locator<StreakNotifier>().refresh();
+                  // Increment cumulative streak if all 3 tasks done today
+                  await locator<StreakNotifier>().refreshAndIncrement();
                   if (context.mounted) {
                     Navigator.pop(context);
                   }

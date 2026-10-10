@@ -111,7 +111,8 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
 
     // Also check for all reciters to update sheet indicators
     for (final reciter in _filteredReciters) {
-      final isReciterDownloaded = await SurahAudioDownloadService().isDownloaded(reciter.link);
+      final isReciterDownloaded = await SurahAudioDownloadService()
+          .isDownloaded(reciter.link);
       _downloadedRecitersMap[reciter.link] = isReciterDownloaded;
     }
 
@@ -185,16 +186,28 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('حذف التنزيل', style: TextStyle(fontFamily: 'Tajawal')),
-          content: const Text('هل تريد حذف الملف الصوتي لهذه السورة من الجهاز؟', style: TextStyle(fontFamily: 'Tajawal')),
+          title: const Text(
+            'حذف التنزيل',
+            style: TextStyle(fontFamily: 'Tajawal'),
+          ),
+          content: const Text(
+            'هل تريد حذف الملف الصوتي لهذه السورة من الجهاز؟',
+            style: TextStyle(fontFamily: 'Tajawal'),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('إلغاء', style: TextStyle(fontFamily: 'Tajawal')),
+              child: const Text(
+                'إلغاء',
+                style: TextStyle(fontFamily: 'Tajawal'),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('حذف', style: TextStyle(fontFamily: 'Tajawal', color: Colors.red)),
+              child: const Text(
+                'حذف',
+                style: TextStyle(fontFamily: 'Tajawal', color: Colors.red),
+              ),
             ),
           ],
         ),
@@ -298,8 +311,12 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
             return Container(
               height: MediaQuery.of(context).size.height * 0.7,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF211F1D) : const Color(0xFFFBF9F1),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                color: isDark
+                    ? const Color(0xFF211F1D)
+                    : const Color(0xFFFBF9F1),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
               ),
               child: Column(
                 children: [
@@ -323,7 +340,8 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                       itemBuilder: (context, index) {
                         final reciter = _filteredReciters[index];
                         final isSelected = _selectedReciter?.id == reciter.id;
-                        final isReciterDownloaded = _downloadedRecitersMap[reciter.link] ?? false;
+                        final isReciterDownloaded =
+                            _downloadedRecitersMap[reciter.link] ?? false;
 
                         return ListTile(
                           title: Row(
@@ -334,16 +352,20 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                                   fontFamily: 'Tajawal',
                                   color: isSelected
                                       ? (isDark
-                                          ? const Color(0xFFC8A88A)
-                                          : const Color(0xFF8B4513))
+                                            ? const Color(0xFFC8A88A)
+                                            : const Color(0xFF8B4513))
                                       : (isDark
-                                          ? const Color(0xFFF5F2EE)
-                                          : Colors.black),
+                                            ? const Color(0xFFF5F2EE)
+                                            : Colors.black),
                                 ),
                               ),
                               if (isReciterDownloaded) ...[
                                 const SizedBox(width: 8),
-                                const Icon(Icons.offline_pin_rounded, color: Colors.green, size: 18),
+                                const Icon(
+                                  Icons.offline_pin_rounded,
+                                  color: Colors.green,
+                                  size: 18,
+                                ),
                               ],
                             ],
                           ),
@@ -382,9 +404,7 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
     final primaryAccent = isDark
         ? const Color(0xFFC8A88A)
         : const Color(0xFF8B4513);
-    final secondaryText = isDark
-        ? const Color(0xFFB8AEA5)
-        : Colors.grey;
+    final secondaryText = isDark ? const Color(0xFFB8AEA5) : Colors.grey;
 
     if (!_isExpanded) {
       return InkWell(
@@ -492,7 +512,9 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
               PopupMenuButton<int>(
                 key: _popupMenuKey,
                 icon: Icon(Icons.more_horiz, color: primaryAccent),
-                color: isDark ? const Color(0xFF2D2A26) : const Color(0xFFEBE6DF),
+                color: isDark
+                    ? const Color(0xFF2D2A26)
+                    : const Color(0xFFEBE6DF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -511,10 +533,7 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(
-                          Icons.person_outline,
-                          color: primaryAccent,
-                        ),
+                        Icon(Icons.person_outline, color: primaryAccent),
                       ],
                     ),
                   ),
@@ -564,8 +583,8 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                           _isDownloading
                               ? 'جاري التنزيل (${(_downloadProgress * 100).toInt()}%)'
                               : _isDownloaded
-                                  ? 'محفوظة أوفلاين (حذف)'
-                                  : 'تنزيل السورة (أوفلاين)',
+                              ? 'محفوظة أوفلاين (حذف)'
+                              : 'تنزيل السورة (أوفلاين)',
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontWeight: FontWeight.bold,
@@ -584,9 +603,17 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                             ),
                           )
                         else if (_isDownloaded)
-                          const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20)
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.green,
+                            size: 20,
+                          )
                         else
-                          Icon(Icons.download_for_offline_outlined, color: primaryAccent, size: 20),
+                          Icon(
+                            Icons.download_for_offline_outlined,
+                            color: primaryAccent,
+                            size: 20,
+                          ),
                       ],
                     ),
                   ),
@@ -628,10 +655,7 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                 onPressed: _toggleDownload,
               ),
               IconButton(
-                icon: Icon(
-                  Icons.fast_rewind_outlined,
-                  color: primaryAccent,
-                ),
+                icon: Icon(Icons.fast_rewind_outlined, color: primaryAccent),
                 onPressed: () {
                   final newPos = _position - const Duration(seconds: 10);
                   _audioPlayer.seek(
@@ -663,10 +687,7 @@ class _QuranAudioPlayerWidgetState extends State<QuranAudioPlayerWidget> {
                 ),
               ),
               IconButton(
-                icon: Icon(
-                  Icons.fast_forward_outlined,
-                  color: primaryAccent,
-                ),
+                icon: Icon(Icons.fast_forward_outlined, color: primaryAccent),
                 onPressed: () {
                   final newPos = _position + const Duration(seconds: 10);
                   _audioPlayer.seek(newPos > _duration ? _duration : newPos);

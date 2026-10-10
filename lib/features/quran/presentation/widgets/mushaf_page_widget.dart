@@ -25,11 +25,13 @@ import 'package:islamic_app/features/quran/presentation/pages/quran_view.dart';
 class MushafPageWidget extends StatefulWidget {
   final List<Verse> verses;
   final int pageNumber;
+  final double bottomPadding;
 
   const MushafPageWidget({
     super.key,
     required this.verses,
     required this.pageNumber,
+    this.bottomPadding = 140.0,
   });
 
   @override
@@ -113,7 +115,7 @@ class _MushafPageWidgetState extends State<MushafPageWidget> {
       await prefs.setInt('last_read_surah_number', verse.surahNumber ?? 1);
 
       // تحديث الـ ValueNotifier في الفهرس
-      QuranLastReadHelper.update(verse.surahNameAr ?? '', verse.page);
+      QuranLastReadHelper.update(verse.surahNameAr ?? '', verse.page, verse.number ?? 1);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +181,13 @@ class _MushafPageWidgetState extends State<MushafPageWidget> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  left: 4,
+                  right: 4,
+                  top: 4,
+                  bottom: widget.bottomPadding,
+                ),
                 child: Directionality(
                   textDirection: TextDirection.rtl,
                   child: Column(

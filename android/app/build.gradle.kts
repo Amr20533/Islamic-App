@@ -58,6 +58,14 @@ android {
 
             isMinifyEnabled = true
             isShrinkResources = true
+
+            // Keep BroadcastReceivers used by flutter_local_notifications alive
+            // after R8 shrinking — without this, scheduled notifications break
+            // silently on all release APKs / AABs.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 

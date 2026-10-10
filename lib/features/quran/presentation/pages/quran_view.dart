@@ -11,11 +11,15 @@ import 'package:islamic_app/features/quran/presentation/widgets/custom_surah_sel
 
 /// Helper to communicate reading progress updates in real-time across widgets.
 class QuranLastReadHelper {
-  static final ValueNotifier<({String surahName, int pageNumber})?> lastReadNotifier =
+  static final ValueNotifier<({String surahName, int pageNumber, int verseNumber})?> lastReadNotifier =
       ValueNotifier(null);
 
-  static void update(String surahName, int pageNumber) {
-    lastReadNotifier.value = (surahName: surahName, pageNumber: pageNumber);
+  static void update(String surahName, int pageNumber, int verseNumber) {
+    lastReadNotifier.value = (
+      surahName: surahName,
+      pageNumber: pageNumber,
+      verseNumber: verseNumber,
+    );
   }
 }
 
@@ -37,11 +41,13 @@ class _QuranViewState extends State<QuranView> {
     final prefs = locator<SharedPreferences>();
     final surahName = prefs.getString('last_read_surah_name');
     final pageNumber = prefs.getInt('last_read_page_number');
+    final verseNumber = prefs.getInt('last_read_verse_number');
 
     if (surahName != null && pageNumber != null) {
       QuranLastReadHelper.lastReadNotifier.value = (
         surahName: surahName,
         pageNumber: pageNumber,
+        verseNumber: verseNumber ?? 1,
       );
     }
   }
@@ -85,11 +91,12 @@ class _QuranViewState extends State<QuranView> {
             child: Column(
               spacing: 20,
               children: [
-                ValueListenableBuilder<({String surahName, int pageNumber})?>(
+                ValueListenableBuilder<({String surahName, int pageNumber, int verseNumber})?>(
                   valueListenable: QuranLastReadHelper.lastReadNotifier,
                   builder: (context, lastRead, child) {
                     final displaySurahName = lastRead != null ? lastRead.surahName : 'البقرة';
                     final displayPageNumber = lastRead != null ? lastRead.pageNumber : 12;
+                    final displayVerseNumber = lastRead != null ? lastRead.verseNumber : 1;
 
                     return Container(
                       width: double.infinity,
@@ -132,7 +139,7 @@ class _QuranViewState extends State<QuranView> {
                                 ),
                               ),
                               Text(
-                                "سورة $displaySurahName • صفحة $displayPageNumber",
+                                "سورة $displaySurahName • آية $displayVerseNumber • صفحة $displayPageNumber",
                                 style: (AppTextStyles.textTheme.titleMedium ?? const TextStyle()).copyWith(
                                   color: isDark ? const Color(0xFFC8A88A) : null,
                                 ),
