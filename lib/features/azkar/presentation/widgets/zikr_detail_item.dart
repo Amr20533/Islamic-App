@@ -16,6 +16,9 @@ class ZikrDetailItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: onTap,
@@ -35,11 +38,11 @@ class ZikrDetailItem extends StatelessWidget {
                       Text(
                         "“ ${item.arabicText.trim()} ”",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF3D3020),
+                          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
                           height: 1.6,
                         ),
                       ),

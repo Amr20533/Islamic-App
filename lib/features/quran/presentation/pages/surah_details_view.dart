@@ -44,12 +44,7 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
   }
 
   int _getStartingPageForSurah(int surahNumber) {
-    for (var entry in QuranMetadata.pageToSurah.entries) {
-      if (entry.value['surahNumber'] == surahNumber) {
-        return entry.key;
-      }
-    }
-    return 1;
+    return QuranMetadata.getStartingPageForSurah(surahNumber);
   }
 
   int _getJuzNumberForPage(int page) {
@@ -106,6 +101,7 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final initialSurahNum = _resolveSurahNumber(widget.surahName);
     if (!_isInit) {
       _currentPageNumber =
@@ -124,7 +120,9 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFBF9F1),
+        backgroundColor: isDark
+            ? const Color(0xFF1B1A18)
+            : const Color(0xFFFBF9F1),
         body: SafeArea(
           child: Column(
             children: [
@@ -185,7 +183,11 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            return MushafPageWidget(verses: versesInPage, pageNumber: pageNum);
+            return MushafPageWidget(
+              verses: versesInPage,
+              pageNumber: pageNum,
+              bottomPadding: 140.0,
+            );
           },
         ),
         Positioned(

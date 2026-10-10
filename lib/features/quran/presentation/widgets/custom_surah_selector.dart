@@ -10,6 +10,7 @@ class CustomSurahSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<SurahSelectorCubit>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       height: 32,
@@ -31,14 +32,20 @@ class CustomSurahSelector extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primaryColor
-                          : Colors.transparent,
+                          ? (isDark
+                              ? const Color(0xFFC8A88A)
+                              : AppColors.primaryColor)
+                          : (isDark
+                              ? const Color(0xFF211F1D)
+                              : Colors.transparent),
                       borderRadius: BorderRadius.circular(7),
                       border: Border.all(
                         width: 1,
                         color: isSelected
                             ? Colors.transparent
-                            : AppColors.borderColor,
+                            : (isDark
+                                ? const Color(0xFF383430)
+                                : AppColors.borderColor),
                       ),
                     ),
                     child: Text(
@@ -47,10 +54,14 @@ class CustomSurahSelector extends StatelessWidget {
                           (AppTextStyles.textTheme.titleMedium ??
                                   const TextStyle())
                               .copyWith(
-                                fontSize: 16,
+                                fontSize: 14,
                                 color: isSelected
-                                    ? AppColors.whiteColor
-                                    : AppColors.primaryColor,
+                                    ? (isDark
+                                        ? const Color(0xFF141312)
+                                        : AppColors.whiteColor)
+                                    : (isDark
+                                        ? const Color(0xFFB8AEA5)
+                                        : AppColors.primaryColor),
                               ),
                     ),
                   );

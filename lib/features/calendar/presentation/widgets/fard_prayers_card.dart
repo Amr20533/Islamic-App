@@ -25,38 +25,44 @@ class FardPrayersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF242220) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: isDark ? Border.all(color: const Color(0xFF383430), width: 1) : null,
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.circle_notifications,
-                color: AppColors.primaryColor,
+                color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                 size: 24,
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'الفروض الخمسة',
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryTextColor,
+                  color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
                 ),
               ),
               const Spacer(),
@@ -66,7 +72,9 @@ class FardPrayersCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: fardCount >= 3 ? Colors.green[50] : Colors.amber[50],
+                  color: isDark
+                      ? const Color(0xFF383430)
+                      : (fardCount >= 3 ? Colors.green[50] : Colors.amber[50]),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -75,15 +83,18 @@ class FardPrayersCard extends StatelessWidget {
                     fontFamily: 'Tajawal',
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: fardCount >= 3
-                        ? Colors.green[700]
-                        : Colors.brown[600],
+                    color: isDark
+                        ? const Color(0xFFC8A88A)
+                        : (fardCount >= 3 ? Colors.green[700] : Colors.brown[600]),
                   ),
                 ),
               ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(
+            height: 24,
+            color: isDark ? const Color(0xFF383430) : null,
+          ),
 
           // List of 5 prayers
           ...List.generate(5, (index) {
@@ -110,8 +121,8 @@ class FardPrayersCard extends StatelessWidget {
                               ? FontWeight.bold
                               : FontWeight.w500,
                           color: isChecked
-                              ? AppColors.primaryColor
-                              : AppColors.primaryTextColor,
+                              ? (isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor)
+                              : (isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor),
                         ),
                       ),
                       BrownCheckbox(isChecked: isChecked),
@@ -129,12 +140,16 @@ class FardPrayersCard extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: fardCount >= 3
-                  ? Colors.green[50]?.withOpacity(0.5)
-                  : Colors.amber[50]?.withOpacity(0.5),
+              color: isDark
+                  ? const Color(0xFF1E1C1A)
+                  : (fardCount >= 3
+                      ? Colors.green[50]?.withOpacity(0.5)
+                      : Colors.amber[50]?.withOpacity(0.5)),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: fardCount >= 3 ? Colors.green[100]! : Colors.amber[100]!,
+                color: isDark
+                    ? const Color(0xFF383430)
+                    : (fardCount >= 3 ? Colors.green[100]! : Colors.amber[100]!),
                 width: 1,
               ),
             ),
@@ -142,7 +157,9 @@ class FardPrayersCard extends StatelessWidget {
               children: [
                 Icon(
                   fardCount >= 3 ? Icons.lock_open : Icons.lock,
-                  color: fardCount >= 3 ? Colors.green[700] : Colors.brown[600],
+                  color: isDark
+                      ? const Color(0xFFC8A88A)
+                      : (fardCount >= 3 ? Colors.green[700] : Colors.brown[600]),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -155,9 +172,9 @@ class FardPrayersCard extends StatelessWidget {
                       fontFamily: 'Tajawal',
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: fardCount >= 3
-                          ? Colors.green[800]
-                          : Colors.brown[600],
+                      color: isDark
+                          ? const Color(0xFFB8AEA5)
+                          : (fardCount >= 3 ? Colors.green[800] : Colors.brown[600]),
                     ),
                   ),
                 ),

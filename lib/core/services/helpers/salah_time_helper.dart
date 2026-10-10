@@ -1,60 +1,45 @@
-import 'package:adhan_dart/adhan_dart.dart';
+import 'package:islamic_app/core/services/prayer_calculation_service.dart';
 
+/// Helper for accessing prayer times at arbitrary coordinates.
+/// Delegates all calculation to [PrayerCalculationService] (single source of truth).
 class SalahTimeHelper {
   final double latitude;
   final double longitude;
 
   SalahTimeHelper({required this.latitude, required this.longitude});
 
-  /// Returns a map of prayer times
-  Map<String, DateTime> getSalahTimes() {
-    final coordinates = Coordinates(latitude, longitude);
-    final params = CalculationMethodParameters.egyptian();
-    final date = DateTime.now();
-
-    final prayerTimes = PrayerTimes(
-      coordinates: coordinates,
-      date: date,
-      calculationParameters: params,
+  /// Returns a map of today's prayer times using the user's saved settings.
+  Future<Map<String, DateTime>> getSalahTimes() {
+    return PrayerCalculationService.calculatePrayerTimes(
+      latitude: latitude,
+      longitude: longitude,
     );
-
-    return {
-      "Fajr": prayerTimes.fajr,
-      "Dhuhr": prayerTimes.dhuhr,
-      "Asr": prayerTimes.asr,
-      "Maghrib": prayerTimes.maghrib,
-      "Isha": prayerTimes.isha,
-    };
   }
 
-  /// Returns the name of the next prayer and the DateTime
-  Map<String, DateTime> getNextPrayer() {
-    final coordinates = Coordinates(latitude, longitude);
-    final params = CalculationMethodParameters.egyptian();
-    final date = DateTime.now();
-
-    final prayerTimes = PrayerTimes(
-      coordinates: coordinates,
-      date: date,
-      calculationParameters: params,
+  /// Returns a single-entry map { nextPrayerName: nextPrayerTime }.
+  Future<Map<String, DateTime>> getNextPrayer() async {
+    final prayers = await PrayerCalculationService.calculatePrayerTimes(
+      latitude: latitude,
+      longitude: longitude,
     );
 
     final now = DateTime.now();
 
-    // Check each prayer in order
-    if (now.isBefore(prayerTimes.fajr)) return {"Fajr": prayerTimes.fajr};
-    if (now.isBefore(prayerTimes.dhuhr)) return {"Dhuhr": prayerTimes.dhuhr};
-    if (now.isBefore(prayerTimes.asr)) return {"Asr": prayerTimes.asr};
-    if (now.isBefore(prayerTimes.maghrib)) return {"Maghrib": prayerTimes.maghrib};
-    if (now.isBefore(prayerTimes.isha)) return {"Isha": prayerTimes.isha};
+    // Check each prayer in order (the map is already insertion-ordered)
+    final ordered = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
+    for (final name in ordered) {
+      final time = prayers[name];
+      if (time != null && now.isBefore(time)) {
+        return {name: time};
+      }
+    }
 
-    // If after Isha, next prayer is tomorrow Fajr
-    final tomorrow = DateTime.now().add(Duration(days: 1));
-    final tomorrowPrayerTimes = PrayerTimes(
-      coordinates: coordinates,
-      date: tomorrow,
-      calculationParameters: params,
+    // If after Isha, next prayer is tomorrow's Fajr
+    final tomorrowPrayers = await PrayerCalculationService.calculatePrayerTimes(
+      latitude: latitude,
+      longitude: longitude,
+      date: DateTime.now().add(const Duration(days: 1)),
     );
-    return {"Fajr": tomorrowPrayerTimes.fajr};
+    return {"الفجر": tomorrowPrayers["الفجر"]!};
   }
 }

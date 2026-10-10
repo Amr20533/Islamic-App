@@ -10,11 +10,17 @@ class DailyReminderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF242220) : null,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor2, width: 1),
+        border: Border.all(
+          color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -37,15 +43,25 @@ class DailyReminderCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          SvgPicture.asset("assets/svg/ph_plant.svg"),
+                          SvgPicture.asset(
+                            "assets/svg/ph_plant.svg",
+                            colorFilter: ColorFilter.mode(
+                              isDark
+                                  ? const Color(0xFFC8A88A)
+                                  : AppColors.primaryColor,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'التذكير اليومي',
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primaryColor,
+                              color: isDark
+                                  ? const Color(0xFFF5F2EE)
+                                  : AppColors.primaryColor,
                             ),
                           ),
                         ],
@@ -58,10 +74,18 @@ class DailyReminderCard extends StatelessWidget {
                           onChanged: (val) => context
                               .read<ProfileCubit>()
                               .toggleDailyReminder(val),
-                          // activeThumbColor: AppColors.whiteColor,
-                          activeTrackColor: AppColors.successColor800,
-                          inactiveThumbColor: AppColors.greyColor,
-                          inactiveTrackColor: AppColors.lightGreyColor,
+                          activeThumbColor: isDark
+                              ? const Color(0xFF141312)
+                              : AppColors.whiteColor,
+                          activeTrackColor: isDark
+                              ? const Color(0xFFC8A88A)
+                              : AppColors.successColor800,
+                          inactiveThumbColor: isDark
+                              ? const Color(0xFFB8AEA5)
+                              : AppColors.greyColor,
+                          inactiveTrackColor: isDark
+                              ? const Color(0xFF383430)
+                              : AppColors.lightGreyColor,
                           materialTapTargetSize:
                               MaterialTapTargetSize.shrinkWrap,
                         ),
@@ -86,9 +110,12 @@ class DailyReminderCard extends StatelessWidget {
                     final picked = await showTimePicker(
                       context: context,
                       initialTime: initialTime,
-                      builder: (context, child) => Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: child!,
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context),
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: child!,
+                        ),
                       ),
                     );
                     if (picked != null) {
@@ -110,15 +137,23 @@ class DailyReminderCard extends StatelessWidget {
                           children: [
                             SvgPicture.asset(
                               "assets/svg/hugeicons_date-time.svg",
+                              colorFilter: ColorFilter.mode(
+                                isDark
+                                    ? const Color(0xFFC8A88A)
+                                    : AppColors.primaryColor,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               'وقت التذكير',
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.primaryColor,
+                                color: isDark
+                                    ? const Color(0xFFF5F2EE)
+                                    : AppColors.primaryColor,
                               ),
                             ),
                           ],
@@ -130,10 +165,14 @@ class DailyReminderCard extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.borderColor3,
+                            color: isDark
+                                ? const Color(0xFF383430)
+                                : AppColors.borderColor3,
                             borderRadius: BorderRadius.circular(5),
                             border: Border.all(
-                              color: AppColors.borderColor2,
+                              color: isDark
+                                  ? const Color(0xFF504B46)
+                                  : AppColors.borderColor2,
                               width: 1,
                             ),
                           ),
@@ -141,18 +180,22 @@ class DailyReminderCard extends StatelessWidget {
                             children: [
                               Text(
                                 reminderTime,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Tajawal',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryColor,
+                                  color: isDark
+                                      ? const Color(0xFFC8A88A)
+                                      : AppColors.primaryColor,
                                 ),
                               ),
                               const SizedBox(width: 15),
-                              const Icon(
+                              Icon(
                                 Icons.arrow_forward_ios,
                                 size: 17,
-                                color: AppColors.primaryColor,
+                                color: isDark
+                                    ? const Color(0xFFC8A88A)
+                                    : AppColors.primaryColor,
                               ),
                             ],
                           ),

@@ -69,9 +69,9 @@ class _MainViewState extends State<MainView> {
             ),
             padding: const EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(width: 1, color: AppColors.lightGreyColor),
+              border: Border.all(width: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4)),
               boxShadow: AppShadows.customShadow,
             ),
             child: Row(

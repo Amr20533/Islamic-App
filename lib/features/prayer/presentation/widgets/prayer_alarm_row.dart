@@ -25,6 +25,8 @@ class PrayerAlarmRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPng = iconPath.endsWith('.png');
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -37,15 +39,25 @@ class PrayerAlarmRow extends StatelessWidget {
               if (isPng)
                 Image.asset(iconPath, width: 32, height: 32)
               else
-                SvgPicture.asset(iconPath, width: 24, height: 24),
+                SvgPicture.asset(
+                  iconPath,
+                  width: 24,
+                  height: 24,
+                  colorFilter: isDark
+                      ? const ColorFilter.mode(
+                          Color(0xFFC8A88A),
+                          BlendMode.srcIn,
+                        )
+                      : null,
+                ),
               const SizedBox(width: 8),
               Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.counterColor,
+                  color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
                 ),
               ),
             ],
@@ -55,11 +67,11 @@ class PrayerAlarmRow extends StatelessWidget {
             children: [
               Text(
                 FormatHelper.formatTime12Hour(time),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.thirdTextColor,
+                  color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
                 ),
               ),
               const SizedBox(width: 8),
@@ -68,10 +80,10 @@ class PrayerAlarmRow extends StatelessWidget {
                 child: Switch(
                   value: isEnabled,
                   onChanged: onToggle,
-                  // activeThumbColor: AppColors.primaryColor,
-                  activeTrackColor: AppColors.secondaryColor,
-                  inactiveThumbColor: AppColors.greyColor,
-                  inactiveTrackColor: AppColors.lightGreyColor,
+                  activeThumbColor: isDark ? const Color(0xFF141312) : Colors.white,
+                  activeTrackColor: isDark ? const Color(0xFFC8A88A) : AppColors.secondaryColor,
+                  inactiveThumbColor: isDark ? const Color(0xFFB8AEA5) : AppColors.greyColor,
+                  inactiveTrackColor: isDark ? const Color(0xFF383430) : AppColors.lightGreyColor,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
               ),

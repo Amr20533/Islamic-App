@@ -32,6 +32,8 @@ class _TasbeehBeadsAreaState extends State<TasbeehBeadsArea> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: widget.onIncrement,
@@ -41,7 +43,10 @@ class _TasbeehBeadsAreaState extends State<TasbeehBeadsArea> {
         width: double.infinity,
         height: 280,
         child: CustomPaint(
-          painter: TasbeehBeadsPainter(progress: widget.animationProgress),
+          painter: TasbeehBeadsPainter(
+            progress: widget.animationProgress,
+            isDark: isDark,
+          ),
         ),
       ),
     );

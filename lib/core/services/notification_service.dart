@@ -28,18 +28,24 @@ class NotificationService {
   static const int dailyReminderId = 123;
 
   static const _messages = [
-    'هل صليت على النبي اليوم؟',
-    'استعن بالله ولا تعجز، وردك القرآني بانتظارك.',
-    "قال تعالى: 'ألا بذكر الله تطمئن القلوب'.. اذكر الله.",
-    'نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل.',
-    'خطوة صغيرة اليوم قد تقربك أكثر، افتح مآب وأكمل رحلتك.',
-    "لا تأجل عمل اليوم للغد، فقد يفتنك التسويف.",
-    "هون عليك، فالقليل المستمر خير من الكثير المنقطع.",
-    'الاستغفار يفتح مغاليق الخير، استغفر ربك.',
-    "الدنيا دار ممر لا دار مقر",
-    "من كان يؤمن بالله واليوم الآخر فليقل خيراً أو ليصمت",
-    "يا ابن آدم، عش ما شئت فإنك ميت، وأحبب من شئت فإنك مفارقه، واعمل ما شئت فإنك مجازى به.",
-    "خير الأعمال أدومها وإن قل.",
+    'وردك القرآني بانتظارك، افتح مآب وأكمل من حيث توقفت 📖',
+    'لا تجعل يومك يمضي دون أن تنور قلبك بآيات من القرآن، افتح مآب الآن 🌱',
+    'صفحة واحدة من المصحف قد تكفي لإضاءة يومك، افتح مآب وأكمل وردك 🕊️',
+    'هل صليت على النبي اليوم؟ اللهم صلِّ وسلم على نبينا محمد ﷺ',
+    'استعن بالله ولا تعجز، وردك القرآني بانتظارك 🌿',
+    "قال تعالى: 'ألا بذكر الله تطمئن القلوب'.. اذكر الله ✨",
+    'دقائق قليلة مع كتاب الله تمنحك طمأنينة لا تنتهي، افتح مآب وأكمل قراءتك 📖',
+    'خطوة صغيرة اليوم تقربك أكثر، افتح مآب وأكمل رحلتك 🚀',
+    'الاستغفار يفتح مغاليق الخير، أستغفر الله العظيم وأتوب إليه 🌿',
+    'جدد نيتك وافتح المصحف الآن لقراءة وردك اليومي 📖',
+    'خير الأعمال أدومها وإن قل، لا تنسَ قراءة وردك اليوم 🌸',
+    'نصف ساعة من وقتك للقرآن قد تغير مجرى يومك بالكامل 💚',
+    'تذكر أن القرآن شفيع لأصحابه يوم القيامة، افتح مآب واقرأ آياتك 🕊️',
+    'لا تؤجل وردك اليومي، ابدأ الآن واقرأ ما تيسر من القرآن 📖',
+    'سبحان الله وبحمده، سبحان الله العظيم.. جدد لسانك بذكر الله 💫',
+    'قال رسول الله ﷺ: «من قرأ حرفاً من كتاب الله فله به حسنة».. افتح مآب واكسب الحسنات 🌿',
+    'هون عليك، فالقليل المستمر خير من الكثير المنقطع',
+    'ساعة إجابة أو لحظة تدبر قد تغير حياتك، افتح مآب واذكر ربك 🤍',
     "وَقُل رَّبِّ زِدْنِي عِلْمًا",
     "قال تعالى: 'وَفِي ذَٰلِكَ فَلْيَتَنَافَسِ الْمُتَنَافِسُونَ'",
   ];
@@ -57,6 +63,9 @@ class NotificationService {
       NotificationPermissionStatus.unknown;
 
   bool _initialized = false;
+
+  /// Whether [init] has completed successfully.
+  bool get isInitialized => _initialized;
 
   // ── Init ─────────────────────────────────────────────────────────────────────
 
@@ -101,12 +110,10 @@ class NotificationService {
       final info = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(info.identifier));
       debugPrint('📍 Timezone: ${info.identifier}');
-    } catch (_) {
-      try {
-        tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
-      } catch (_) {
-        tz.setLocalLocation(tz.UTC);
-      }
+    } catch (e) {
+      // Cannot determine device timezone — keep the default system local.
+      // Do NOT hardcode Africa/Cairo or tz.UTC as a fallback.
+      debugPrint('⚠️ Could not detect timezone: $e — using system default');
     }
   }
 
@@ -183,7 +190,9 @@ class NotificationService {
     // If the prayer time has already passed today, schedule for tomorrow
     if (scheduledTime.isBefore(now)) {
       scheduledTime = scheduledTime.add(const Duration(days: 1));
-      debugPrint('⏭ Prayer time passed — rescheduled to tomorrow: $scheduledTime');
+      debugPrint(
+        '⏭ Prayer time passed — rescheduled to tomorrow: $scheduledTime',
+      );
     }
 
     await _schedule(
@@ -191,6 +200,25 @@ class NotificationService {
       title: 'حان وقت صلاة $prayerName 🕌',
       body: 'حي على الصلاة، حي على الفلاح',
       at: scheduledTime,
+      details: _prayerDetails,
+    );
+  }
+
+  /// Schedule a test Adhan notification [seconds] into the future.
+  /// Used for manual testing of alarm, notification, and sound playback.
+  Future<void> scheduleTestNotification({int seconds = 10}) async {
+    const testId = 9999;
+    await cancelNotification(testId);
+
+    final testTime = tz.TZDateTime.now(
+      tz.local,
+    ).add(Duration(seconds: seconds));
+
+    await _schedule(
+      id: testId,
+      title: 'اختبار الأذان التجريبي 🕌',
+      body: 'حي على الصلاة، حي على الفلاح - نجاح تجربة الأذان والصوت',
+      at: testTime,
       details: _prayerDetails,
     );
   }
@@ -222,6 +250,142 @@ class NotificationService {
       details: _defaultDetails,
       recurring: DateTimeComponents.time,
     );
+  }
+
+  /// Schedule multiple daily motivational notifications at specific hours.
+  /// Each notification gets a unique ID (base 300+index).
+  /// Cancels any previously scheduled reminders in the same slot range.
+  ///
+  /// Example: [8, 13, 18] schedules at 8:00, 13:00, and 18:00 every day.
+  Future<void> scheduleMultipleDailyReminders(List<int> hours) async {
+    // Cancel old reminders in the slots 300-319
+    for (int i = 300; i < 320; i++) {
+      await cancelNotification(i);
+    }
+
+    final now = tz.TZDateTime.now(tz.local);
+
+    for (int i = 0; i < hours.length; i++) {
+      final hour = hours[i];
+      var target = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        0,
+      );
+      if (target.isBefore(now)) target = target.add(const Duration(days: 1));
+
+      await _schedule(
+        id: 300 + i,
+        title: 'تذكيرك الإسلامي 🌿',
+        body: await _nextMessage(),
+        at: target,
+        details: _defaultDetails,
+        recurring: DateTimeComponents.time,
+      );
+      debugPrint('📅 Scheduled daily reminder #$i at $hour:00');
+    }
+    debugPrint('✅ ${hours.length} daily reminders scheduled at hours: $hours');
+  }
+
+  /// Schedule a custom daily repeating reminder at a specific hour and minute.
+  /// Uses [DateTimeComponents.time] so it repeats automatically every day at the given time.
+  Future<void> scheduleDailyCustomReminder({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) async {
+    await cancelNotification(id);
+
+    final now = tz.TZDateTime.now(tz.local);
+    var target = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+    if (target.isBefore(now)) target = target.add(const Duration(days: 1));
+
+    await _schedule(
+      id: id,
+      title: title,
+      body: body,
+      at: target,
+      details: _defaultDetails,
+      recurring: DateTimeComponents.time,
+      payload: payload,
+    );
+    debugPrint(
+      '⏰ Scheduled daily reminder "$title" (id=$id) at ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
+    );
+  }
+
+  /// Schedule the standard Islamic daily reminders throughout the day:
+  /// 1. أذكار الصباح (07:00 AM)
+  /// 2. صلاة الضحى (10:30 AM)
+  /// 3. أذكار المساء (05:00 PM)
+  /// 4. ورد القرآن اليومي (09:00 PM)
+  /// 5. صلاة الوتر وأذكار النوم (11:00 PM)
+  Future<void> scheduleIslamicDailyReminders() async {
+    // 1. Morning Azkar (07:00 AM)
+    await scheduleDailyCustomReminder(
+      id: 401,
+      title: 'أذكار الصباح ☀️',
+      body: 'أصبحنا وأصبح الملك لله.. حان وقت أذكار الصباح لحفظك وبركة يومك 🌿',
+      hour: 7,
+      minute: 0,
+      payload: 'azkar_morning',
+    );
+
+    // 2. Duha Prayer (10:30 AM)
+    await scheduleDailyCustomReminder(
+      id: 402,
+      title: 'صلاة الضحى ☀️',
+      body: 'صلاة الأوابين.. ركعتان تجزئ عن 360 صدقة فلا تفوت أجرها ✨',
+      hour: 10,
+      minute: 30,
+      payload: 'duha_prayer',
+    );
+
+    // 3. Evening Azkar (05:00 PM)
+    await scheduleDailyCustomReminder(
+      id: 403,
+      title: 'أذكار المساء 🌙',
+      body: 'أمسينا وأمسى الملك لله.. حصّن نفسك وأهلك بأذكار المساء 🕊️',
+      hour: 17,
+      minute: 0,
+      payload: 'azkar_evening',
+    );
+
+    // 4. Daily Quran (09:00 PM)
+    await scheduleDailyCustomReminder(
+      id: 404,
+      title: 'وردك القرآني اليومي ',
+      body:
+          'دقائق قليلة مع كتاب الله تمنحك طمأنينة لا تنتهي.. افتح مآب واقرأ وردك ',
+      hour: 21,
+      minute: 0,
+      payload: 'quran_reading',
+    );
+
+    // 5. Witr Prayer & Sleep Azkar (11:00 PM)
+    await scheduleDailyCustomReminder(
+      id: 405,
+      title: 'صلاة الوتر وأذكار النوم ',
+      body: 'أوتر ولو بركعة واختم يومك بذكر الله.. باسمك ربي وضعت جنبي ',
+      hour: 23,
+      minute: 0,
+      payload: 'sleep_azkar',
+    );
+
+    debugPrint('✅ All 5 Islamic daily reminders scheduled successfully');
   }
 
   /// Show an instant (non-scheduled) notification.
@@ -282,6 +446,7 @@ class NotificationService {
     required tz.TZDateTime at,
     required NotificationDetails details,
     DateTimeComponents? recurring,
+    String? payload,
   }) async {
     // Guard: skip only if still in the past after caller adjustments
     if (recurring == null && at.isBefore(tz.TZDateTime.now(tz.local))) {
@@ -307,12 +472,30 @@ class NotificationService {
             ? AndroidScheduleMode.exactAllowWhileIdle
             : AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: recurring,
+        payload: payload,
       );
       debugPrint(
         '✅ Scheduled id=$id at $at (exact: $exact, recurring: ${recurring != null})',
       );
     } catch (e) {
       debugPrint('❌ zonedSchedule failed id=$id: $e');
+      if (exact) {
+        try {
+          await _plugin.zonedSchedule(
+            id: id,
+            title: title,
+            body: body,
+            scheduledDate: at,
+            notificationDetails: details,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            matchDateTimeComponents: recurring,
+            payload: payload,
+          );
+          debugPrint('⚠️ Retry with inexact succeeded for id=$id');
+        } catch (retryError) {
+          debugPrint('❌ zonedSchedule retry failed id=$id: $retryError');
+        }
+      }
     }
   }
 
@@ -324,9 +507,9 @@ class NotificationService {
       'Adhan Alerts',
       importance: Importance.max,
       priority: Priority.high,
-      fullScreenIntent: true,
       playSound: true,
       sound: RawResourceAndroidNotificationSound('adhan'),
+      audioAttributesUsage: AudioAttributesUsage.notification,
       enableVibration: true,
     ),
     iOS: DarwinNotificationDetails(

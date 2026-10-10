@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/services/notification_service.dart';
 import 'package:islamic_app/features/prayer/domain/repositories/prayer_alarm_repository.dart';
@@ -37,6 +38,7 @@ class PrayerAlarmCubit extends Cubit<PrayerAlarmState> {
 
       if (isEnabled) {
         if (prayerTime != null) {
+          await _ensureInitialized();
           await notificationService.schedulePrayerNotification(
             id: config.notificationId,
             prayerName: config.name,
@@ -62,6 +64,8 @@ class PrayerAlarmCubit extends Cubit<PrayerAlarmState> {
     if (state is! PrayerAlarmLoaded) return;
     final alarmStates = (state as PrayerAlarmLoaded).alarmStates;
 
+    await _ensureInitialized();
+
     for (final config in configs) {
       await notificationService.cancelNotification(config.notificationId);
 
@@ -76,5 +80,19 @@ class PrayerAlarmCubit extends Cubit<PrayerAlarmState> {
         }
       }
     }
+    debugPrint('✅ PrayerAlarmCubit: all enabled alarms rescheduled');
+  }
+
+  /// Waits until [NotificationService] has finished initializing.
+  /// Retries every 500ms up to 10 times (5 seconds total).
+  Future<void> _ensureInitialized() async {
+    for (int i = 0; i < 10; i++) {
+      if (notificationService.isInitialized) return;
+      debugPrint('⏳ Waiting for NotificationService init... attempt ${i + 1}');
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+    debugPrint(
+      '⚠️ NotificationService still not initialized after 5s — proceeding anyway',
+    );
   }
 }

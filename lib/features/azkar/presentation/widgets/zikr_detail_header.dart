@@ -7,6 +7,9 @@ class ZikrDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       height: 56,
       child: Stack(
@@ -14,19 +17,19 @@ class ZikrDetailHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF3D3020),
+              color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
             ),
           ),
           Align(
             alignment: Alignment.centerRight,
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.chevron_left,
-                color: Color(0xFF3D3020),
+                color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
                 size: 32,
               ),
               onPressed: () => Navigator.pop(context),

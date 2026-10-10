@@ -17,14 +17,16 @@ class ProblemTypeDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return DropdownButtonFormField<String>(
       // initialValue: selectedValue,
       hint: Text(
         hintText,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 14,
-          color: AppColors.hintTextColor,
+          color: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
         ),
       ),
       items: items.map((type) {
@@ -32,10 +34,12 @@ class ProblemTypeDropdown extends StatelessWidget {
           value: type,
           child: Text(
             type,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 15,
-              color: AppColors.primaryTextColor,
+              color: isDark
+                  ? const Color(0xFFF5F2EE)
+                  : AppColors.primaryTextColor,
             ),
           ),
         );
@@ -43,32 +47,36 @@ class ProblemTypeDropdown extends StatelessWidget {
       onChanged: onChanged,
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDark ? const Color(0xFF242220) : Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 12,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderColor2),
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderColor2),
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primaryColor,
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
             width: 1.5,
           ),
         ),
       ),
-      icon: const Icon(
+      icon: Icon(
         Icons.keyboard_arrow_down_rounded,
-        color: AppColors.primaryColor,
+        color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
       ),
-      dropdownColor: Colors.white,
+      dropdownColor: isDark ? const Color(0xFF211F1D) : Colors.white,
     );
   }
 }

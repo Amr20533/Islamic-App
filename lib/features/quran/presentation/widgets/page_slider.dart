@@ -12,6 +12,8 @@ class PageSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Expanded(
       child: SizedBox(
         width: double.infinity,
@@ -45,7 +47,11 @@ class PageSlider extends StatelessWidget {
                   border: !isLast
                       ? Border(
                           bottom: BorderSide(
-                              width: 1, color: AppColors.borderColor),
+                            width: 1,
+                            color: isDark
+                                ? const Color(0xFF383430)
+                                : AppColors.borderColor,
+                          ),
                         )
                       : const Border(),
                 ),
@@ -54,15 +60,17 @@ class PageSlider extends StatelessWidget {
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        Image.asset('assets/icons/surah_number_container.png'),
+                        Image.asset(
+                          'assets/icons/surah_number_container.png',
+                          color: isDark ? const Color(0xFFC8A88A) : null,
+                        ),
                         Text(
                           '${index + 1}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall!
+                          style: Theme.of(context).textTheme.headlineSmall!
                               .copyWith(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
+                                color: isDark ? const Color(0xFFF5F2EE) : null,
                               ),
                           textAlign: TextAlign.center,
                         ),
@@ -71,9 +79,14 @@ class PageSlider extends StatelessWidget {
                     const SizedBox(width: 16),
                     Text(
                       "الصفحة ${index + 1}",
-                      style: AppTextStyles.textTheme.titleLarge!.copyWith(
-                        color: AppColors.thirdTextColor,
-                      ),
+                      style:
+                          (AppTextStyles.textTheme.titleLarge ??
+                                  const TextStyle())
+                              .copyWith(
+                                color: isDark
+                                    ? const Color(0xFFF5F2EE)
+                                    : AppColors.thirdTextColor,
+                              ),
                     ),
                   ],
                 ),

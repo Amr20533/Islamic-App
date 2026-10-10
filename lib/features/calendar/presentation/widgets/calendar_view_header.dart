@@ -13,17 +13,20 @@ class CalendarViewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'التقويم',
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 22,
             fontWeight: FontWeight.w900,
-            color: AppColors.counterColor,
+            color: isDark ? const Color(0xFFC8A88A) : AppColors.counterColor,
           ),
         ),
         const SizedBox(height: 12),
@@ -32,27 +35,27 @@ class CalendarViewHeader extends StatelessWidget {
           children: [
             Text(
               hijriDate,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.thirdTextColor,
+                color: isDark ? const Color(0xFFF5F2EE) : AppColors.thirdTextColor,
               ),
             ),
             const SizedBox(width: 16),
             Container(
               width: 1,
               height: 16,
-              color: AppColors.borderColor,
+              color: isDark ? const Color(0xFF383430) : AppColors.borderColor,
             ),
             const SizedBox(width: 16),
             Text(
               gregorianDate,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.thirdTextColor,
+                color: isDark ? const Color(0xFFF5F2EE) : AppColors.thirdTextColor,
               ),
             ),
           ],

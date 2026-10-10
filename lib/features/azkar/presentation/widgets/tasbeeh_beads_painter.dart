@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class TasbeehBeadsPainter extends CustomPainter {
   final double progress;
+  final bool isDark;
 
-  TasbeehBeadsPainter({required this.progress});
+  TasbeehBeadsPainter({required this.progress, this.isDark = false});
 
   Offset _getPointOnCurve(double t, Size size) {
     final p0 = Offset(-40, size.height * 0.2);
@@ -20,7 +21,9 @@ class TasbeehBeadsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final linePaint = Paint()
-      ..color = const Color(0xFF8A7560).withOpacity(0.6)
+      ..color = isDark
+          ? const Color(0xFFC8A88A).withOpacity(0.6)
+          : const Color(0xFF8A7560).withOpacity(0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
@@ -37,6 +40,18 @@ class TasbeehBeadsPainter extends CustomPainter {
     const double spacing = 0.19;
     const double baseBeadRadius = 32.0;
 
+    final beadColors = isDark
+        ? const [
+            Color(0xFFEADDC4),
+            Color(0xFFC8A88A),
+            Color(0xFF7A5C43),
+          ]
+        : const [
+            Color(0xFF91725A),
+            Color(0xFF6B5040),
+            Color(0xFF423026),
+          ];
+
     for (int i = -1; i <= 5; i++) {
       double t = (i * spacing) - (progress * spacing) + 0.15;
 
@@ -45,25 +60,20 @@ class TasbeehBeadsPainter extends CustomPainter {
       final beadCenter = _getPointOnCurve(t, size);
 
       final beadPaint = Paint()
-        ..shader =
-            RadialGradient(
-              colors: const [
-                Color(0xFF91725A),
-                Color(0xFF6B5040),
-                Color(0xFF423026),
-              ],
-              stops: const [0.0, 0.65, 1.0],
-              center: const Alignment(-0.25, -0.25),
-              radius: 0.85,
-            ).createShader(
-              Rect.fromCircle(center: beadCenter, radius: baseBeadRadius),
-            );
+        ..shader = RadialGradient(
+          colors: beadColors,
+          stops: const [0.0, 0.65, 1.0],
+          center: const Alignment(-0.25, -0.25),
+          radius: 0.85,
+        ).createShader(
+          Rect.fromCircle(center: beadCenter, radius: baseBeadRadius),
+        );
 
       canvas.drawCircle(
         beadCenter.translate(0, 4),
         baseBeadRadius,
         Paint()
-          ..color = Colors.black.withOpacity(0.08)
+          ..color = isDark ? Colors.black.withOpacity(0.25) : Colors.black.withOpacity(0.08)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
       );
 
@@ -73,6 +83,6 @@ class TasbeehBeadsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant TasbeehBeadsPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress || oldDelegate.isDark != isDark;
   }
 }

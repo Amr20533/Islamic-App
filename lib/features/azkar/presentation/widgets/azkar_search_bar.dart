@@ -26,19 +26,26 @@ class _AzkarSearchBarState extends State<AzkarSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF211F1D) : Colors.white,
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
         border: Border.all(
-          color: AppColors.borderColor.withOpacity(0.5),
+          color: isDark
+              ? const Color(0xFF383430)
+              : AppColors.borderColor.withOpacity(0.5),
           width: 1,
         ),
       ),
@@ -47,23 +54,27 @@ class _AzkarSearchBarState extends State<AzkarSearchBar> {
         onChanged: widget.onChanged,
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 15,
-          color: AppColors.primaryTextColor,
+          color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
         ),
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 14,
-            color: AppColors.hintTextColor.withOpacity(0.6),
+            color: isDark
+                ? const Color(0xFFB8AEA5)
+                : AppColors.hintTextColor.withOpacity(0.6),
           ),
           prefixIcon: _controller.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    color: AppColors.greyColor,
+                    color: isDark
+                        ? const Color(0xFFB8AEA5)
+                        : AppColors.greyColor,
                     size: 18,
                   ),
                   onPressed: () {
@@ -79,10 +90,10 @@ class _AzkarSearchBarState extends State<AzkarSearchBar> {
               'assets/icons/iconoir_search.png',
               width: 18,
               height: 18,
-              color: AppColors.primaryColor,
-              errorBuilder: (_, __, ___) => const Icon(
+              color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
+              errorBuilder: (_, __, ___) => Icon(
                 Icons.search,
-                color: AppColors.primaryColor,
+                color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                 size: 20,
               ),
             ),

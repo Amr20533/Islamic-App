@@ -54,24 +54,35 @@ class _AccountManagementContent extends StatelessWidget {
     final controller = TextEditingController(
       text: isPassword ? "" : initialValue,
     );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (dialogContext) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            backgroundColor: const Color(0xFFF7F5F0),
+            backgroundColor: isDark
+                ? const Color(0xFF211F1D)
+                : const Color(0xFFF7F5F0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: AppColors.borderColor2, width: 1.5),
+              side: BorderSide(
+                color: isDark
+                    ? const Color(0xFF383430)
+                    : AppColors.borderColor2,
+                width: 1.5,
+              ),
             ),
             title: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.counterColor,
+                color: isDark
+                    ? const Color(0xFFF5F2EE)
+                    : AppColors.counterColor,
               ),
             ),
             content: TextField(
@@ -79,21 +90,43 @@ class _AccountManagementContent extends StatelessWidget {
               obscureText: isPassword,
               autofocus: true,
               textAlign: TextAlign.right,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                color: isDark
+                    ? const Color(0xFFF5F2EE)
+                    : AppColors.primaryTextColor,
+              ),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: isDark
+                    ? const Color(0xFF141312)
+                    : Colors.white,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.borderColor2),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? const Color(0xFF383430)
+                        : AppColors.borderColor2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? const Color(0xFF383430)
+                        : AppColors.borderColor2,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.primaryColor,
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? const Color(0xFFC8A88A)
+                        : AppColors.primaryColor,
                     width: 1.5,
                   ),
                 ),
@@ -102,11 +135,11 @@ class _AccountManagementContent extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text(
+                child: Text(
                   'إلغاء',
                   style: TextStyle(
                     fontFamily: 'Tajawal',
-                    color: Colors.grey,
+                    color: isDark ? const Color(0xFFB8AEA5) : Colors.grey,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -120,8 +153,12 @@ class _AccountManagementContent extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: isDark
+                      ? const Color(0xFFC8A88A)
+                      : AppColors.primaryColor,
+                  foregroundColor: isDark
+                      ? const Color(0xFF141312)
+                      : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -143,30 +180,32 @@ class _AccountManagementContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F0),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F5F0),
         elevation: 0,
         leading: Container(),
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.primaryTextColor,
+              color: isDark
+                  ? const Color(0xFFF5F2EE)
+                  : AppColors.primaryTextColor,
               size: 20,
             ),
             onPressed: () => Navigator.pop(context),
           ),
         ],
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'إدارة الحساب',
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.counterColor,
+            color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
           ),
         ),
       ),
@@ -210,8 +249,8 @@ class _AccountManagementContent extends StatelessWidget {
                       "assets/icons/user.svg",
                       width: 20,
                       height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primaryColor,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -226,8 +265,8 @@ class _AccountManagementContent extends StatelessWidget {
                       'assets/icons/email.svg',
                       width: 20,
                       height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primaryColor,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                         BlendMode.srcIn,
                       ),
                     ),

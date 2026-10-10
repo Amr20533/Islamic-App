@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 
 class DailyPlanPainter extends CustomPainter {
+  final Color backgroundColor;
+
+  DailyPlanPainter({this.backgroundColor = AppColors.thirdColor});
+
   @override
   void paint(Canvas canvas, Size size) {
     final double radius = 24.0; // Matches your card's corner radius
@@ -20,21 +24,17 @@ class DailyPlanPainter extends CustomPainter {
 
     // 2. Draw the background color
     Paint basePaint = Paint()
-      ..color = AppColors
-          .thirdColor // Base thirdColor
+      ..color = backgroundColor
       ..style = PaintingStyle.fill;
     canvas.drawRRect(outerRRect, basePaint);
 
     // 3. Clip everything else to the card boundaries
-    // This ensures decorative shapes don't go outside the rounded corners
     canvas.save();
     canvas.clipRRect(outerRRect);
 
     // 4. Draw Top-Left Decorative Shape
-    // This looks like a large circle centered slightly off-canvas
     Paint decoPaint = Paint()
-      ..color = Colors.white
-          .withValues(alpha: 0.15) // Subtle highlight
+      ..color = Colors.white.withValues(alpha: 0.08) // Subtle highlight
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(
@@ -45,7 +45,7 @@ class DailyPlanPainter extends CustomPainter {
 
     // 5. Draw Bottom-Right Decorative Shape
     Paint circlePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+      ..color = Colors.white.withValues(alpha: 0.05)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(
@@ -58,5 +58,7 @@ class DailyPlanPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant DailyPlanPainter oldDelegate) =>
+      oldDelegate.backgroundColor != backgroundColor;
 }
+

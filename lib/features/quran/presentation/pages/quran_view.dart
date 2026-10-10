@@ -11,11 +11,15 @@ import 'package:islamic_app/features/quran/presentation/widgets/custom_surah_sel
 
 /// Helper to communicate reading progress updates in real-time across widgets.
 class QuranLastReadHelper {
-  static final ValueNotifier<({String surahName, int pageNumber})?> lastReadNotifier =
+  static final ValueNotifier<({String surahName, int pageNumber, int verseNumber})?> lastReadNotifier =
       ValueNotifier(null);
 
-  static void update(String surahName, int pageNumber) {
-    lastReadNotifier.value = (surahName: surahName, pageNumber: pageNumber);
+  static void update(String surahName, int pageNumber, int verseNumber) {
+    lastReadNotifier.value = (
+      surahName: surahName,
+      pageNumber: pageNumber,
+      verseNumber: verseNumber,
+    );
   }
 }
 
@@ -37,25 +41,33 @@ class _QuranViewState extends State<QuranView> {
     final prefs = locator<SharedPreferences>();
     final surahName = prefs.getString('last_read_surah_name');
     final pageNumber = prefs.getInt('last_read_page_number');
+    final verseNumber = prefs.getInt('last_read_verse_number');
 
     if (surahName != null && pageNumber != null) {
       QuranLastReadHelper.lastReadNotifier.value = (
         surahName: surahName,
         pageNumber: pageNumber,
+        verseNumber: verseNumber ?? 1,
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.lightGreyColor,
         appBar: AppBar(
-          backgroundColor: AppColors.lightGreyColor,
           leading: Container(),
-          title: Text("القران", style: AppTextStyles.textTheme.titleLarge),
+          title: Text(
+            "القران",
+            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
+              color: isDark ? const Color(0xFFC8A88A) : null,
+            ),
+          ),
           actions: [
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 24),
@@ -67,6 +79,7 @@ class _QuranViewState extends State<QuranView> {
                   "assets/icons/Vector (9).png",
                   width: 18,
                   height: 24,
+                  color: isDark ? const Color(0xFFC8A88A) : null,
                 ),
               ),
             ),
@@ -78,25 +91,35 @@ class _QuranViewState extends State<QuranView> {
             child: Column(
               spacing: 20,
               children: [
-                ValueListenableBuilder<({String surahName, int pageNumber})?>(
+                ValueListenableBuilder<({String surahName, int pageNumber, int verseNumber})?>(
                   valueListenable: QuranLastReadHelper.lastReadNotifier,
                   builder: (context, lastRead, child) {
                     final displaySurahName = lastRead != null ? lastRead.surahName : 'البقرة';
                     final displayPageNumber = lastRead != null ? lastRead.pageNumber : 12;
+                    final displayVerseNumber = lastRead != null ? lastRead.verseNumber : 1;
 
                     return Container(
                       width: double.infinity,
                       height: 132,
                       padding: const EdgeInsets.symmetric(horizontal: 13),
                       decoration: BoxDecoration(
-                        color: AppColors.authCardBorderColor,
+                        color: isDark ? const Color(0xFF282522) : AppColors.authCardBorderColor,
                         borderRadius: BorderRadius.circular(8),
-                        image: const DecorationImage(
-                          image: ResizeImage(
+                        border: isDark
+                            ? Border.all(color: const Color(0xFF383430), width: 1)
+                            : null,
+                        image: DecorationImage(
+                          image: const ResizeImage(
                             width: 800,
                             AssetImage('assets/images/quran_banner_1.png'),
                           ),
                           fit: BoxFit.fill,
+                          colorFilter: isDark
+                              ? ColorFilter.mode(
+                                  Colors.black.withValues(alpha: 0.65),
+                                  BlendMode.darken,
+                                )
+                              : null,
                         ),
                       ),
                       child: Column(
@@ -110,12 +133,16 @@ class _QuranViewState extends State<QuranView> {
                             children: [
                               Text(
                                 "تابع من حيث توقفت",
-                                style: AppTextStyles.textTheme.labelMedium!
-                                    .copyWith(fontSize: 20),
+                                style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
+                                  fontSize: 20,
+                                  color: isDark ? const Color(0xFFF5F2EE) : null,
+                                ),
                               ),
                               Text(
-                                "سورة $displaySurahName • صفحة $displayPageNumber",
-                                style: AppTextStyles.textTheme.titleMedium,
+                                "سورة $displaySurahName • آية $displayVerseNumber • صفحة $displayPageNumber",
+                                style: (AppTextStyles.textTheme.titleMedium ?? const TextStyle()).copyWith(
+                                  color: isDark ? const Color(0xFFC8A88A) : null,
+                                ),
                               ),
                             ],
                           ),
@@ -151,9 +178,9 @@ class _QuranViewState extends State<QuranView> {
                     alignment: AlignmentDirectional.centerStart,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: AppColors.whiteColor,
+                      color: isDark ? const Color(0xFF211F1D) : AppColors.whiteColor,
                       border: Border.all(
-                        color: AppColors.borderColor,
+                        color: isDark ? const Color(0xFF383430) : AppColors.borderColor,
                         width: 1,
                       ),
                       borderRadius: BorderRadius.circular(12),
@@ -163,9 +190,14 @@ class _QuranViewState extends State<QuranView> {
                       children: [
                         Text(
                           "ابحث عن سورة أو آية ...",
-                          style: AppTextStyles.textTheme.titleSmall,
+                          style: (AppTextStyles.textTheme.titleSmall ?? const TextStyle()).copyWith(
+                            color: isDark ? const Color(0xFFB8AEA5) : null,
+                          ),
                         ),
-                        Image.asset('assets/icons/iconoir_search.png'),
+                        Image.asset(
+                          'assets/icons/iconoir_search.png',
+                          color: isDark ? const Color(0xFFC8A88A) : null,
+                        ),
                       ],
                     ),
                   ),

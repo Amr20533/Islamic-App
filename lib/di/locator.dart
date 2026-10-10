@@ -1,12 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:islamic_app/core/services/helpers/db.helper.dart';
+import 'package:islamic_app/core/theme/theme_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/login_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/singup_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
 import 'package:islamic_app/features/auth/repositories/user_repositories.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:islamic_app/core/services/notification_service.dart';
-import 'package:islamic_app/features/audio/presentation/bloc/audio_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/azkar_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
@@ -41,9 +41,12 @@ void setupLocator(SharedPreferences sharedPreferences) {
 
   locator.registerSingleton<NotificationService>(NotificationService());
 
+  locator.registerLazySingleton<ThemeCubit>(
+    () => ThemeCubit(locator<SharedPreferences>()),
+  );
+
   locator.registerLazySingleton<AdhanBloc>(() => AdhanBloc());
 
-  locator.registerLazySingleton<AudioCubit>(() => AudioCubit());
   locator.registerLazySingleton<QuranCubit>(() => QuranCubit());
   locator.registerLazySingleton<QuranSearchCubit>(() => QuranSearchCubit());
   locator.registerLazySingleton<RamadanCubit>(() => RamadanCubit());

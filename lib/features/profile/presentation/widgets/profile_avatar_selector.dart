@@ -18,6 +18,8 @@ class ProfileAvatarSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Stack(
         children: [
@@ -26,7 +28,10 @@ class ProfileAvatarSelector extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderColor2, width: 2),
+              border: Border.all(
+                color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+                width: 2,
+              ),
             ),
             child: ClipOval(
               child: imagePath != null && File(imagePath!).existsSync()
@@ -50,14 +55,17 @@ class ProfileAvatarSelector extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF211F1D) : Colors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.borderColor2, width: 1.5),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF383430) : AppColors.borderColor2,
+                    width: 1.5,
+                  ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.edit_outlined,
                   size: 18,
-                  color: AppColors.primaryColor,
+                  color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                 ),
               ),
             ),

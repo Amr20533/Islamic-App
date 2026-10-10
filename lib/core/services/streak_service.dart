@@ -5,6 +5,9 @@ class StreakService {
 
   StreakService(this._prefs);
 
+  static const _totalStreakKey = 'streak_total_days';
+  static const _lastCompletedDateKey = 'streak_last_completed_date';
+
   static String _dateKey(DateTime date) =>
       "${date.year}-${date.month}-${date.day}";
 
@@ -17,25 +20,26 @@ class StreakService {
     return quran && dhikr && dua;
   }
 
-  /// Calculates the current streak (consecutive completed days).
-  /// Counts backwards from today until a day is not fully completed.
-  /// If today is not yet completed we still count from yesterday (streak in progress).
+  /// Returns the total number of completed days ever (never resets).
+  /// Call [tryIncrementStreak] after each task completion to keep it updated.
   int calculateStreak() {
+    return _prefs.getInt(_totalStreakKey) ?? 0;
+  }
+
+  /// If today is newly completed (all 3 tasks done) and hasn't been counted yet,
+  /// increments the total streak counter by 1 and saves today's date as last counted.
+  /// Safe to call multiple times — only counts once per day.
+  Future<void> tryIncrementStreak() async {
     final today = DateTime.now();
-    int streak = 0;
+    final todayKey = _dateKey(today);
+    final lastCounted = _prefs.getString(_lastCompletedDateKey) ?? '';
 
-    // If today is completed, start counting from today; otherwise from yesterday
-    final startFrom = isDayCompleted(today) ? 0 : 1;
+    // Only count if today is newly completed and hasn't been counted yet
+    if (lastCounted == todayKey) return;
+    if (!isDayCompleted(today)) return;
 
-    for (int i = startFrom; i <= 365; i++) {
-      final day = today.subtract(Duration(days: i));
-      if (isDayCompleted(day)) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
-    return streak;
+    final current = _prefs.getInt(_totalStreakKey) ?? 0;
+    await _prefs.setInt(_totalStreakKey, current + 1);
+    await _prefs.setString(_lastCompletedDateKey, todayKey);
   }
 }

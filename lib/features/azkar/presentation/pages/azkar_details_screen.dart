@@ -104,7 +104,6 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 244, 231, 220),
         body: SafeArea(
           child: widget.zikrList != null
               ? _buildContent(widget.zikrList!)

@@ -15,15 +15,18 @@ class TourCompletedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 500,
       padding: const EdgeInsets.symmetric(horizontal: 47, vertical: 46),
       margin: const EdgeInsets.symmetric(horizontal: 24),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: context.tertiaryColor,
+        color: isDark ? const Color(0xFF282522) : context.tertiaryColor,
         borderRadius: BorderRadius.circular(32),
-        boxShadow: AppShadows.customShadow,
+        boxShadow: isDark ? const [] : AppShadows.customShadow,
       ),
       child: Column(
         children: [
@@ -32,21 +35,27 @@ class TourCompletedCard extends StatelessWidget {
             width: 88,
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              color: AppColors.whiteColor,
+              color: isDark ? const Color(0xFF1E1C1A) : AppColors.whiteColor,
               shape: BoxShape.circle,
-              border: Border.all(width: 1, color: AppColors.thirdTextColor),
-              boxShadow: AppShadows.softCenteredGlow,
+              border: Border.all(
+                width: 1,
+                color: isDark ? const Color(0xFF383430) : AppColors.thirdTextColor,
+              ),
+              boxShadow: isDark ? const [] : AppShadows.softCenteredGlow,
             ),
             child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: AppColors.thirdColor,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF35312C) : AppColors.thirdColor,
                 shape: BoxShape.circle,
               ),
               child: Image.asset("assets/icons/Check.png"),
             ),
           ),
           const SizedBox(height: 64),
-          Text("تمت الجولة", style: AppTextStyles.textTheme.titleLarge),
+          Text(
+            "تمت الجولة",
+            style: theme.textTheme.titleLarge,
+          ),
           const SizedBox(height: 64),
           AppPrimaryButton(
             onPressed: () async {
@@ -56,8 +65,8 @@ class TourCompletedCard extends StatelessWidget {
                 "daily_dhikr_done_$dateStr",
                 true,
               );
-              // Auto-refresh the streak card on home screen
-              locator<StreakNotifier>().refresh();
+              // Increment cumulative streak if all 3 tasks done today
+              await locator<StreakNotifier>().refreshAndIncrement();
               if (context.mounted) {
                 Navigator.pop(context);
               }
@@ -70,8 +79,8 @@ class TourCompletedCard extends StatelessWidget {
               context.read<DailyDhikrCubit>().resetCount();
             },
             label: 'اعادة الجولة',
-            bgColor: AppColors.secondaryColor,
-            foregroundColor: AppColors.primaryColor,
+            bgColor: isDark ? const Color(0xFF383430) : AppColors.secondaryColor,
+            foregroundColor: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryColor,
           ),
         ],
       ),

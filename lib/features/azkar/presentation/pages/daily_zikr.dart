@@ -35,23 +35,24 @@ class _DailyZikrState extends State<DailyZikr> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.lightGreyColor,
         appBar: AppBar(
-          backgroundColor: AppColors.lightGreyColor,
           leading: GestureDetector(
             onTap: () {
               Navigator.pop(context);
             },
             child: Icon(
               Icons.arrow_back_ios_sharp,
-              color: context.primaryColor,
+              color: isDark ? const Color(0xFFC8A88A) : context.primaryColor,
               size: 18,
             ),
           ),
-          title: Text("ذكر اليوم", style: AppTextStyles.textTheme.titleLarge),
+          title: Text("ذكر اليوم", style: theme.textTheme.titleLarge),
         ),
         body: SizedBox.expand(
           child: Stack(
@@ -64,11 +65,11 @@ class _DailyZikrState extends State<DailyZikr> {
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
                         _currentDhikr['text'] as String,
-                        style: AppTextStyles.textTheme.displayLarge?.copyWith(
+                        style: theme.textTheme.displayLarge?.copyWith(
                           fontFamily: 'Tajawal',
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryTextColor,
+                          color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryTextColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -83,19 +84,21 @@ class _DailyZikrState extends State<DailyZikr> {
                             height: 271,
                             margin: const EdgeInsets.only(top: 77, bottom: 41),
                             decoration: BoxDecoration(
-                              color: context.tertiaryColor,
+                              color: isDark ? const Color(0xFF282522) : context.tertiaryColor,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 width: 4,
-                                color: AppColors.lightGreyColor,
+                                color: isDark ? const Color(0xFF383430) : AppColors.lightGreyColor,
                               ),
                               boxShadow: context.softShadow,
                             ),
                             child: Center(
                               child: Text(
                                 "${state.count} / ${state.maxCount}",
-                                style: AppTextStyles.textTheme.displaySmall
-                                    ?.copyWith(height: 1),
+                                style: theme.textTheme.displaySmall?.copyWith(
+                                  height: 1,
+                                  color: isDark ? const Color(0xFFC8A88A) : null,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -105,8 +108,9 @@ class _DailyZikrState extends State<DailyZikr> {
                     ),
                     Text(
                       "اضغط للعد",
-                      style: AppTextStyles.textTheme.labelSmall?.copyWith(
+                      style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 18,
+                        color: isDark ? const Color(0xFFB8AEA5) : null,
                       ),
                       textAlign: TextAlign.center,
                     ),

@@ -10,6 +10,9 @@ class TasbeehHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: SizedBox(
@@ -17,21 +20,21 @@ class TasbeehHeader extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            const Text(
+            Text(
               "المسبحة الإلكترونية",
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF3D3020),
+                color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF3D3020),
               ),
             ),
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.chevron_left,
-                  color: Color(0xFF3D3020),
+                  color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
                   size: 32,
                 ),
                 onPressed: () => Navigator.pop(context),
@@ -40,9 +43,9 @@ class TasbeehHeader extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.refresh,
-                  color: Color(0xFF3D3020),
+                  color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF3D3020),
                   size: 28,
                 ),
                 onPressed: onReset,

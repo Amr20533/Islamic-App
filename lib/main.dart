@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:islamic_app/di/locator.dart' as service_locator;
 import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/surah_selector_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/azkar_cubit.dart';
-import 'package:islamic_app/features/audio/presentation/bloc/audio_cubit.dart';
 import 'package:islamic_app/features/ramadan/presentation/bloc/ramadan_cubit.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
@@ -16,33 +17,45 @@ import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dar
 import 'package:islamic_app/core/services/helpers/location_helper.dart';
 import 'package:islamic_app/core/services/notification_service.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
-import 'core/static_files/app_colors.dart';
+import 'package:islamic_app/core/static_files/app_theme.dart';
+import 'package:islamic_app/core/theme/theme_cubit.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Run independent, fast inits in parallel instead of sequentially
+  // Initialize background audio (must be before runApp)
+  try {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.islamic.app.audio',
+      androidNotificationChannelName: 'تلاوة القرآن الكريم',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    );
+  } catch (e) {
+    debugPrint('⚠️ JustAudioBackground init failed: $e');
+  }
+
+  // Fast initializations
   final sharedPreferences = await SharedPreferences.getInstance();
-  await Future.wait([
-    initializeDateFormatting('ar', null),
-  ]);
+  await initializeDateFormatting('ar', null);
 
   service_locator.setupLocator(sharedPreferences);
 
-  final cachedLat = sharedPreferences.getDouble('last_lat') ?? 30.0444;
-  final cachedLng = sharedPreferences.getDouble('last_lng') ?? 31.2357;
+  // Use the last saved location for instant startup
+  double? cachedLat = sharedPreferences.getDouble('last_lat');
+  double? cachedLng = sharedPreferences.getDouble('last_lng');
 
   service_locator.locator.registerLazySingleton<PrayerCubit>(
-        () => PrayerCubit(latitude: cachedLat, longitude: cachedLng),
+    () => PrayerCubit(latitude: cachedLat, longitude: cachedLng),
   );
 
   runApp(const MyApp());
 
   // Everything below runs AFTER first frame — doesn't block startup.
   _updateLocationInBackground(sharedPreferences);
-  _initNotificationsInBackground();
+  unawaited(_initNotificationsInBackground());
 }
 
 class MyApp extends StatefulWidget {
@@ -79,6 +92,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => service_locator.locator<ThemeCubit>()),
         BlocProvider(create: (_) => service_locator.locator<PrayerCubit>()),
         BlocProvider(create: (_) => service_locator.locator<AdhanBloc>()),
         BlocProvider(
@@ -88,7 +102,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) =>
               service_locator.locator<AzkarCubit>()..loadCategories(),
         ),
-        BlocProvider(create: (_) => service_locator.locator<AudioCubit>()),
         BlocProvider(
           create: (_) =>
               service_locator.locator<RamadanCubit>()..fetchPrayerTimes(),
@@ -102,39 +115,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => service_locator.locator<ProfileCubit>()..loadProfile(),
         ),
         BlocProvider(
-          create: (_) => service_locator.locator<UserProfileCubit>()..loadUser(),
+          create: (_) =>
+              service_locator.locator<UserProfileCubit>()..loadUser(),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Islamic App',
-        theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: AppColors.whiteColor,
-          colorScheme: ColorScheme(
-            brightness: Brightness.light,
-            primary: AppColors.primaryColor,
-            onPrimary: AppColors.whiteColor,
-            secondary: AppColors.secondaryColor,
-            onSecondary: AppColors.whiteColor,
-            tertiary: AppColors.thirdColor,
-            onTertiary: AppColors.primaryTextColor,
-            surface: AppColors.whiteColor,
-            onSurface: AppColors.primaryTextColor,
-            error: Colors.redAccent,
-            onError: AppColors.whiteColor,
-            outline: AppColors.greyColor,
-          ),
-          fontFamily: 'Tajawal',
-          textTheme: AppTextStyles.textTheme,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            centerTitle: true,
-            elevation: 0,
-          ),
-        ),
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Islamic App',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeState.themeMode,
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: AppRoutes.generateRoute,
+          );
+        },
       ),
     );
   }
@@ -150,10 +146,14 @@ Future<void> _updateLocationInBackground(SharedPreferences prefs) async {
     await prefs.setDouble('last_lng', position.longitude);
 
     if (service_locator.locator.isRegistered<PrayerCubit>()) {
-      service_locator.locator<PrayerCubit>()
-          .updateLocation(position.latitude, position.longitude);
+      service_locator.locator<PrayerCubit>().updateLocation(
+        position.latitude,
+        position.longitude,
+      );
     }
-    debugPrint('📍 Location updated: ${position.latitude}, ${position.longitude}');
+    debugPrint(
+      '📍 Location updated: ${position.latitude}, ${position.longitude}',
+    );
   } catch (e) {
     debugPrint('⚠️ Location not available: $e');
   }
@@ -162,6 +162,13 @@ Future<void> _updateLocationInBackground(SharedPreferences prefs) async {
 Future<void> _initNotificationsInBackground() async {
   debugPrint('🔔 Initializing notifications...');
   await NotificationService().init();
+
+  // Single daily reminder at 8:00 (from profile setting)
   await NotificationService().scheduleDailyReminderAt(hour: 8, minute: 0);
+
+  // Schedule specific Islamic daily reminders throughout the day
+  // (Morning Azkar, Duha prayer, Evening Azkar, Quran reading, Sleep Azkar & Witr)
+  await NotificationService().scheduleIslamicDailyReminders();
+
   debugPrint('✅ Notifications ready');
 }

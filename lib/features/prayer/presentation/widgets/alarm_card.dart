@@ -13,18 +13,29 @@ class AlarmCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF242220) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: isDark
+              ? const Color(0xFF383430)
+              : AppColors.borderColor.withOpacity(0.35),
+          width: 1,
+        ),
+        boxShadow: isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -53,6 +64,49 @@ class AlarmCard extends StatelessWidget {
 
                   return BlocBuilder<PrayerCubit, PrayerState>(
                     builder: (context, prayerState) {
+                      if (prayerState is PrayerLoading || prayerState is PrayerInitial) {
+                        return const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      if (prayerState is PrayerError) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Column(
+                            children: [
+                              Text(
+                                prayerState.message,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 14,
+                                  color: isDark ? const Color(0xFFC8A88A) : AppColors.counterColor,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.counterColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  context.read<PrayerCubit>().refreshLocation();
+                                },
+                                icon: const Icon(Icons.my_location, size: 18, color: Colors.white),
+                                label: const Text(
+                                  'تحديد / تحديث الموقع',
+                                  style: TextStyle(fontFamily: 'Tajawal', color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
                       final todayPrayers = prayerState is PrayerLoaded
                           ? prayerState.todayPrayers
                           : <String, DateTime>{};
@@ -81,10 +135,12 @@ class AlarmCard extends StatelessWidget {
                               },
                             ),
                             if (i < prayerAlarmConfigs.length - 1)
-                              const Divider(
+                              Divider(
                                 height: 1,
                                 thickness: 0.5,
-                                color: AppColors.borderColor,
+                                color: isDark
+                                    ? const Color(0xFF383430)
+                                    : AppColors.borderColor,
                               ),
                           ],
                         ],

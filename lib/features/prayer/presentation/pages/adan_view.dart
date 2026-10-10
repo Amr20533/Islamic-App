@@ -9,6 +9,7 @@ import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart'
 import 'package:islamic_app/features/prayer/presentation/widgets/adan_view_header.dart';
 import 'package:islamic_app/features/prayer/presentation/widgets/alarm_card.dart';
 import 'package:islamic_app/features/prayer/presentation/widgets/next_prayer_virtue_card.dart';
+import 'package:islamic_app/features/prayer/presentation/widgets/notification_permission_banner.dart';
 
 class AdanView extends StatelessWidget {
   const AdanView({super.key});
@@ -33,10 +34,14 @@ class _AdanPageContent extends StatefulWidget {
 }
 
 class _AdanPageContentState extends State<_AdanPageContent> {
+  bool _alarmStateReady = false;
+  bool _prayerStateReady = false;
   bool _rescheduled = false;
 
   void _tryReschedule(BuildContext context) {
     if (_rescheduled) return;
+    if (!_alarmStateReady || !_prayerStateReady) return;
+
     final alarmState = context.read<PrayerAlarmCubit>().state;
     if (alarmState is! PrayerAlarmLoaded) return;
 
@@ -52,22 +57,38 @@ class _AdanPageContentState extends State<_AdanPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PrayerAlarmCubit, PrayerAlarmState>(
-      // Reschedule as soon as alarms are loaded from storage
-      listener: (context, state) {
-        if (state is PrayerAlarmLoaded) {
-          _tryReschedule(context);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        // Reschedule when alarm states are loaded from storage
+        BlocListener<PrayerAlarmCubit, PrayerAlarmState>(
+          listener: (context, state) {
+            if (state is PrayerAlarmLoaded) {
+              _alarmStateReady = true;
+              _tryReschedule(context);
+            }
+          },
+        ),
+        // Also reschedule when prayer times arrive (handles late GPS fix)
+        BlocListener<PrayerCubit, PrayerState>(
+          listener: (context, state) {
+            if (state is PrayerLoaded) {
+              _prayerStateReady = true;
+              // Reset so we reschedule when new times arrive
+              _rescheduled = false;
+              _tryReschedule(context);
+            }
+          },
+        ),
+      ],
       child: const Scaffold(
-        backgroundColor: Color(0xFFF7F5F0),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 AdanViewHeader(),
-                SizedBox(height: 24),
+                NotificationPermissionBanner(),
+                SizedBox(height: 12),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: AlarmCard(),

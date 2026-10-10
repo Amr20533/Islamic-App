@@ -6,31 +6,52 @@ class SurahBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final displayName =
+        surahName.startsWith('سورة') ? surahName : 'سورة $surahName';
+
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 15),
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        image: const DecorationImage(
-          image: ResizeImage(
-          width: 800,
-          AssetImage('assets/images/surah_banner_frame.png'),
-          ),
-          fit: BoxFit.fill,
+        color: isDark ? const Color(0xFF242220) : const Color(0xFFF7F4EC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? const Color(0xFF383430) : const Color(0xFFE2D6C5),
+          width: 1.2,
         ),
-        color: Colors.green.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.3), width: 1),
       ),
-      child: Text(
-        "سورة $surahName",
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontFamily: 'QuranFont',
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.green,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "۞",
+            style: TextStyle(
+              fontSize: 16,
+              color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B6B4F),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            displayName,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'QuranFont',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF765B43),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            "۞",
+            style: TextStyle(
+              fontSize: 16,
+              color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B6B4F),
+            ),
+          ),
+        ],
       ),
     );
   }

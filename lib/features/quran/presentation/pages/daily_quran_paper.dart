@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/features/quran/data/models/quran_metadata.dart';
@@ -12,6 +11,9 @@ import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/core/services/streak_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Key used to store the last Quran page the user read (1-604).
+const _kLastQuranPage = 'quran_sequential_last_page';
+
 class DailyQuranPaper extends StatefulWidget {
   const DailyQuranPaper({super.key});
 
@@ -20,29 +22,27 @@ class DailyQuranPaper extends StatefulWidget {
 }
 
 class _DailyQuranPaperState extends State<DailyQuranPaper> {
-  late int _dailyPageNumber;
+  late int _pageNumber;
   late String _surahName;
   bool _isInit = false;
 
-  /// Calculate today's page number (1-604) based on the day of the year.
-  /// Each day shows a different page, cycling through all 604 pages.
-  int _getDailyPageNumber() {
-    final now = DateTime.now();
-    // Reference date: start of the current year
-    final startOfYear = DateTime(now.year, 1, 1);
-    final dayOfYear = now.difference(startOfYear).inDays;
-    // Pages 1-604, cycling every 604 days
-    return (dayOfYear % 604) + 1;
+  /// Returns the next page after the last read page.
+  /// Picks up exactly where the user left off, cycling after page 604.
+  int _getSequentialPage() {
+    final prefs = locator<SharedPreferences>();
+    final lastPage = prefs.getInt(_kLastQuranPage) ?? 0;
+    // Next page after last read, cycling 1-604
+    return (lastPage % 604) + 1;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInit) {
-      _dailyPageNumber = _getDailyPageNumber();
+      _pageNumber = _getSequentialPage();
 
       // Get surah info for this page
-      final metadata = QuranMetadata.pageToSurah[_dailyPageNumber];
+      final metadata = QuranMetadata.pageToSurah[_pageNumber];
       final surahNumber = metadata?['surahNumber'] as int? ?? 1;
       _surahName = metadata?['surahName'] as String? ?? 'الفاتحة';
 
@@ -55,25 +55,27 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFBF9F1),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFFBF9F1),
           leading: GestureDetector(
             onTap: () {
               Navigator.pop(context);
             },
             child: Icon(
               Icons.arrow_back_ios_sharp,
-              color: context.primaryColor,
+              color: isDark ? const Color(0xFFF5F2EE) : context.primaryColor,
               size: 18,
             ),
           ),
           title: Text(
             "صفحة من القرآن",
-            style: AppTextStyles.textTheme.titleLarge,
+            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
+              color: isDark ? const Color(0xFFC8A88A) : null,
+            ),
           ),
         ),
         body: Column(
@@ -86,8 +88,8 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                 children: [
                   Text(
                     "سورة $_surahName",
-                    style: AppTextStyles.textTheme.labelMedium?.copyWith(
-                      color: AppColors.primaryColor,
+                    style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
+                      color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -97,13 +99,15 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withAlpha(20),
+                      color: isDark
+                          ? const Color(0xFFC8A88A).withValues(alpha: 0.18)
+                          : AppColors.primaryColor.withAlpha(20),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      "صفحة $_dailyPageNumber",
-                      style: AppTextStyles.textTheme.labelSmall?.copyWith(
-                        color: AppColors.primaryColor,
+                      "صفحة $_pageNumber من 604",
+                      style: (AppTextStyles.textTheme.labelSmall ?? const TextStyle()).copyWith(
+                        color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
                       ),
                     ),
                   ),
@@ -124,9 +128,9 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                   }
 
                   if (state is QuranLoaded) {
-                    final verses = state.pages[_dailyPageNumber];
+                    final verses = state.pages[_pageNumber];
                     if (verses == null || verses.isEmpty) {
-                      final metadata = QuranMetadata.pageToSurah[_dailyPageNumber];
+                      final metadata = QuranMetadata.pageToSurah[_pageNumber];
                       if (metadata != null) {
                         final surahNumber = metadata['surahNumber'] as int;
                         context.read<QuranCubit>().loadSurahIfNeeded(surahNumber);
@@ -141,7 +145,8 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
 
                     return MushafPageWidget(
                       verses: verses,
-                      pageNumber: _dailyPageNumber,
+                      pageNumber: _pageNumber,
+                      bottomPadding: 20.0,
                     );
                   }
 
@@ -180,18 +185,19 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
               child: AppPrimaryButton(
                 width: 116,
                 onPressed: () async {
+                  final prefs = locator<SharedPreferences>();
 
-                  Navigator.pushReplacementNamed(context, AppRoutes.login);
+                  // ① Save the page just read as the new sequential bookmark
+                  await prefs.setInt(_kLastQuranPage, _pageNumber);
 
-
+                  // ② Mark today's Quran task as done
                   final now = DateTime.now();
                   final dateStr = "${now.year}-${now.month}-${now.day}";
-                  await locator<SharedPreferences>().setBool(
-                    "daily_quran_done_$dateStr",
-                    true,
-                  );
-                  // Auto-refresh the streak card on home screen
-                  locator<StreakNotifier>().refresh();
+                  await prefs.setBool("daily_quran_done_$dateStr", true);
+
+                  // ③ Try to increment the cumulative streak if all 3 tasks are done today
+                  await locator<StreakNotifier>().refreshAndIncrement();
+
                   if (context.mounted) {
                     Navigator.pop(context);
                   }
@@ -205,3 +211,4 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
     );
   }
 }
+

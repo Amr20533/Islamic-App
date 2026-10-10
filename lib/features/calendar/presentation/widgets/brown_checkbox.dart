@@ -8,20 +8,30 @@ class BrownCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: 24,
       height: 24,
       decoration: BoxDecoration(
-        color: isChecked ? AppColors.primaryColor : Colors.white,
+        color: isChecked
+            ? (isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor)
+            : (isDark ? const Color(0xFF1E1C1A) : Colors.white),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: isChecked ? AppColors.primaryColor : AppColors.borderColor,
+          color: isChecked
+              ? (isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor)
+              : (isDark ? const Color(0xFF383430) : AppColors.borderColor),
           width: 1.5,
         ),
       ),
       child: isChecked
-          ? const Icon(Icons.check, color: Colors.white, size: 16)
+          ? Icon(
+              Icons.check,
+              color: isDark ? const Color(0xFF141312) : Colors.white,
+              size: 16,
+            )
           : null,
     );
   }

@@ -24,6 +24,12 @@ class BottomNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSelected = currentIndex == index;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final effectiveActiveColor = isDark ? theme.colorScheme.primary : activeColor;
+    final effectiveInactiveColor = isDark ? const Color(0xFFB8AEA5) : inactiveColor;
+    final effectiveUnselectedIconColor = isDark ? const Color(0xFFD4C8BC) : AppColors.blackColor;
 
     return GestureDetector(
       onTap: onTap,
@@ -36,7 +42,7 @@ class BottomNavItem extends StatelessWidget {
             curve: Curves.easeInOut,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isSelected ? activeColor : Colors.transparent,
+              color: isSelected ? effectiveActiveColor : Colors.transparent,
               shape: BoxShape.circle,
             ),
             child: Image.asset(
@@ -44,7 +50,7 @@ class BottomNavItem extends StatelessWidget {
               width: 24,
               height: 24,
               cacheWidth: 800,
-              color: isSelected ? AppColors.whiteColor : AppColors.blackColor,
+              color: isSelected ? AppColors.whiteColor : effectiveUnselectedIconColor,
             ),
           ),
           const SizedBox(height: 4),
@@ -53,7 +59,7 @@ class BottomNavItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected ? activeColor : inactiveColor,
+              color: isSelected ? effectiveActiveColor : effectiveInactiveColor,
             ),
           ),
         ],

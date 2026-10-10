@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/services/streak_notifier.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/di/locator.dart';
 
 class ProgressCard extends StatelessWidget {
@@ -20,6 +19,9 @@ class ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return ValueListenableBuilder<int>(
       valueListenable: locator<StreakNotifier>(),
       builder: (context, streak, _) {
@@ -30,7 +32,7 @@ class ProgressCard extends StatelessWidget {
             height: 81,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: context.tertiaryColor,
+              color: isDark ? const Color(0xFF282522) : context.tertiaryColor,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Row(
@@ -41,7 +43,7 @@ class ProgressCard extends StatelessWidget {
                   width: 54,
                   height: 54,
                   decoration: BoxDecoration(
-                    color: context.surfaceColor,
+                    color: isDark ? const Color(0xFF1E1D1B) : context.surfaceColor,
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(icon),
@@ -50,13 +52,20 @@ class ProgressCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(leading, style: AppTextStyles.textTheme.bodyLarge),
+                    Text(
+                      leading,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 2),
                     Text(
                       'يتقدم بإتمام خطتك اليومية',
-                      style: AppTextStyles.textTheme.labelSmall?.copyWith(
+                      style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 11,
-                        color: AppColors.hintTextColor,
+                        color: isDark
+                            ? const Color(0xFFB8AEA5)
+                            : AppColors.hintTextColor,
                       ),
                     ),
                   ],
@@ -64,7 +73,9 @@ class ProgressCard extends StatelessWidget {
                 const Spacer(flex: 1),
                 Text(
                   _streakText(streak),
-                  style: AppTextStyles.textTheme.bodyLarge,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(width: 7),
               ],

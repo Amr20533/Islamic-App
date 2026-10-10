@@ -19,17 +19,20 @@ class OtherAzkarList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (categories.isEmpty && isSearchMode) {
-      return const SliverToBoxAdapter(
+      return SliverToBoxAdapter(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 40.0),
+            padding: const EdgeInsets.symmetric(vertical: 40.0),
             child: Text(
               "لم يتم العثور على نتائج للبحث",
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 16,
-                color: AppColors.greyColor,
+                color: isDark ? const Color(0xFFB8AEA5) : AppColors.greyColor,
               ),
             ),
           ),
@@ -54,9 +57,13 @@ class OtherAzkarList extends StatelessWidget {
                   fontFamily: 'Tajawal',
                   fontSize: isSearchMode ? 16 : 18,
                   fontWeight: FontWeight.bold,
-                  color: isSearchMode
-                      ? AppColors.primaryColor
-                      : AppColors.primaryTextColor.withOpacity(0.9),
+                  color: isDark
+                      ? (isSearchMode
+                          ? const Color(0xFFC8A88A)
+                          : const Color(0xFFF5F2EE))
+                      : (isSearchMode
+                          ? AppColors.primaryColor
+                          : AppColors.primaryTextColor.withOpacity(0.9)),
                 ),
               ),
             ),
