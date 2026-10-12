@@ -5,11 +5,10 @@ import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/features/calendar/presentation/bloc/calendar_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
-import 'package:islamic_app/core/services/helpers/islamic_occasion_helper.dart';
 import 'package:islamic_app/features/calendar/presentation/widgets/calendar_view_header.dart';
 import 'package:islamic_app/features/calendar/presentation/widgets/next_prayer_countdown_card.dart';
 import 'package:islamic_app/features/calendar/presentation/widgets/prayer_times_card.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/islamic_occasion_card.dart';
+import 'package:islamic_app/features/calendar/presentation/widgets/quran_stats_card.dart';
 
 class CalendarView extends StatelessWidget {
   const CalendarView({super.key});
@@ -78,7 +77,8 @@ class _CalendarPageContent extends StatelessWidget {
                         return Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
                                 ? const Color(0xFF242220)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -88,7 +88,10 @@ class _CalendarPageContent extends StatelessWidget {
                               Text(
                                 state.message,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14),
+                                style: const TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 14,
+                                ),
                               ),
                               const SizedBox(height: 12),
                               ElevatedButton.icon(
@@ -96,7 +99,10 @@ class _CalendarPageContent extends StatelessWidget {
                                   context.read<PrayerCubit>().refreshLocation();
                                 },
                                 icon: const Icon(Icons.my_location, size: 16),
-                                label: const Text('تحديث الموقع', style: TextStyle(fontFamily: 'Tajawal')),
+                                label: const Text(
+                                  'تحديث الموقع',
+                                  style: TextStyle(fontFamily: 'Tajawal'),
+                                ),
                               ),
                             ],
                           ),
@@ -118,15 +124,7 @@ class _CalendarPageContent extends StatelessWidget {
                     right: 20,
                     bottom: 24,
                   ),
-                  child: Builder(
-                    builder: (context) {
-                      final occasionData =
-                          IslamicOccasionHelper.getNextOccasion();
-                      return IslamicOccasionCard(
-                        occasion: occasionData.occasion,
-                      );
-                    },
-                  ),
+                  child: const QuranStatsCard(),
                 ),
               ],
             ),

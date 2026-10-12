@@ -72,6 +72,7 @@ flutter:
     - assets/images/
     - assets/svg/
     - assets/quran_search.json
+    - shorebird.yaml
 
   fonts:
     - family: Tajawal

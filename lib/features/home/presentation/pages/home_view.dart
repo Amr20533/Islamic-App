@@ -67,8 +67,9 @@ class HomeView extends StatelessWidget {
                             children: [
                               Text(
                                 greetingText,
-                                style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(height: 1.2),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleLarge?.copyWith(height: 1.2),
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -76,7 +77,9 @@ class HomeView extends StatelessWidget {
                                 children: [
                                   Text(
                                     "جميل أنك عدت اليوم",
-                                    style: Theme.of(context).textTheme.labelMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.labelMedium,
                                   ),
                                   Image.asset(
                                     "assets/icons/like.png",
@@ -119,25 +122,30 @@ class HomeView extends StatelessWidget {
                   ),
                 ),
 
-                Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    Text(
-                      "\"أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ\"",
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w400,
-                      ),
-                      textAlign: TextAlign.center,
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        Text(
+                          "\"أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ\"",
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w400),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        const DailyPlanCard(),
+                        const SizedBox(height: 20),
+                        const ProgressCard(
+                          icon: 'assets/icons/progress.png',
+                          leading: 'استمرارك ',
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    const DailyPlanCard(),
-                    const SizedBox(height: 20),
-                    const ProgressCard(
-                      icon: 'assets/icons/progress.png',
-                      leading: 'استمرارك ',
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
               ],
             ),

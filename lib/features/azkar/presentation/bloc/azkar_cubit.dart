@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -113,12 +113,13 @@ class AzkarCubit extends Cubit<AzkarState> {
                   .replaceAll('هَذَا الْيَوْمِ', 'هَذِهِ اللَّيْلَةِ')
                   .replaceAll('مَا بَعْدَهُ', 'مَا بَعْدَهَا');
             }
-            // Item 78: اللهم بك أصبحنا... -> اللهم بك أمسينا...
+            // Item 78: swap order and change النشور to المصير
             else if (item.id == 78) {
-              updatedText = updatedText.replaceAll(
-                'اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا ، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ',
-                'اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ',
-              );
+              updatedText = updatedText
+                  .replaceAll('\u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u0646\u064e\u0627\u060c', 'SABAH_PH\u060c')
+                  .replaceAll('\u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u0646\u064e\u0627\u060c', '\u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u0646\u064e\u0627\u060c')
+                  .replaceAll('SABAH_PH\u060c', '\u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u0646\u064e\u0627\u060c')
+                  .replaceAll('\u0627\u0644\u0646\u064f\u0651\u0634\u064f\u0648\u0631\u064f', '\u0627\u0644\u0652\u0645\u064e\u0635\u0650\u064a\u0631\u064f');
             }
             // Item 79: أصبحت -> أمسيت
             else if (item.id == 79) {

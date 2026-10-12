@@ -50,12 +50,10 @@ class _DailyPlanCardState extends State<DailyPlanCard> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: CustomPaint(
-          size: const Size(342, 310),
           painter: DailyPlanPainter(backgroundColor: cardBgColor),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 29),
-            width: 342,
-            height: 310,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            width: double.infinity,
             alignment: AlignmentDirectional.topStart,
             child: Directionality(
               textDirection: TextDirection.rtl,

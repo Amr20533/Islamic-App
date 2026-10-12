@@ -29,8 +29,7 @@ class ProgressCard extends StatelessWidget {
           textDirection: TextDirection.rtl,
           child: Container(
             width: double.infinity,
-            height: 81,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF282522) : context.tertiaryColor,
               borderRadius: BorderRadius.circular(24),
