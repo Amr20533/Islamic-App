@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_shadows.dart';
 import 'package:islamic_app/features/home/presentation/widgets/bottom_nav_item.dart';
 import 'package:islamic_app/features/home/presentation/pages/home_view.dart';
