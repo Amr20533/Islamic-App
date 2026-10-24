@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:islamic_app/core/services/helpers/quran_last_read_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:islamic_app/di/locator.dart';
@@ -115,7 +116,7 @@ class _MushafPageWidgetState extends State<MushafPageWidget> {
       await prefs.setInt('last_read_surah_number', verse.surahNumber ?? 1);
 
       // تحديث الـ ValueNotifier في الفهرس
-      QuranLastReadHelper.update(verse.surahNameAr ?? '', verse.page, verse.number ?? 1);
+      // QuranLastReadHelper.update(verse.surahNameAr ?? '', verse.page, verse.number ?? 1);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

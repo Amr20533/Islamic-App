@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:islamic_app/di/locator.dart';
+import 'package:islamic_app/core/services/helpers/quran_last_read_helper.dart';
 import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/surah_selector_cubit.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
@@ -9,19 +8,6 @@ import 'package:islamic_app/core/static_files/app_routes.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/custom_surah_selector.dart';
 
-/// Helper to communicate reading progress updates in real-time across widgets.
-class QuranLastReadHelper {
-  static final ValueNotifier<({String surahName, int pageNumber, int verseNumber})?> lastReadNotifier =
-      ValueNotifier(null);
-
-  static void update(String surahName, int pageNumber, int verseNumber) {
-    lastReadNotifier.value = (
-      surahName: surahName,
-      pageNumber: pageNumber,
-      verseNumber: verseNumber,
-    );
-  }
-}
 
 class QuranView extends StatefulWidget {
   const QuranView({super.key});
@@ -34,23 +20,27 @@ class _QuranViewState extends State<QuranView> {
   @override
   void initState() {
     super.initState();
-    _initLastRead();
+    getLastRead();
   }
 
-  void _initLastRead() {
-    final prefs = locator<SharedPreferences>();
-    final surahName = prefs.getString('last_read_surah_name');
-    final pageNumber = prefs.getInt('last_read_page_number');
-    final verseNumber = prefs.getInt('last_read_verse_number');
-
-    if (surahName != null && pageNumber != null) {
-      QuranLastReadHelper.lastReadNotifier.value = (
-        surahName: surahName,
-        pageNumber: pageNumber,
-        verseNumber: verseNumber ?? 1,
-      );
-    }
+  void getLastRead() async{
+   await QuranLastReadHelper.init();
   }
+
+  // void _initLastRead() {
+  //   final prefs = locator<SharedPreferences>();
+  //   final surahName = prefs.getString('last_read_surah_name');
+  //   final pageNumber = prefs.getInt('last_read_page_number');
+  //   final verseNumber = prefs.getInt('last_read_verse_number');
+
+  //   if (surahName != null && pageNumber != null) {
+  //     QuranLastReadHelper.lastReadNotifier.value = (
+  //       surahName: surahName,
+  //       pageNumber: pageNumber,
+  //       verseNumber: verseNumber ?? 1,
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

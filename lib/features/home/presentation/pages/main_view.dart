@@ -64,7 +64,8 @@ class _MainViewState extends State<MainView> {
               24,
               0,
               24,
-              MediaQuery.of(context).viewPadding.bottom + 24,
+              24
+              // MediaQuery.of(context).viewPadding.bottom + 24,
             ),
             padding: const EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(

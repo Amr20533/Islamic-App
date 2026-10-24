@@ -556,6 +556,32 @@ class NotificationService {
     }
   }
 
+  Future<void> schedulePrayerReminder({
+  required int id,
+  required String prayerName,
+  required DateTime prayerTime,
+  int minutesBefore = 5,
+}) async {
+  await cancelNotification(id);
+ 
+  var scheduledTime = tz.TZDateTime.from(prayerTime, tz.local)
+      .subtract(Duration(minutes: minutesBefore));
+  final now = tz.TZDateTime.now(tz.local);
+ 
+  if (scheduledTime.isBefore(now)) {
+    scheduledTime = scheduledTime.add(const Duration(days: 1));
+  }
+ 
+  await _schedule(
+    id: id,
+    title: 'آذان $prayerName',
+    body: 'اقتربت صلاة $prayerName',
+    at: scheduledTime,
+    details: _defaultDetails, 
+  );
+}
+
+
   // ── Tap Handlers ─────────────────────────────────────────────────────────────
 
   static void _onTap(NotificationResponse r) =>

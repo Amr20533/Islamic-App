@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:islamic_app/core/services/helpers/quran_last_read_helper.dart';
+import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/features/quran/data/models/quran_metadata.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/surah_details_header.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/mushaf_page_widget.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/quran_audio_player_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Main Quran reading page — displays a PageView of Mushaf pages.
 ///
@@ -125,6 +128,8 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
             : const Color(0xFFFBF9F1),
         body: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // ── Header ──
               SurahDetailsHeader(
@@ -190,10 +195,10 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
             );
           },
         ),
-        Positioned(
+        PositionedDirectional(
           bottom: 20,
-          left: 20,
-          right: 20,
+          start: 20,
+          end: 20,
           child: Align(
             alignment: Alignment.bottomCenter,
             child: QuranAudioPlayerWidget(
@@ -207,17 +212,46 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
   }
 
   /// Update surah/juz metadata when the user swipes to a new page.
-  void _onPageChanged(int index) {
-    final pageNum = index + 1;
-    final metadata = QuranMetadata.pageToSurah[pageNum];
-    if (metadata != null) {
-      final surahNum = metadata['surahNumber'] as int;
-      context.read<QuranCubit>().loadSurahIfNeeded(surahNum);
-      setState(() {
-        _currentPageNumber = pageNum;
-        _currentSurahName = metadata['surahName'];
-        _currentJuzName = _getJuzName(_getJuzNumberForPage(pageNum));
-      });
-    }
+void _onPageChanged(int index) {
+  final pageNum = index + 1;
+  final metadata = QuranMetadata.pageToSurah[pageNum];
+  if (metadata != null) {
+    final surahNum = metadata['surahNumber'] as int;
+    context.read<QuranCubit>().loadSurahIfNeeded(surahNum);
+    
+    setState(() {
+      _currentPageNumber = pageNum;
+      _currentSurahName = metadata['surahName'];
+      _currentJuzName = _getJuzName(_getJuzNumberForPage(pageNum));
+    });
+
+    // ── Save automatically on page swipe ──
+    _saveCurrentPageToLastRead();
+  }
+}
+
+Future<void> _saveCurrentPageToLastRead() async {
+  final metadata = QuranMetadata.pageToSurah[_currentPageNumber];
+  if (metadata == null) return;
+
+  final surahName = metadata['surahName'] as String? ?? _currentSurahName;
+  final surahNumber = metadata['surahNumber'] as int? ?? 1;
+
+  // Update SharedPreferences
+  final prefs = locator<SharedPreferences>();
+  await prefs.setString('last_read_surah_name', surahName);
+  await prefs.setInt('last_read_page_number', _currentPageNumber);
+  await prefs.setInt('last_read_verse_number', 1);
+  await prefs.setInt('last_read_surah_number', surahNumber);
+
+  // Update the ValueNotifier driving the home banner UI
+  QuranLastReadHelper.update(surahName, _currentPageNumber, 1);
+}
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _saveCurrentPageToLastRead();
+    super.dispose();
   }
 }

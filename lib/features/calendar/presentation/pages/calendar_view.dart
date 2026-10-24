@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/features/calendar/presentation/bloc/calendar_cubit.dart';
+import 'package:islamic_app/features/calendar/presentation/widgets/next_occasion_section.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_state.dart';
 import 'package:islamic_app/features/calendar/presentation/widgets/calendar_view_header.dart';
 import 'package:islamic_app/features/calendar/presentation/widgets/next_prayer_countdown_card.dart';
 import 'package:islamic_app/features/calendar/presentation/widgets/prayer_times_card.dart';
-import 'package:islamic_app/features/calendar/presentation/widgets/quran_stats_card.dart';
 
 class CalendarView extends StatelessWidget {
   const CalendarView({super.key});
@@ -124,8 +124,16 @@ class _CalendarPageContent extends StatelessWidget {
                     right: 20,
                     bottom: 24,
                   ),
-                  child: const QuranStatsCard(),
+                  child: NextOccasionSection()
                 ),
+                // Padding(
+                //   padding: const EdgeInsets.only(
+                //     left: 20,
+                //     right: 20,
+                //     bottom: 24,
+                //   ),
+                //   child: const QuranStatsCard(),
+                // ),
               ],
             ),
           ),
