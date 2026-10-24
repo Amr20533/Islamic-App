@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
@@ -8,6 +10,7 @@ import 'package:islamic_app/features/profile/presentation/pages/report_problem_v
 import 'package:islamic_app/features/profile/presentation/pages/rate_app_view.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileSettingsCard extends StatelessWidget {
   const ProfileSettingsCard({super.key});
@@ -79,11 +82,32 @@ class ProfileSettingsCard extends StatelessWidget {
             label: 'تقيم التطبيق',
             labelColor: labelColor,
             iconColor: primaryColor,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const RateAppView()),
-              );
+            onTap: () async{
+
+              const androidPackageName = 'com.maab.islamic_app'; 
+              const iosAppId = '1234567890'; // Your numeric Apple App ID
+
+              Uri marketUrl;
+              Uri webUrl;
+
+              if (Platform.isIOS) {
+                // Opens the review page directly on iOS App Store
+                marketUrl = Uri.parse('itms-apps://itunes.apple.com/app/id$iosAppId?action=write-review');
+                webUrl = Uri.parse('https://apps.apple.com/app/id$iosAppId?action=write-review');
+              } else {
+                // Android Play Store
+                marketUrl = Uri.parse('market://details?id=$androidPackageName');
+                webUrl = Uri.parse('https://play.google.com/store/apps/details?id=$androidPackageName');
+              }
+
+              if (await canLaunchUrl(marketUrl)) {
+                await launchUrl(marketUrl, mode: LaunchMode.externalApplication);
+              } else if (await canLaunchUrl(webUrl)) {
+                await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+              }              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (_) => const RateAppView()),
+              // );
             },
           ),
           Divider(height: 1, thickness: 0.5, color: dividerColor),
