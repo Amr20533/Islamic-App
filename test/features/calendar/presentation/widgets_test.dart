@@ -9,11 +9,7 @@ import 'package:islamic_app/core/services/helpers/islamic_occasion_helper.dart';
 
 void main() {
   Widget buildTestableWidget(Widget child) {
-    return MaterialApp(
-      home: Scaffold(
-        body: child,
-      ),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   setUpAll(() async {
@@ -21,7 +17,9 @@ void main() {
   });
 
   group('Calendar View Widgets Tests', () {
-    testWidgets('CalendarViewHeader renders correct dates and title', (WidgetTester tester) async {
+    testWidgets('CalendarViewHeader renders correct dates and title', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         buildTestableWidget(
           const CalendarViewHeader(
@@ -36,31 +34,36 @@ void main() {
       expect(find.text('١٣ يونيو ٢٠٢٦'), findsOneWidget);
     });
 
-    testWidgets('NextPrayerCountdownCard displays countdown components correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        buildTestableWidget(
-          const NextPrayerCountdownCard(
-            nextPrayerName: 'العصر',
-            countdown: '01:23:45',
+    testWidgets(
+      'NextPrayerCountdownCard displays countdown components correctly',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          buildTestableWidget(
+            const NextPrayerCountdownCard(
+              nextPrayerName: 'العصر',
+              countdown: '01:23:45',
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('الصلاة القادمة'), findsOneWidget);
-      expect(find.text('العصر'), findsOneWidget);
+        expect(find.text('الصلاة القادمة'), findsOneWidget);
+        expect(find.text('العصر'), findsOneWidget);
 
-      // Verify countdown unit values are present
-      expect(find.text('01'), findsOneWidget);
-      expect(find.text('23'), findsOneWidget);
-      expect(find.text('45'), findsOneWidget);
+        // Verify countdown unit values are present
+        expect(find.text('01'), findsOneWidget);
+        expect(find.text('23'), findsOneWidget);
+        expect(find.text('45'), findsOneWidget);
 
-      // Verify labels are present
-      expect(find.text('ساعة'), findsOneWidget);
-      expect(find.text('دقيقة'), findsNWidgets(3));
-      expect(find.text('ثانيه'), findsOneWidget);
-    });
+        // Verify labels are present
+        expect(find.text('ساعة'), findsOneWidget);
+        expect(find.text('دقيقة'), findsNWidgets(3));
+        expect(find.text('ثانيه'), findsOneWidget);
+      },
+    );
 
-    testWidgets('PrayerTimesCard renders all prayer rows and formatted times', (WidgetTester tester) async {
+    testWidgets('PrayerTimesCard renders all prayer rows and formatted times', (
+      WidgetTester tester,
+    ) async {
       // Mock today's prayers mapping
       final todayPrayers = {
         'الفجر': DateTime(2026, 6, 13, 3, 30),
@@ -72,9 +75,7 @@ void main() {
       };
 
       await tester.pumpWidget(
-        buildTestableWidget(
-          PrayerTimesCard(todayPrayers: todayPrayers),
-        ),
+        buildTestableWidget(PrayerTimesCard(todayPrayers: todayPrayers)),
       );
 
       expect(find.text('أوقات الصلاة'), findsOneWidget);
@@ -88,25 +89,28 @@ void main() {
       expect(find.text('العشاء'), findsOneWidget);
     });
 
-    testWidgets('IslamicOccasionCard displays the occasion detail correctly', (WidgetTester tester) async {
+    testWidgets('IslamicOccasionCard displays the occasion detail correctly', (
+      WidgetTester tester,
+    ) async {
       const occasion = IslamicOccasion(
         name: 'عيد الفطر المبارك',
-        description: 'يوم الفرحة والسرور بعد صيام رمضان، اجعله يومًا للشكر وصلة الأرحام.',
+        description:
+            'يوم الفرحة والسرور بعد صيام رمضان، اجعله يومًا للشكر وصلة الأرحام.',
         month: 10,
         day: 1,
       );
 
       await tester.pumpWidget(
-        buildTestableWidget(
-          const IslamicOccasionCard(occasion: occasion),
-        ),
+        buildTestableWidget(const IslamicOccasionCard(occasion: occasion)),
       );
 
       expect(find.text('المناسبة الدينية القادمة'), findsOneWidget);
       expect(find.text('عيد الفطر المبارك'), findsOneWidget);
       expect(find.text('استعد لهذه المناسبة المباركة 🌿'), findsOneWidget);
       expect(
-        find.text('يوم الفرحة والسرور بعد صيام رمضان، اجعله يومًا للشكر وصلة الأرحام.'),
+        find.text(
+          'يوم الفرحة والسرور بعد صيام رمضان، اجعله يومًا للشكر وصلة الأرحام.',
+        ),
         findsOneWidget,
       );
     });

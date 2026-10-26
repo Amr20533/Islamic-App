@@ -4,7 +4,7 @@ description: "A new Flutter project."
 
 publish_to: 'none'
 
-version: 1.0.0+7
+version: 1.0.0+10
 
 environment:
   sdk: ^3.8.1
@@ -71,6 +71,7 @@ flutter:
     - assets/images/
     - assets/svg/
     - assets/quran_search.json
+    - shorebird.yaml
 
   fonts:
     - family: Tajawal

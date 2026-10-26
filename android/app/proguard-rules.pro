@@ -45,3 +45,8 @@
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
+
+##───────────────────────────────────────────────────────────────────────────────
+## Google Play Core (referenced by Flutter engine deferred components, not used here)
+##───────────────────────────────────────────────────────────────────────────────
+-dontwarn com.google.android.play.core.**
