@@ -1,11 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/features/home/presentation/widgets/daily_plan_card.dart';
+import 'package:islamic_app/features/home/presentation/widgets/home_header.dart';
 import 'package:islamic_app/features/home/presentation/widgets/progress_card.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
-import 'package:islamic_app/features/profile/presentation/bloc/profile_state.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -20,84 +17,12 @@ class HomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                BlocBuilder<ProfileCubit, ProfileState>(
-                  builder: (context, state) {
-                    final String name = state is ProfileLoaded
-                        ? state.profileName
-                        : '';
-                    final String? imagePath = state is ProfileLoaded
-                        ? state.profileImagePath
-                        : null;
-                    final String? gender = state is ProfileLoaded
-                        ? state.gender
-                        : null;
+                HomeHeader(),
 
-                    final greetingText = name.isNotEmpty
-                        ? "السلام عليكم، $name"
-                        : "السلام عليكم";
-
-                    ImageProvider avatarImage;
-                    if (imagePath != null && File(imagePath).existsSync()) {
-                      avatarImage = FileImage(File(imagePath));
-                    } else if (gender == 'female') {
-                      avatarImage = const AssetImage(
-                        'assets/images/Ellipse 12 (1).png',
-                      );
-                    } else if (gender == 'male') {
-                      avatarImage = const AssetImage(
-                        'assets/images/Ellipse 12.png',
-                      );
-                    } else {
-                      avatarImage = const AssetImage(
-                        'assets/images/avatar_1.jpg',
-                      );
-                    }
-
-                    return Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Row(
-                        spacing: 12,
-                        children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundImage: avatarImage,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                greetingText,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleLarge?.copyWith(height: 1.2),
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                spacing: 3,
-                                children: [
-                                  Text(
-                                    "جميل أنك عدت اليوم",
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelMedium,
-                                  ),
-                                  Image.asset(
-                                    "assets/icons/like.png",
-                                    width: 16,
-                                    height: 16,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                SizedBox(
+                  height: (MediaQuery.sizeOf(context).height * 0.035)
+                      .clamp(8.0, 14.0),
                 ),
-
-                const SizedBox(height: 14),
-
                 IntrinsicHeight(
                   child: SizedBox(
                     width: 264,
@@ -128,21 +53,23 @@ class HomeView extends StatelessWidget {
                     constraints: const BoxConstraints(maxWidth: 600),
                     child: Column(
                       children: [
-                        const SizedBox(height: 20),
+                        SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
                         Text(
                           "\"أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ\"",
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w400),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 20),
-                        const DailyPlanCard(),
-                        const SizedBox(height: 20),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w400,
+                        fontSize: (MediaQuery.sizeOf(context).width * 0.045).clamp(10.0, 20.0),
+                      ),
+                      textAlign: TextAlign.center),
+                      SizedBox(
+                          height: (MediaQuery.sizeOf(context).height * 0.04).clamp(16.0, 32.0),
+                        ),                           const DailyPlanCard(),
+                        SizedBox(height: MediaQuery.sizeOf(context).height * 0.050),                        
                         const ProgressCard(
                           icon: 'assets/icons/progress.png',
                           leading: 'استمرارك ',
                         ),
-                        const SizedBox(height: 20),
+                        // const SizedBox(height: 61),
                       ],
                     ),
                   ),
