@@ -44,14 +44,34 @@ class AdhanBloc extends Bloc<AdhanEvent, AdhanState> {
   void _startForegroundTimer(PrayerTimes prayerTimes) {
     _adhanTimer?.cancel();
 
-    final nextPrayer = prayerTimes.nextPrayer();
-    if (nextPrayer == Prayer.none) return;
+    // Explicitly define the 5 actual prayers, skipping sunrise entirely
+    const realPrayers = [
+      Prayer.fajr,
+      Prayer.dhuhr,
+      Prayer.asr,
+      Prayer.maghrib,
+      Prayer.isha,
+    ];
 
-    final prayerName = _translate(nextPrayer);
-    final prayerTime = prayerTimes.timeForPrayer(nextPrayer);
-    if (prayerTime == null) return;
+    final now = DateTime.now();
+    Prayer? nextRealPrayer;
+    DateTime? nextPrayerTime;
 
-    final duration = prayerTime.difference(DateTime.now());
+    // Find the next upcoming real prayer for today
+    for (final prayer in realPrayers) {
+      final time = prayerTimes.timeForPrayer(prayer);
+      if (time != null && time.isAfter(now)) {
+        nextRealPrayer = prayer;
+        nextPrayerTime = time;
+        break; // Chronological order ensures the first future match is the next prayer
+      }
+    }
+
+    // If all 5 prayers for today have passed, exit (or handle tomorrow if needed)
+    if (nextRealPrayer == null || nextPrayerTime == null) return;
+
+    final prayerName = _translate(nextRealPrayer);
+    final duration = nextPrayerTime.difference(now);
     if (duration.isNegative) return;
 
     _adhanTimer = Timer(duration, () {
