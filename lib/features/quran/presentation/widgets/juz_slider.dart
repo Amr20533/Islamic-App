@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
-
+import 'package:islamic_app/core/utils/app_responsive.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
@@ -46,6 +45,10 @@ class JuzSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleFontSize = AppResponsive.fontSize(context, mobile: 16, tablet: 15, web: 16);
+    final numberFontSize = AppResponsive.fontSize(context, mobile: 13, tablet: 12, web: 13);
+    final iconSize = AppResponsive.value<double>(context, mobile: 38, tablet: 34, web: 38);
+    final rowHeight = AppResponsive.value<double>(context, mobile: 62, tablet: 54, web: 62);
 
     return Expanded(
       child: SizedBox(
@@ -74,7 +77,7 @@ class JuzSlider extends StatelessWidget {
                 }
               },
               child: Container(
-                height: 62,
+                height: rowHeight,
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                 decoration: BoxDecoration(
                   border: !isLast
@@ -95,16 +98,18 @@ class JuzSlider extends StatelessWidget {
                       children: [
                         Image.asset(
                           'assets/icons/surah_number_container.png',
+                          width: iconSize,
+                          height: iconSize,
                           color: isDark ? const Color(0xFFC8A88A) : null,
                         ),
                         Text(
                           '${index + 1}',
-                          style: Theme.of(context).textTheme.headlineSmall!
-                              .copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: isDark ? const Color(0xFFF5F2EE) : null,
-                              ),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: numberFontSize,
+                            fontWeight: FontWeight.w400,
+                            color: isDark ? const Color(0xFFF5F2EE) : null,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -112,14 +117,14 @@ class JuzSlider extends StatelessWidget {
                     const SizedBox(width: 16),
                     Text(
                       juzNames[index],
-                      style:
-                          (AppTextStyles.textTheme.titleLarge ??
-                                  const TextStyle())
-                              .copyWith(
-                                color: isDark
-                                    ? const Color(0xFFF5F2EE)
-                                    : AppColors.thirdTextColor,
-                              ),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? const Color(0xFFF5F2EE)
+                            : AppColors.thirdTextColor,
+                      ),
                     ),
                   ],
                 ),

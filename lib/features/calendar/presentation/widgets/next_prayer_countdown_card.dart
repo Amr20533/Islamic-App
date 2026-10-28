@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 
 class NextPrayerCountdownCard extends StatelessWidget {
   final String nextPrayerName;
@@ -20,12 +22,19 @@ class NextPrayerCountdownCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final cardHeight = AppResponsive.value<double>(
+      context,
+      mobile: 160,
+      tablet: 150,
+      web: 170,
+    );
+
     return Container(
-      height: 140,
+      height: cardHeight,
       width: double.infinity,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF242220) : null,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         border: isDark
             ? Border.all(color: const Color(0xFF383430), width: 1)
             : null,
@@ -52,10 +61,7 @@ class NextPrayerCountdownCard extends StatelessWidget {
                 ),
               ],
       ),
-      padding: const EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -63,22 +69,24 @@ class NextPrayerCountdownCard extends StatelessWidget {
             "الصلاة القادمة",
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 16,
+              fontSize: AppResponsive.fontSize(context, mobile: 16, tablet: 13, web: 15),
               fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
+              color: isDark
+                  ? const Color(0xFFB8AEA5)
+                  : AppColors.thirdTextColor,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             nextPrayerName,
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 20,
+              fontSize: AppResponsive.fontSize(context, mobile: 20, tablet: 16, web: 18),
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           Directionality(
             textDirection: TextDirection.ltr,
             child: Row(
@@ -111,6 +119,9 @@ class _TimeUnit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final numSize = AppResponsive.fontSize(context, mobile: 20, tablet: 16, web: 18);
+    final lblSize = AppResponsive.fontSize(context, mobile: 12, tablet: 10, web: 11);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -118,17 +129,17 @@ class _TimeUnit extends StatelessWidget {
           value,
           style: TextStyle(
             fontFamily: 'Tajawal',
-            fontSize: 20,
+            fontSize: numSize,
             fontWeight: FontWeight.bold,
             color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6.h),
         Text(
           label,
           style: TextStyle(
             fontFamily: 'Tajawal',
-            fontSize: 12,
+            fontSize: lblSize,
             fontWeight: FontWeight.bold,
             color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
             height: 1.0,
@@ -146,6 +157,9 @@ class _Colon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final numSize = AppResponsive.fontSize(context, mobile: 20, tablet: 16, web: 18);
+    final lblSize = AppResponsive.fontSize(context, mobile: 12, tablet: 10, web: 11);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -153,20 +167,22 @@ class _Colon extends StatelessWidget {
           ':',
           style: TextStyle(
             fontFamily: 'Tajawal',
-            fontSize: 20,
+            fontSize: numSize,
             fontWeight: FontWeight.bold,
-            color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryTextColor,
+            color: isDark
+                ? const Color(0xFFC8A88A)
+                : AppColors.primaryTextColor,
             height: 1.0,
           ),
         ),
-        const SizedBox(height: 6),
-        const Opacity(
+        SizedBox(height: 6.h),
+        Opacity(
           opacity: 0,
           child: Text(
             'دقيقة',
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 12,
+              fontSize: lblSize,
               fontWeight: FontWeight.bold,
               height: 1.0,
             ),

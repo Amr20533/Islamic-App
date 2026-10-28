@@ -9,10 +9,11 @@ class OnboardingImageCubit extends Cubit<OnboardingImageState> {
     : super(const OnboardingImageState());
 
   Future<void> pickImage() async {
-    final image = await imagePickerService.pickImage();
+    final xFile = await imagePickerService.pickImage();
+    if (xFile == null) return;
 
-    if (image == null) return;
-
-    emit(state.copyWith(image: image));
+    // readAsBytes() works on both web and mobile
+    final bytes = await xFile.readAsBytes();
+    emit(state.copyWith(imageBytes: bytes));
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 import 'package:islamic_app/features/azkar/presentation/widgets/tour_completed_card.dart';
 import 'package:islamic_app/core/constants/daily_content.dart';
 
@@ -52,7 +52,15 @@ class _DailyZikrState extends State<DailyZikr> {
               size: 18,
             ),
           ),
-          title: Text("ذكر اليوم", style: theme.textTheme.titleLarge),
+          title: Text(
+            "ذكر اليوم",
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: AppResponsive.fontSize(context, mobile: 20, tablet: 16, web: 18),
+              fontWeight: FontWeight.w700,
+              color: isDark ? const Color(0xFFF5F2EE) : null,
+            ),
+          ),
         ),
         body: SizedBox.expand(
           child: Stack(
@@ -95,7 +103,15 @@ class _DailyZikrState extends State<DailyZikr> {
                             child: Center(
                               child: Text(
                                 "${state.count} / ${state.maxCount}",
-                                style: theme.textTheme.displaySmall?.copyWith(
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: AppResponsive.fontSize(
+                                    context,
+                                    mobile: 84,
+                                    tablet: 52,
+                                    web: 64,
+                                  ),
+                                  fontWeight: FontWeight.w400,
                                   height: 1,
                                   color: isDark ? const Color(0xFFC8A88A) : null,
                                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/di/locator.dart';
@@ -39,9 +40,9 @@ class _CalendarPageContent extends StatelessWidget {
                   hijriDate: FormatHelper.getHijriFormattedDate(),
                   gregorianDate: FormatHelper.getMiladFormattedDate(),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: BlocBuilder<PrayerCubit, PrayerState>(
                     builder: (context, state) {
                       if (state is PrayerLoaded) {
@@ -62,9 +63,9 @@ class _CalendarPageContent extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: BlocBuilder<PrayerCubit, PrayerState>(
                     builder: (context, state) {
                       if (state is PrayerLoading || state is PrayerInitial) {
@@ -117,12 +118,12 @@ class _CalendarPageContent extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    bottom: 24,
+                  padding: EdgeInsets.only(
+                    left: 20.w,
+                    right: 20.w,
+                    bottom: 24.h,
                   ),
                   child: NextOccasionSection()
                 ),

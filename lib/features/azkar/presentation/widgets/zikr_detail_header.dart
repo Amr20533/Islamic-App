@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 
 class ZikrDetailHeader extends StatelessWidget {
   final String title;
@@ -10,8 +12,11 @@ class ZikrDetailHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final titleSize = AppResponsive.fontSize(context, mobile: 18, tablet: 15, web: 16);
+    final iconSize = AppResponsive.fontSize(context, mobile: 32, tablet: 28, web: 30);
+
     return SizedBox(
-      height: 56,
+      height: 56.h,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -19,7 +24,7 @@ class ZikrDetailHeader extends StatelessWidget {
             title,
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 18,
+              fontSize: titleSize,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
             ),
@@ -30,7 +35,7 @@ class ZikrDetailHeader extends StatelessWidget {
               icon: Icon(
                 Icons.chevron_left,
                 color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3D3020),
-                size: 32,
+                size: iconSize,
               ),
               onPressed: () => Navigator.pop(context),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 
 class BottomNavItem extends StatelessWidget {
@@ -40,20 +41,20 @@ class BottomNavItem extends StatelessWidget {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
               color: isSelected ? effectiveActiveColor : Colors.transparent,
               shape: BoxShape.circle,
             ),
             child: Image.asset(
               iconPath,
-              width: 24,
-              height: 24,
+              width: 24.w,
+              height: 24.h,
               cacheWidth: 800,
               color: isSelected ? AppColors.whiteColor : effectiveUnselectedIconColor,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(
             label,
             style: TextStyle(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:islamic_app/features/quran/data/models/surah_category.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 
 class BookmarkTile extends StatelessWidget {
   const BookmarkTile({
@@ -16,8 +16,14 @@ class BookmarkTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final nameSize = AppResponsive.fontSize(context, mobile: 16, tablet: 15, web: 16);
+    final metaSize = AppResponsive.fontSize(context, mobile: 14, tablet: 12, web: 13);
+    final numSize = AppResponsive.fontSize(context, mobile: 14, tablet: 12, web: 13);
+    final iconSize = AppResponsive.value<double>(context, mobile: 38, tablet: 34, web: 38);
+    final rowHeight = AppResponsive.value<double>(context, mobile: 62, tablet: 54, web: 62);
+
     return Container(
-      height: 62,
+      height: rowHeight,
       padding: const EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
         border: !isLast
@@ -37,15 +43,18 @@ class BookmarkTile extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/icons/surah_number_container.png',
+                width: iconSize,
+                height: iconSize,
                 color: isDark ? const Color(0xFFC8A88A) : null,
               ),
               Text(
                 '${surahModel.number}',
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: isDark ? const Color(0xFFF5F2EE) : null,
-                    ),
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: numSize,
+                  fontWeight: FontWeight.w400,
+                  color: isDark ? const Color(0xFFF5F2EE) : null,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -57,7 +66,10 @@ class BookmarkTile extends StatelessWidget {
             children: [
               Text(
                 surahModel.name,
-                style: AppTextStyles.textTheme.titleLarge!.copyWith(
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: nameSize,
+                  fontWeight: FontWeight.w700,
                   color: isDark ? const Color(0xFFF5F2EE) : AppColors.thirdTextColor,
                 ),
               ),
@@ -66,7 +78,10 @@ class BookmarkTile extends StatelessWidget {
                 children: [
                   Text(
                     "${surahModel.number}",
-                    style: AppTextStyles.textTheme.labelMedium!.copyWith(
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: metaSize,
+                      fontWeight: FontWeight.w500,
                       color: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
                     ),
                   ),
@@ -79,7 +94,10 @@ class BookmarkTile extends StatelessWidget {
                   ),
                   Text(
                     '${surahModel.versesCount} ايات ',
-                    style: AppTextStyles.textTheme.labelMedium!.copyWith(
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: metaSize,
+                      fontWeight: FontWeight.w500,
                       color: isDark ? const Color(0xFFB8AEA5) : AppColors.hintTextColor,
                     ),
                   ),
@@ -90,8 +108,10 @@ class BookmarkTile extends StatelessWidget {
           const Spacer(),
           Text(
             "${surahModel.wordsCount} حرف ",
-            style: AppTextStyles.textTheme.labelMedium!.copyWith(
-              fontSize: 16,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: metaSize,
+              fontWeight: FontWeight.w500,
               color: isDark ? const Color(0xFFB8AEA5) : null,
             ),
           ),

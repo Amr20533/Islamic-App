@@ -14,7 +14,7 @@ class ProfileViewModel extends ChangeNotifier {
 
     if (image == null) return;
 
-    selectedImage = image;
+    selectedImage = File(image.path);
     notifyListeners();
   }
 }

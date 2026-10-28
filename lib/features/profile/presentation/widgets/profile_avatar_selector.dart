@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:islamic_app/core/utils/profile_image_resolver.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 
 class ProfileAvatarSelector extends StatelessWidget {
@@ -34,16 +34,17 @@ class ProfileAvatarSelector extends StatelessWidget {
               ),
             ),
             child: ClipOval(
-              child: imagePath != null && File(imagePath!).existsSync()
-                  ? Image.file(File(imagePath!), fit: BoxFit.cover)
-                  : Image.asset(
-                      gender == 'female'
-                          ? 'assets/images/Ellipse 12 (1).png'
-                          : gender == 'male'
+              child: Image(
+                image: resolveProfileImage(
+                  imagePath: imagePath,
+                  fallbackAsset: gender == 'female'
+                      ? 'assets/images/Ellipse 12 (1).png'
+                      : gender == 'male'
                           ? 'assets/images/Ellipse 12.png'
                           : 'assets/images/avatar_1.jpg',
-                      fit: BoxFit.cover,
-                    ),
+                ),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           Positioned(

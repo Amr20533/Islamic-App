@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -133,14 +135,44 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Ma\'ab',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeState.themeMode,
-            initialRoute: AppRoutes.splash,
-            onGenerateRoute: AppRoutes.generateRoute,
+          // On web / large screens: use actual window size so ScreenUtil
+          // scale factor = 1.0 (no inflation). Content is then pinned to
+          // a 430-px-wide centred column so it looks like a phone view.
+          final view = WidgetsBinding.instance.platformDispatcher.views.first;
+          final logicalSize = view.physicalSize / view.devicePixelRatio;
+          final designSize =
+              kIsWeb ? logicalSize : const Size(390, 844);
+
+          return ScreenUtilInit(
+            designSize: designSize,
+            splitScreenMode: true,
+            builder: (_, __) => MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Ma\'ab',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeState.themeMode,
+              initialRoute: AppRoutes.splash,
+              onGenerateRoute: AppRoutes.generateRoute,
+              // ── Web / large-screen wrapper ────────────────────────────
+              builder: (context, child) {
+                // Disable system text-scale from inflating our sizes
+                Widget content = MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.noScaling,
+                  ),
+                  child: child!,
+                );
+
+                final screenWidth = MediaQuery.of(context).size.width;
+                if (screenWidth > 600) {
+                  // Tablet / web: just disable system text scaling,
+                  // layout fills the full screen (side nav handles the chrome)
+                  return content;
+                }
+                return content;
+              },
+            ),
           );
         },
       ),

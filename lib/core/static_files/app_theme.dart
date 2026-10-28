@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
 
@@ -61,52 +62,52 @@ class AppTheme {
         outline: darkBorder,
       ),
       fontFamily: AppTextStyles.fontFamily,
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         displayLarge: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 32,
+          fontSize: 32.sp,
           fontWeight: FontWeight.w900,
           height: 1.0,
           color: darkPrimaryAccent,
         ),
         displaySmall: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 84,
+          fontSize: 84.sp,
           fontWeight: FontWeight.w400,
           height: 1.0,
           color: darkPrimaryAccent,
         ),
         titleLarge: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 20,
+          fontSize: 20.sp,
           height: 1.0,
           fontWeight: FontWeight.w700,
           color: darkPrimaryText,
         ),
         titleSmall: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 10,
+          fontSize: 10.sp,
           height: 1.2,
           fontWeight: FontWeight.w400,
           color: darkSecondaryText,
         ),
         bodyLarge: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 18,
+          fontSize: 18.sp,
           fontWeight: FontWeight.w500,
           height: 1.0,
           color: darkPrimaryText,
         ),
         labelMedium: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 14,
+          fontSize: 14.sp,
           fontWeight: FontWeight.w500,
           height: 1.0,
           color: darkSecondaryText,
         ),
         labelSmall: TextStyle(
           fontFamily: AppTextStyles.fontFamily,
-          fontSize: 14,
+          fontSize: 14.sp,
           fontWeight: FontWeight.w400,
           height: 1.0,
           color: darkSecondaryText,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/services/helpers/quran_last_read_helper.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/surah_selector_cubit.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
@@ -54,7 +55,10 @@ class _QuranViewState extends State<QuranView> {
           leading: Container(),
           title: Text(
             "القران",
-            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: AppResponsive.fontSize(context, mobile: 20, tablet: 16, web: 18),
+              fontWeight: FontWeight.w700,
               color: isDark ? const Color(0xFFC8A88A) : null,
             ),
           ),
@@ -90,8 +94,20 @@ class _QuranViewState extends State<QuranView> {
 
                     return Container(
                       width: double.infinity,
-                      height: 132,
-                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      height: AppResponsive.value<double>(
+                        context,
+                        mobile: 132,
+                        tablet: 160,
+                        web: 180,
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppResponsive.value<double>(
+                          context,
+                          mobile: 13,
+                          tablet: 16,
+                          web: 18,
+                        ),
+                      ),
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF282522) : AppColors.authCardBorderColor,
                         borderRadius: BorderRadius.circular(8),
@@ -103,7 +119,8 @@ class _QuranViewState extends State<QuranView> {
                             width: 800,
                             AssetImage('assets/images/quran_banner_1.png'),
                           ),
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
+                          alignment: AlignmentDirectional.centerEnd,
                           colorFilter: isDark
                               ? ColorFilter.mode(
                                   Colors.black.withValues(alpha: 0.65),
@@ -124,13 +141,24 @@ class _QuranViewState extends State<QuranView> {
                               Text(
                                 "تابع من حيث توقفت",
                                 style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
-                                  fontSize: 20,
+                                  fontSize: AppResponsive.fontSize(
+                                    context,
+                                    mobile: 20,
+                                    tablet: 16,
+                                    web: 18,
+                                  ),
                                   color: isDark ? const Color(0xFFF5F2EE) : null,
                                 ),
                               ),
                               Text(
                                 "سورة $displaySurahName • آية $displayVerseNumber • صفحة $displayPageNumber",
                                 style: (AppTextStyles.textTheme.titleMedium ?? const TextStyle()).copyWith(
+                                  fontSize: AppResponsive.fontSize(
+                                    context,
+                                    mobile: 14,
+                                    tablet: 12,
+                                    web: 13,
+                                  ),
                                   color: isDark ? const Color(0xFFC8A88A) : null,
                                 ),
                               ),

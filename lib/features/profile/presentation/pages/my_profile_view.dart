@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:islamic_app/core/utils/profile_image_resolver.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/features/profile/presentation/bloc/profile_cubit.dart';
@@ -82,13 +82,13 @@ class _ProfileContent extends StatelessWidget {
                           ),
                         ),
                         child: ClipOval(
-                          child:
-                              imagePath != null && File(imagePath).existsSync()
-                              ? Image.file(File(imagePath), fit: BoxFit.cover)
-                              : Image.asset(
-                                  defaultAvatarAsset,
-                                  fit: BoxFit.cover,
-                                ),
+                          child: Image(
+                            image: resolveProfileImage(
+                              imagePath: imagePath,
+                              fallbackAsset: defaultAvatarAsset,
+                            ),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

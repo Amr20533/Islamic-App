@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,11 +21,18 @@ class ChooseAPicture extends StatelessWidget {
   static const double _size = 180;
   static const Color _borderColor = Color(0xFFD8CFC6);
 
-  Future<String> _persistImage(File tempFile) async {
+  /// Mobile only: write bytes to disk and return the persisted path.
+  Future<String> _persistImageMobile(Uint8List bytes) async {
     final dir = await getApplicationDocumentsDirectory();
     final fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final saved = await tempFile.copy('${dir.path}/$fileName');
-    return saved.path;
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsBytes(bytes);
+    return file.path;
+  }
+
+  /// Web: encode bytes as base64 and return a data-URI string.
+  String _encodeWebImage(Uint8List bytes) {
+    return 'data:image/jpeg;base64,${base64Encode(bytes)}';
   }
 
   @override
@@ -69,9 +79,9 @@ class ChooseAPicture extends StatelessWidget {
                           border: Border.all(color: _borderColor),
                         ),
                         child: ClipOval(
-                          child: state.image != null
-                              ? Image.file(
-                                  state.image!,
+                          child: state.imageBytes != null
+                              ? Image.memory(
+                                  state.imageBytes!,
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                   height: double.infinity,
@@ -95,7 +105,6 @@ class ChooseAPicture extends StatelessWidget {
               // ── Skip button (optional) ─────────────────────────────
               TextButton(
                 onPressed: () {
-                  // Skip without saving image → go to gender selection
                   Navigator.pushNamed(context, AppRoutes.genderSelectionView);
                 },
                 child: Text(
@@ -115,13 +124,20 @@ class ChooseAPicture extends StatelessWidget {
                 builder: (context, state) {
                   return AppPrimaryButton(
                     onPressed: () async {
-                      if (state.image != null) {
-                        // Persist image and save to profile
-                        final savedPath = await _persistImage(state.image!);
+                      if (state.imageBytes != null) {
+                        String savedPath;
+                        if (kIsWeb) {
+                          // On web: store base64 data-URI in SharedPreferences
+                          savedPath = _encodeWebImage(state.imageBytes!);
+                        } else {
+                          // On mobile: persist bytes to disk and store path
+                          savedPath =
+                              await _persistImageMobile(state.imageBytes!);
+                        }
                         if (!context.mounted) return;
-                        await context.read<ProfileCubit>().updateProfileImage(
-                          savedPath,
-                        );
+                        await context
+                            .read<ProfileCubit>()
+                            .updateProfileImage(savedPath);
                       }
                       if (!context.mounted) return;
                       Navigator.pushNamed(

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/features/azkar/presentation/bloc/daily_dhikr_cubit.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_shadows.dart';
-import 'package:islamic_app/core/static_files/app_text_styles.dart';
 import 'package:islamic_app/di/locator.dart';
 import 'package:islamic_app/core/services/streak_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,21 +19,21 @@ class TourCompletedCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      height: 500,
-      padding: const EdgeInsets.symmetric(horizontal: 47, vertical: 46),
-      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: 47.w, vertical: 46.h),
+      margin: EdgeInsets.symmetric(horizontal: 24.w),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF282522) : context.tertiaryColor,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(32.r),
         boxShadow: isDark ? const [] : AppShadows.customShadow,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 88,
-            width: 88,
-            padding: const EdgeInsets.all(2),
+            height: 88.h,
+            width: 88.h,
+            padding: EdgeInsets.all(2.r),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E1C1A) : AppColors.whiteColor,
               shape: BoxShape.circle,
@@ -51,12 +51,12 @@ class TourCompletedCard extends StatelessWidget {
               child: Image.asset("assets/icons/Check.png"),
             ),
           ),
-          const SizedBox(height: 64),
+          SizedBox(height: 48.h),
           Text(
             "تمت الجولة",
             style: theme.textTheme.titleLarge,
           ),
-          const SizedBox(height: 64),
+          SizedBox(height: 48.h),
           AppPrimaryButton(
             onPressed: () async {
               final now = DateTime.now();
@@ -73,7 +73,7 @@ class TourCompletedCard extends StatelessWidget {
             },
             label: 'تم',
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           AppPrimaryButton(
             onPressed: () {
               context.read<DailyDhikrCubit>().resetCount();

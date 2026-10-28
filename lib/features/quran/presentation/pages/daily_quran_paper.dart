@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/core/services/extensions/theme_extension.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_text_styles.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 import 'package:islamic_app/core/widgets/app_primary_button.dart';
 import 'package:islamic_app/features/quran/data/models/quran_metadata.dart';
 import 'package:islamic_app/features/quran/presentation/bloc/quran_cubit.dart';
@@ -73,7 +74,10 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
           ),
           title: Text(
             "صفحة من القرآن",
-            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: AppResponsive.fontSize(context, mobile: 20, tablet: 16, web: 18),
+              fontWeight: FontWeight.w700,
               color: isDark ? const Color(0xFFC8A88A) : null,
             ),
           ),

@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,11 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 class OnboardingImagePicker extends StatelessWidget {
   const OnboardingImagePicker({
     super.key,
-    required this.image,
+    required this.imageBytes,
     required this.onTap,
   });
 
-  final File? image;
+  final Uint8List? imageBytes;
   final VoidCallback onTap;
 
   static const double _size = 180;
@@ -34,9 +34,9 @@ class OnboardingImagePicker extends StatelessWidget {
             border: Border.all(color: _borderColor),
           ),
           child: ClipOval(
-            child: image != null
-                ? Image.file(
-                    image!,
+            child: imageBytes != null
+                ? Image.memory(
+                    imageBytes!,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,

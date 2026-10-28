@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 
 class AdanViewHeader extends StatelessWidget {
   const AdanViewHeader({super.key});
@@ -10,10 +12,14 @@ class AdanViewHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final titleSize = AppResponsive.fontSize(context, mobile: 22, tablet: 18, web: 20);
+    final dateSize = AppResponsive.fontSize(context, mobile: 14, tablet: 12, web: 13);
+    final iconSize = AppResponsive.fontSize(context, mobile: 20, tablet: 18, web: 20);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
         Row(
           children: [
             IconButton(
@@ -22,7 +28,7 @@ class AdanViewHeader extends StatelessWidget {
                 color: isDark
                     ? const Color(0xFFF5F2EE)
                     : AppColors.counterColor,
-                size: 20,
+                size: iconSize,
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -32,7 +38,7 @@ class AdanViewHeader extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
-                  fontSize: 22,
+                  fontSize: titleSize,
                   fontWeight: FontWeight.w900,
                   color: isDark
                       ? const Color(0xFFC8A88A)
@@ -41,15 +47,15 @@ class AdanViewHeader extends StatelessWidget {
               ),
             ),
             // Placeholder to keep the title centered opposite the back button
-            const SizedBox(width: 48),
+            SizedBox(width: 48.w),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Text(
           FormatHelper.getMiladFormattedDate(),
           style: TextStyle(
             fontFamily: 'Tajawal',
-            fontSize: 14,
+            fontSize: dateSize,
             fontWeight: FontWeight.w500,
             color: isDark ? const Color(0xFFB8AEA5) : AppColors.thirdTextColor,
           ),

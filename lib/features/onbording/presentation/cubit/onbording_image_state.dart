@@ -1,11 +1,13 @@
-import 'dart:io';
+import 'dart:typed_data';
 
+/// Holds the picked image as raw bytes so it works on both
+/// Flutter Web (no dart:io File support) and mobile.
 class OnboardingImageState {
-  final File? image;
+  final Uint8List? imageBytes;
 
-  const OnboardingImageState({this.image});
+  const OnboardingImageState({this.imageBytes});
 
-  OnboardingImageState copyWith({File? image}) {
-    return OnboardingImageState(image: image ?? this.image);
+  OnboardingImageState copyWith({Uint8List? imageBytes}) {
+    return OnboardingImageState(imageBytes: imageBytes ?? this.imageBytes);
   }
 }

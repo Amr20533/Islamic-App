@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/services/helpers/format_helper.dart';
 import 'package:islamic_app/core/static_files/app_routes.dart';
+import 'package:islamic_app/core/utils/app_responsive.dart';
 import 'package:islamic_app/core/widgets/custom_asset_image.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PrayerTimesCard extends StatelessWidget {
   final Map<String, DateTime?> todayPrayers;
@@ -21,7 +23,7 @@ class PrayerTimesCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF242220) : null,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         border: isDark
             ? Border.all(color: const Color(0xFF383430), width: 1)
             : null,
@@ -51,7 +53,7 @@ class PrayerTimesCard extends StatelessWidget {
               ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.r),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -62,7 +64,7 @@ class PrayerTimesCard extends StatelessWidget {
                   "أوقات الصلاة",
                   style: TextStyle(
                     fontFamily: 'Tajawal',
-                    fontSize: 16,
+                    fontSize: AppResponsive.fontSize(context, mobile: 16, tablet: 13, web: 14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? const Color(0xFFC8A88A) : AppColors.counterColor,
                   ),
@@ -73,8 +75,8 @@ class PrayerTimesCard extends StatelessWidget {
                   },
                   child: SvgPicture.asset(
                     "assets/svg/proicons_bell.svg",
-                    width: 24,
-                    height: 24,
+                    width: 24.w,
+                    height: 24.h,
                     colorFilter: isDark
                         ? const ColorFilter.mode(
                             Color(0xFFC8A88A),
@@ -85,57 +87,37 @@ class PrayerTimesCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             _PrayerRow(
               name: "الفجر",
               time: todayPrayers["الفجر"],
               iconPath: "assets/images/fajr.png",
             ),
-            Divider(
-              height: 1,
-              thickness: 0.5,
-              color: dividerColor,
-            ),
+            Divider(height: 1, thickness: 0.5, color: dividerColor),
             _PrayerRow(
               name: "الشروق",
               time: todayPrayers["الشروق"],
               iconPath: "assets/images/sunrise.png",
             ),
-            Divider(
-              height: 1,
-              thickness: 0.5,
-              color: dividerColor,
-            ),
+            Divider(height: 1, thickness: 0.5, color: dividerColor),
             _PrayerRow(
               name: "الظهر",
               time: todayPrayers["الظهر"],
               iconPath: "assets/images/dhuhr.png",
             ),
-            Divider(
-              height: 1,
-              thickness: 0.5,
-              color: dividerColor,
-            ),
+            Divider(height: 1, thickness: 0.5, color: dividerColor),
             _PrayerRow(
               name: "العصر",
               time: todayPrayers["العصر"],
               iconPath: "assets/images/asr.png",
             ),
-            Divider(
-              height: 1,
-              thickness: 0.5,
-              color: dividerColor,
-            ),
+            Divider(height: 1, thickness: 0.5, color: dividerColor),
             _PrayerRow(
               name: "المغرب",
               time: todayPrayers["المغرب"],
               iconPath: "assets/images/maghrib.png",
             ),
-            Divider(
-              height: 1,
-              thickness: 0.5,
-              color: dividerColor,
-            ),
+            Divider(height: 1, thickness: 0.5, color: dividerColor),
             _PrayerRow(
               name: "العشاء",
               time: todayPrayers["العشاء"],
@@ -166,30 +148,30 @@ class _PrayerRow extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               if (isPng)
-                CustomAssetImage(image: iconPath, width: 32, height: 32)
+                CustomAssetImage(image: iconPath, width: 32.w, height: 32.h)
               else
                 SvgPicture.asset(
                   iconPath,
-                  width: 24,
-                  height: 24,
+                  width: 24.w,
+                  height: 24.h,
                   colorFilter: ColorFilter.mode(
                     isDark ? const Color(0xFFC8A88A) : Colors.grey,
                     BlendMode.srcIn,
                   ),
                 ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8.w),
               Text(
                 name,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
-                  fontSize: 16,
+                  fontSize: AppResponsive.fontSize(context, mobile: 16, tablet: 13, web: 14),
                   fontWeight: FontWeight.bold,
                   color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
                 ),
@@ -200,7 +182,7 @@ class _PrayerRow extends StatelessWidget {
             FormatHelper.formatTime12Hour(time),
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 16,
+              fontSize: AppResponsive.fontSize(context, mobile: 16, tablet: 13, web: 14),
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFF5F2EE) : AppColors.counterColor,
             ),
