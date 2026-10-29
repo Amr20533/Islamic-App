@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/core/static_files/app_colors.dart';
 import 'package:islamic_app/core/static_files/app_shadows.dart';
 import 'package:islamic_app/features/home/presentation/widgets/bottom_nav_item.dart';
@@ -113,33 +112,36 @@ class _PhoneLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[currentIndex],
-      bottomNavigationBar: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Container(
-          margin: EdgeInsets.fromLTRB(24.w, 0, 24.w, 24.h),
-          padding: EdgeInsets.symmetric(vertical: 6.h),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(32.r),
-            border: Border.all(
-              width: 1,
-              color: Theme.of(
-                context,
-              ).colorScheme.outline.withValues(alpha: 0.4),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                width: 1,
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.4),
+              ),
+              boxShadow: AppShadows.customShadow,
             ),
-            boxShadow: AppShadows.customShadow,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(navItems.length, (i) {
-              return BottomNavItem(
-                index: i,
-                currentIndex: currentIndex,
-                iconPath: navItems[i].icon,
-                label: navItems[i].label,
-                onTap: () => onTabSelected(i),
-              );
-            }),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(navItems.length, (i) {
+                return BottomNavItem(
+                  index: i,
+                  currentIndex: currentIndex,
+                  iconPath: navItems[i].icon,
+                  label: navItems[i].label,
+                  onTap: () => onTabSelected(i),
+                );
+              }),
+            ),
           ),
         ),
       ),

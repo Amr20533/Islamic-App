@@ -84,26 +84,20 @@ class _MobileLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const HomeHeader(),
-            const SizedBox(height: 14),
-            const _DateRow(),
-            const SizedBox(height: 20),
-            const _HadithText(),
-            const SizedBox(height: 20),
-            const DailyPlanCard(),
-            const SizedBox(height: 20),
-            const ProgressCard(
-              icon: 'assets/icons/progress.png',
-              leading: 'استمرارك ',
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: const [
+          HomeHeader(),
+          _DateRow(),
+          _HadithText(),
+          DailyPlanCard(),
+          ProgressCard(
+            icon: 'assets/icons/progress.png',
+            leading: 'استمرارك ',
+          ),
+        ],
       ),
     );
   }
