@@ -57,63 +57,84 @@ class _MainViewState extends State<MainView> {
       },
       child: Scaffold(
         body: pages[currentIndex],
-        bottomNavigationBar: Directionality(
-          textDirection: TextDirection.rtl,
-          child: Container(
-            margin: EdgeInsets.fromLTRB(
-              24,
-              0,
-              24,
-              24
-              // MediaQuery.of(context).viewPadding.bottom + 24,
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(width: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4)),
-              boxShadow: AppShadows.customShadow,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                BottomNavItem(
-                  index: 0,
-                  currentIndex: currentIndex,
-                  iconPath: 'assets/icons/tabler_home.png',
-                  label: 'الرئيسية',
-                  onTap: () => changePage(0),
+
+        bottomNavigationBar: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+
+              final horizontalMargin = (width * 0.06).clamp(12.0, 24.0);
+              final bottomMargin = (width * 0.04).clamp(8.0, 16.0);
+              final verticalPadding = (width * 0.015).clamp(4.0, 6.0);
+              final borderRadius = (width * 0.08).clamp(24.0, 32.0);
+
+              return Directionality(
+                textDirection: TextDirection.rtl,
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(
+                    horizontalMargin,
+                    0,
+                    horizontalMargin,
+                    bottomMargin,
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    vertical: verticalPadding,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    border: Border.all(
+                      width: 1,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withValues(alpha: 0.4),
+                    ),
+                    boxShadow: AppShadows.customShadow,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      BottomNavItem(
+                        index: 0,
+                        currentIndex: currentIndex,
+                        iconPath: 'assets/icons/tabler_home.png',
+                        label: 'الرئيسية',
+                        onTap: () => changePage(0),
+                      ),
+                      BottomNavItem(
+                        index: 1,
+                        currentIndex: currentIndex,
+                        iconPath: 'assets/icons/book.png',
+                        label: 'القرآن',
+                        onTap: () => changePage(1),
+                      ),
+                      BottomNavItem(
+                        index: 2,
+                        currentIndex: currentIndex,
+                        iconPath: 'assets/icons/Tasbeeh.png',
+                        label: 'الأذكار',
+                        onTap: () => changePage(2),
+                      ),
+                      BottomNavItem(
+                        index: 3,
+                        currentIndex: currentIndex,
+                        iconPath: 'assets/icons/calendar.png',
+                        label: 'التقويم',
+                        onTap: () => changePage(3),
+                      ),
+                      BottomNavItem(
+                        index: 4,
+                        currentIndex: currentIndex,
+                        iconPath: 'assets/icons/lucide_user.png',
+                        label: 'حسابي',
+                        onTap: () => changePage(4),
+                      ),
+                    ],
+                  ),
                 ),
-                BottomNavItem(
-                  index: 1,
-                  currentIndex: currentIndex,
-                  iconPath: 'assets/icons/book.png',
-                  label: 'القرآن',
-                  onTap: () => changePage(1),
-                ),
-                BottomNavItem(
-                  index: 2,
-                  currentIndex: currentIndex,
-                  iconPath: 'assets/icons/Tasbeeh.png',
-                  label: 'الأذكار',
-                  onTap: () => changePage(2),
-                ),
-                BottomNavItem(
-                  index: 3,
-                  currentIndex: currentIndex,
-                  iconPath: 'assets/icons/calendar.png',
-                  label: 'التقويم',
-                  onTap: () => changePage(3),
-                ),
-                BottomNavItem(
-                  index: 4,
-                  currentIndex: currentIndex,
-                  iconPath: 'assets/icons/lucide_user.png',
-                  label: 'حسابي',
-                  onTap: () => changePage(4),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

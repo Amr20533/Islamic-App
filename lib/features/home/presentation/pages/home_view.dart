@@ -63,7 +63,8 @@ class HomeView extends StatelessWidget {
                       textAlign: TextAlign.center),
                       SizedBox(
                           height: (MediaQuery.sizeOf(context).height * 0.04).clamp(16.0, 32.0),
-                        ),                           const DailyPlanCard(),
+                        ),                        
+                        const DailyPlanCard(),
                         SizedBox(height: MediaQuery.sizeOf(context).height * 0.050),                        
                         const ProgressCard(
                           icon: 'assets/icons/progress.png',
