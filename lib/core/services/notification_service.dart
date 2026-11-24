@@ -174,9 +174,13 @@ class NotificationService {
 
   // ── Scheduling ───────────────────────────────────────────────────────────────
 
-  /// Schedule a prayer (Adhan) notification.
-  /// Cancels any existing alarm with the same [id] first.
-  /// If [prayerTime] is in the past, schedules for the next day automatically.
+  /// Schedule a prayer (Adhan) notification that repeats **daily** at the
+  /// same hour and minute.  Uses [DateTimeComponents.time] so Android
+  /// re-arms the alarm automatically every 24 h without any extra code.
+  ///
+  /// This is a *text-only* fallback reminder.  Real Adhan audio playback
+  /// is handled by the native [AlarmScheduler] / [PlaybackService] via
+  /// [AdhanNativeBridge].  Both are scheduled together from [PrayerAlarmCubit].
   Future<void> schedulePrayerNotification({
     required int id,
     required String prayerName,
@@ -195,12 +199,16 @@ class NotificationService {
       );
     }
 
+    // Use matchDateTimeComponents.time so the notification recurs every day
+    // at the same clock time (like a daily alarm), without needing to be
+    // re-scheduled from Dart after each firing.
     await _schedule(
       id: id,
       title: 'حان وقت صلاة $prayerName 🕌',
       body: 'حي على الصلاة، حي على الفلاح',
       at: scheduledTime,
       details: _prayerDetails,
+      recurring: DateTimeComponents.time,
     );
   }
 
@@ -557,30 +565,43 @@ class NotificationService {
   }
 
   Future<void> schedulePrayerReminder({
-  required int id,
-  required String prayerName,
-  required DateTime prayerTime,
-  int minutesBefore = 5,
-}) async {
-  await cancelNotification(id);
- 
-  var scheduledTime = tz.TZDateTime.from(prayerTime, tz.local)
-      .subtract(Duration(minutes: minutesBefore));
-  final now = tz.TZDateTime.now(tz.local);
- 
-  if (scheduledTime.isBefore(now)) {
-    scheduledTime = scheduledTime.add(const Duration(days: 1));
-  }
- 
-  await _schedule(
-    id: id,
-    title: 'آذان $prayerName',
-    body: 'اقتربت صلاة $prayerName',
-    at: scheduledTime,
-    details: _defaultDetails, 
-  );
-}
+    required int id,
+    required String prayerName,
+    required DateTime prayerTime,
+    int minutesBefore = 5,
+  }) async {
+    await cancelNotification(id);
 
+    var scheduledTime = tz.TZDateTime.from(
+      prayerTime,
+      tz.local,
+    ).subtract(Duration(minutes: minutesBefore));
+    final now = tz.TZDateTime.now(tz.local);
+
+    if (scheduledTime.isBefore(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+    }
+
+    final isShuruq = prayerName == 'الشروق';
+    final title = isShuruq
+        ? 'اقترب وقت الشروق ☀️'
+        : 'اقتربت صلاة $prayerName ⏳';
+    final body = isShuruq
+        ? 'متبقي $minutesBefore دقائق على وقت الشروق'
+        : 'متبقي $minutesBefore دقائق على أذان $prayerName، استعد للصلاة 🕌';
+
+    await _schedule(
+      id: id,
+      title: title,
+      body: body,
+      at: scheduledTime,
+      details: _defaultDetails,
+      recurring: DateTimeComponents.time,
+    );
+    debugPrint(
+      '⏰ Scheduled $minutesBefore-min advance reminder for $prayerName at $scheduledTime',
+    );
+  }
 
   // ── Tap Handlers ─────────────────────────────────────────────────────────────
 

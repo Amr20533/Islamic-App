@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:islamic_app/di/locator.dart' as service_locator;
+import 'package:islamic_app/core/services/prayer_calculation_service.dart';
+import 'package:islamic_app/features/prayer/domain/entities/prayer_alarm_config.dart';
+import 'package:islamic_app/features/prayer/presentation/bloc/prayer_alarm_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/user_profile_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/prayer_cubit.dart';
 import 'package:islamic_app/features/prayer/presentation/bloc/adhan_bloc.dart';
@@ -24,7 +27,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const double defaultLat = 30.0444;
 const double defaultLng = 31.2357;
- 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +51,10 @@ void main() async {
   if (sharedPreferences.getDouble('last_lat') == null) {
     _fetchInitialLocationInBackground(sharedPreferences);
   }
-  
+
   _updateLocationInBackground(sharedPreferences);
   _initNotificationsInBackground();
+  _initAlarmsInBackground(sharedPreferences);
 }
 
 // Helper to fetch location after app has already rendered
@@ -67,7 +70,6 @@ Future<void> _fetchInitialLocationInBackground(SharedPreferences prefs) async {
     // Optional: Update your Cubit or restart stream if needed
   }
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -166,6 +168,7 @@ Future<void> _updateLocationInBackground(SharedPreferences prefs) async {
     debugPrint(
       '📍 Location updated: ${position.latitude}, ${position.longitude}',
     );
+    _initAlarmsInBackground(prefs);
   } catch (e) {
     debugPrint('⚠️ Location not available: $e');
   }
@@ -176,4 +179,27 @@ Future<void> _initNotificationsInBackground() async {
   await NotificationService().init();
   await NotificationService().scheduleDailyReminderAt(hour: 8, minute: 0);
   debugPrint('✅ Notifications ready');
+}
+
+Future<void> _initAlarmsInBackground(SharedPreferences prefs) async {
+  try {
+    debugPrint('🕌 Initializing background prayer alarms...');
+    final alarmCubit = service_locator.locator<PrayerAlarmCubit>();
+    await alarmCubit.loadAlarms(prayerAlarmConfigs);
+
+    final double lat = prefs.getDouble('last_lat') ?? defaultLat;
+    final double lng = prefs.getDouble('last_lng') ?? defaultLng;
+    final todayPrayers = await PrayerCalculationService.calculatePrayerTimes(
+      latitude: lat,
+      longitude: lng,
+    );
+
+    await alarmCubit.rescheduleEnabledAlarms(
+      configs: prayerAlarmConfigs,
+      todayPrayers: todayPrayers,
+    );
+    debugPrint('✅ Background prayer alarms armed successfully');
+  } catch (e) {
+    debugPrint('⚠️ Error initializing prayer alarms in background: $e');
+  }
 }

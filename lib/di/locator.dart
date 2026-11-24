@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:islamic_app/core/services/helpers/Adhan_native_bridge.dart';
 import 'package:islamic_app/core/services/helpers/db.helper.dart';
 import 'package:islamic_app/core/theme/theme_cubit.dart';
 import 'package:islamic_app/features/auth/cubit/login_cubit.dart';
@@ -41,6 +42,8 @@ void setupLocator(SharedPreferences sharedPreferences) {
 
   locator.registerSingleton<NotificationService>(NotificationService());
 
+  locator.registerSingleton<AdhanNativeBridge>(AdhanNativeBridge());
+
   locator.registerLazySingleton<ThemeCubit>(
     () => ThemeCubit(locator<SharedPreferences>()),
   );
@@ -82,6 +85,7 @@ void setupLocator(SharedPreferences sharedPreferences) {
     () => PrayerAlarmCubit(
       repository: locator<PrayerAlarmRepository>(),
       notificationService: locator<NotificationService>(),
+      adhanBridge: locator<AdhanNativeBridge>(),
     ),
   );
 

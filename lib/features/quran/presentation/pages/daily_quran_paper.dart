@@ -73,9 +73,8 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
           ),
           title: Text(
             "صفحة من القرآن",
-            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle()).copyWith(
-              color: isDark ? const Color(0xFFC8A88A) : null,
-            ),
+            style: (AppTextStyles.textTheme.titleLarge ?? const TextStyle())
+                .copyWith(color: isDark ? const Color(0xFFC8A88A) : null),
           ),
         ),
         body: Column(
@@ -88,10 +87,15 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                 children: [
                   Text(
                     "سورة $_surahName",
-                    style: (AppTextStyles.textTheme.labelMedium ?? const TextStyle()).copyWith(
-                      color: isDark ? const Color(0xFFF5F2EE) : AppColors.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style:
+                        (AppTextStyles.textTheme.labelMedium ??
+                                const TextStyle())
+                            .copyWith(
+                              color: isDark
+                                  ? const Color(0xFFF5F2EE)
+                                  : AppColors.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -106,9 +110,14 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                     ),
                     child: Text(
                       "صفحة $_pageNumber من 604",
-                      style: (AppTextStyles.textTheme.labelSmall ?? const TextStyle()).copyWith(
-                        color: isDark ? const Color(0xFFC8A88A) : AppColors.primaryColor,
-                      ),
+                      style:
+                          (AppTextStyles.textTheme.labelSmall ??
+                                  const TextStyle())
+                              .copyWith(
+                                color: isDark
+                                    ? const Color(0xFFC8A88A)
+                                    : AppColors.primaryColor,
+                              ),
                     ),
                   ),
                 ],
@@ -133,7 +142,9 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
                       final metadata = QuranMetadata.pageToSurah[_pageNumber];
                       if (metadata != null) {
                         final surahNumber = metadata['surahNumber'] as int;
-                        context.read<QuranCubit>().loadSurahIfNeeded(surahNumber);
+                        context.read<QuranCubit>().loadSurahIfNeeded(
+                          surahNumber,
+                        );
                       }
                       return Center(
                         child: Text(
@@ -181,7 +192,7 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
 
             // Done button at the bottom
             Padding(
-              padding: const EdgeInsets.only(bottom: 37, top: 12),
+              padding: const EdgeInsets.only(bottom: 55, top: 20),
               child: AppPrimaryButton(
                 width: 116,
                 onPressed: () async {
@@ -211,4 +222,3 @@ class _DailyQuranPaperState extends State<DailyQuranPaper> {
     );
   }
 }
-

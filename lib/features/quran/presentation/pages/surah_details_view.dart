@@ -191,12 +191,12 @@ class _SurahDetailsViewState extends State<SurahDetailsView> {
             return MushafPageWidget(
               verses: versesInPage,
               pageNumber: pageNum,
-              bottomPadding: 140.0,
+              bottomPadding: 165.0,
             );
           },
         ),
         PositionedDirectional(
-          bottom: 20,
+          bottom: 50,
           start: 20,
           end: 20,
           child: Align(

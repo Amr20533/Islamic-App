@@ -155,7 +155,11 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
         boxShadow: isDark
             ? const []
             : const [
-                BoxShadow(color: Colors.black12, blurRadius: 15, spreadRadius: 2),
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
               ],
       ),
       padding: EdgeInsets.only(
@@ -188,7 +192,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                   IconButton(
                     icon: Icon(
                       Icons.close,
-                      color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
+                      color: isDark
+                          ? const Color(0xFFF5F2EE)
+                          : const Color(0xFF2C1C12),
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -201,7 +207,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Tajawal',
-                          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF3E2723),
+                          color: isDark
+                              ? const Color(0xFFF5F2EE)
+                              : const Color(0xFF3E2723),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -211,7 +219,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                           fontSize: 12,
                           fontFamily: 'Tajawal',
                           fontWeight: FontWeight.w500,
-                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
+                          color: isDark
+                              ? const Color(0xFFC8A88A)
+                              : const Color(0xFF8B4513),
                         ),
                       ),
                     ],
@@ -232,7 +242,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF282522) : const Color(0xFFF5F1E8),
+                    color: isDark
+                        ? const Color(0xFF282522)
+                        : const Color(0xFFF5F1E8),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isDark
@@ -254,7 +266,9 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
                         style: TextStyle(
                           fontSize: 18,
                           fontFamily: 'QuranFont',
-                          color: isDark ? const Color(0xFFF5F2EE) : const Color(0xFF2C1C12),
+                          color: isDark
+                              ? const Color(0xFFF5F2EE)
+                              : const Color(0xFF2C1C12),
                           height: 1.6,
                         ),
                       ),
@@ -264,144 +278,170 @@ class _VerseAudioBottomSheetState extends State<VerseAudioBottomSheet> {
               ),
             ),
 
-            // Controls section — always visible at bottom
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 36),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Slider Progress Bar
-                  Row(
-                    children: [
-                      Text(
-                        _formatDuration(_position),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF5D4037),
-                          fontFamily: 'Tajawal',
+            // Controls section — always visible at bottom above system navigation
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Slider Progress Bar
+                    Row(
+                      children: [
+                        Text(
+                          _formatDuration(_position),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? const Color(0xFFB8AEA5)
+                                : const Color(0xFF5D4037),
+                            fontFamily: 'Tajawal',
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: SliderTheme(
-                          data: SliderThemeData(
-                            trackHeight: 3,
-                            thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 6,
+                        Expanded(
+                          child: SliderTheme(
+                            data: SliderThemeData(
+                              trackHeight: 3,
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 6,
+                              ),
+                              overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 14,
+                              ),
+                              activeTrackColor: isDark
+                                  ? const Color(0xFFC8A88A)
+                                  : const Color(0xFF8B4513),
+                              inactiveTrackColor: isDark
+                                  ? const Color(0xFF383430)
+                                  : const Color(
+                                      0xFFD4A574,
+                                    ).withValues(alpha: 0.3),
+                              thumbColor: isDark
+                                  ? const Color(0xFFC8A88A)
+                                  : const Color(0xFF8B4513),
                             ),
-                            overlayShape: const RoundSliderOverlayShape(
-                              overlayRadius: 14,
+                            child: Slider(
+                              value: _position.inSeconds.toDouble(),
+                              min: 0,
+                              max: _duration.inSeconds.toDouble() > 0
+                                  ? _duration.inSeconds.toDouble()
+                                  : 1,
+                              onChanged: (val) {
+                                _audioPlayer.seek(
+                                  Duration(seconds: val.toInt()),
+                                );
+                              },
                             ),
-                            activeTrackColor: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
-                            inactiveTrackColor: isDark
-                                ? const Color(0xFF383430)
-                                : const Color(0xFFD4A574).withValues(alpha: 0.3),
-                            thumbColor: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
-                          ),
-                          child: Slider(
-                            value: _position.inSeconds.toDouble(),
-                            min: 0,
-                            max: _duration.inSeconds.toDouble() > 0
-                                ? _duration.inSeconds.toDouble()
-                                : 1,
-                            onChanged: (val) {
-                              _audioPlayer.seek(Duration(seconds: val.toInt()));
-                            },
                           ),
                         ),
-                      ),
-                      Text(
-                        _formatDuration(_duration),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? const Color(0xFFB8AEA5) : const Color(0xFF5D4037),
-                          fontFamily: 'Tajawal',
+                        Text(
+                          _formatDuration(_duration),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? const Color(0xFFB8AEA5)
+                                : const Color(0xFF5D4037),
+                            fontFamily: 'Tajawal',
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  // Controls Panel
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Repeat Button
-                      IconButton(
-                        icon: Icon(
-                          _isRepeat
-                              ? Icons.repeat_one_on_outlined
-                              : Icons.repeat_outlined,
-                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
-                          size: 26,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isRepeat = !_isRepeat;
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 20),
-
-                      // Play/Pause Button
-                      GestureDetector(
-                        onTap: _isLoading ? null : _togglePlayPause,
-                        child: Container(
-                          width: 68,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
-                            shape: BoxShape.circle,
-                            boxShadow: isDark
-                                ? const []
-                                : const [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 4),
-                                    ),
-                                  ],
+                    // Controls Panel
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Repeat Button
+                        IconButton(
+                          icon: Icon(
+                            _isRepeat
+                                ? Icons.repeat_one_on_outlined
+                                : Icons.repeat_outlined,
+                            color: isDark
+                                ? const Color(0xFFC8A88A)
+                                : const Color(0xFF8B4513),
+                            size: 26,
                           ),
-                          child: Center(
-                            child: _isLoading
-                                ? SizedBox(
-                                    width: 28,
-                                    height: 28,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        isDark ? const Color(0xFF141312) : Colors.white,
+                          onPressed: () {
+                            setState(() {
+                              _isRepeat = !_isRepeat;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 20),
+
+                        // Play/Pause Button
+                        GestureDetector(
+                          onTap: _isLoading ? null : _togglePlayPause,
+                          child: Container(
+                            width: 68,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFFC8A88A)
+                                  : const Color(0xFF8B4513),
+                              shape: BoxShape.circle,
+                              boxShadow: isDark
+                                  ? const []
+                                  : const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
                                       ),
+                                    ],
+                            ),
+                            child: Center(
+                              child: _isLoading
+                                  ? SizedBox(
+                                      width: 28,
+                                      height: 28,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              isDark
+                                                  ? const Color(0xFF141312)
+                                                  : Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : Icon(
+                                      _isPlaying
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                      color: isDark
+                                          ? const Color(0xFF141312)
+                                          : Colors.white,
+                                      size: 40,
                                     ),
-                                  )
-                                : Icon(
-                                    _isPlaying
-                                        ? Icons.pause_rounded
-                                        : Icons.play_arrow_rounded,
-                                    color: isDark ? const Color(0xFF141312) : Colors.white,
-                                    size: 40,
-                                  ),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 20),
+                        const SizedBox(width: 20),
 
-                      // Stop Button
-                      IconButton(
-                        icon: Icon(
-                          Icons.stop_circle_outlined,
-                          color: isDark ? const Color(0xFFC8A88A) : const Color(0xFF8B4513),
-                          size: 28,
+                        // Stop Button
+                        IconButton(
+                          icon: Icon(
+                            Icons.stop_circle_outlined,
+                            color: isDark
+                                ? const Color(0xFFC8A88A)
+                                : const Color(0xFF8B4513),
+                            size: 28,
+                          ),
+                          onPressed: () {
+                            _audioPlayer.stop();
+                            setState(() {
+                              _position = Duration.zero;
+                              _isPlaying = false;
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          _audioPlayer.stop();
-                          setState(() {
-                            _position = Duration.zero;
-                            _isPlaying = false;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
